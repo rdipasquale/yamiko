@@ -1,0 +1,7 @@
+ar.edu.ungs.yamiko.ga.domain
+ar.edu.ungs.yamiko.ga.domain.impl
+ar.edu.ungs.yamiko.ga.exceptions
+ar.edu.ungs.yamiko.ga.operators
+ar.edu.ungs.yamiko.ga.operators.impl
+ar.edu.ungs.yamiko.ga.toolkit
+ar.edu.ungs.yamiko.test.gadomain
