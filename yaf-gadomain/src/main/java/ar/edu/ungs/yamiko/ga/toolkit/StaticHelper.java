@@ -45,5 +45,16 @@ public class StaticHelper {
 	public static boolean randomBit()
 	{
 		return ra.nextBoolean();
-	}	
+	}
+	
+	/**
+	 * Devuelve un número pseudoaleatorio.
+	 * @param max
+	 * @return
+	 */
+	public static double randomDouble(double max)
+	{
+		return ra.nextDouble()*max;
+	}
+	
 }

@@ -7,14 +7,22 @@ import ar.edu.ungs.yamiko.ga.domain.Individual;
  * @version 1.0
  * @created 08-Oct-2013 11:41:32 p.m.
  * @author ricardo
- * @param <T>
  */
-public interface Selector<T> {
+public interface Selector {
 
 	/**
 	 * Selecciona un individuo de una población.
 	 * @return
 	 */
-	public Individual<T> execute();
+	@SuppressWarnings("rawtypes")
+	public Individual execute();
 
+	/**
+	 * Selecciona n individuos
+	 * @param n
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public Individual execute(int n);
+	
 }
