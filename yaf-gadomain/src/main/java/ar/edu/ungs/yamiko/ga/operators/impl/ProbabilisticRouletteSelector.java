@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.ga.operators.impl;
 
+import java.util.Collections;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.operators.Selector;
@@ -22,17 +24,22 @@ public class ProbabilisticRouletteSelector implements Selector {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Individual execute() {
-		double suma=0;
-		double rou=StaticHelper.randomDouble()
-		for (int i=0;i<p.getAll().size();i++)
-		{
-			suma+=((Individual)(p.getAll().get(i))).getFitness();
-			
-		}
-	}
+		double roulette[]=buildRoulette();
+		double rou=StaticHelper.randomDouble(roulette[roulette.length-1]);
+		Arrays.bi
+	}	
 	
+	@SuppressWarnings("rawtypes")
 	private double[] buildRoulette()
 	{
 		double[] salida=new double[p.getAll().size()];
+		double suma=0;
+		for (int i=0;i<p.getAll().size();i++)
+		{
+			suma+=((Individual)(p.getAll().get(i))).getFitness();
+			salida[i]=suma;
+		}
+		return salida;
+		
 	}
 }
