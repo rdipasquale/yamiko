@@ -9,13 +9,18 @@ import ar.edu.ungs.yamiko.ga.operators.Selector;
 import ar.edu.ungs.yamiko.ga.toolkit.SearchHelper;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 
+/**
+ * Implementación de un selector por ruletas de probabilidades que trabaja sobre una población definida.
+ * @author ricardo
+ *
+ */
 public class ProbabilisticRouletteSelector implements Selector {
 
 	@SuppressWarnings("rawtypes")
 	private Population p;
 
 	public ProbabilisticRouletteSelector() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@SuppressWarnings("rawtypes")

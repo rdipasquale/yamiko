@@ -2,9 +2,20 @@ package ar.edu.ungs.yamiko.ga.toolkit;
 
 import java.util.Arrays;
 
+/**
+ * Toolkit de búsquedas
+ * @author ricardo
+ *
+ */
 public class SearchHelper {
 	    
-	    public static Integer binaryRangeSearch(final double[] array, final double value) {
+	/**
+	 * Búsqueda binaria por rango.  
+	 * @param array -> Ordenado ascendentemente
+	 * @param value -> Valor numérico menor o igual al máximo de los valores de Array
+	 * @return -> Índice del elemento más cercano (en tanto mayor o igual).
+	 */
+	 public static Integer binaryRangeSearch(final double[] array, final double value) {
 	        Integer i = null;
 	        int idx = binarySearch(array, value);
 	        if (idx < 0) {
