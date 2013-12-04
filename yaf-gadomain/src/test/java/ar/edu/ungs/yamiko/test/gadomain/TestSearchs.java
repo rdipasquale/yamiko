@@ -1,10 +1,6 @@
 package ar.edu.ungs.yamiko.test.gadomain;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 

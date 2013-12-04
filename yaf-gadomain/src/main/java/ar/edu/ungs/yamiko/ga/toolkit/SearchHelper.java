@@ -29,7 +29,7 @@ public class SearchHelper {
 
 	    private static int binarySearch(double[] a, double key) {
 	        int index = -1;
-	        if (a[0] < a[1]) {
+	        if (a[0] <= a[1]) {
 	            index = Arrays.binarySearch(a, key);
 	        }
 	        else {

@@ -21,12 +21,12 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.operators.Mutator;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetFlipMutator;
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetRandomPopulationInitializer;
-import ar.edu.ungs.yamiko.ga.operators.impl.GlobalSinglePopulation;
 
 /**
  * Casos de prueba para BitSetFlipMutator

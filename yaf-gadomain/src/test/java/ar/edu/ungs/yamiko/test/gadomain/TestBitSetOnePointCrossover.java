@@ -18,12 +18,12 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetOnePointCrossover;
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetRandomPopulationInitializer;
-import ar.edu.ungs.yamiko.ga.operators.impl.GlobalSinglePopulation;
 
 /**
  * Test Case para BitSetOnePointCrossover

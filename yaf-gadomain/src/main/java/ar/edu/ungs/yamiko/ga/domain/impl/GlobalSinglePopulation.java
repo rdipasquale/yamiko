@@ -1,4 +1,4 @@
-package ar.edu.ungs.yamiko.ga.operators.impl;
+package ar.edu.ungs.yamiko.ga.domain.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;

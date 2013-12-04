@@ -1,4 +1,6 @@
 package ar.edu.ungs.yamiko.ga.operators;
+import java.util.List;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 
 /**
@@ -23,6 +25,6 @@ public interface Selector {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	public Individual execute(int n);
+	public List<Individual> executeN(int n);
 	
 }
