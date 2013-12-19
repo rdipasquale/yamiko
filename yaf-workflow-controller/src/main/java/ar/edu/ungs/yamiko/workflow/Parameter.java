@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.workflow;
 
+import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
@@ -25,7 +26,7 @@ public class Parameter<T> {
 	private PopulationInitializer<T> populationInitializer;
 	private Repair<T> repair;
 	private Selector selector;
-	
+	private Population<T> populationInstance;
 	
 	
 	public double getMutationProbability() {
@@ -185,6 +186,15 @@ public class Parameter<T> {
 				+ populationInitializer + ", repair=" + repair + ", selector="
 				+ selector + "]";
 	}
+
+	public Population<T> getPopulationInstance() {
+		return populationInstance;
+	}
+
+	public void setPopulationInstance(Population<T> populationInstance) {
+		this.populationInstance = populationInstance;
+	}
+
 	
 	
 	
