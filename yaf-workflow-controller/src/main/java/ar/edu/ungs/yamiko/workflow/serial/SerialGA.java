@@ -37,6 +37,10 @@ public class SerialGA<T> {
 			Population<T> p=parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
 			
+			for (Individual<T> individual : p) 
+				parameter.getFitnessEvaluator().execute(individual);
+			
+			
 			
 			return null;
 			
