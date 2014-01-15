@@ -2,6 +2,7 @@ package ar.edu.ungs.yamiko.ga.operators;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.ga.domain.Population;
 
 /**
  * Operador de Selección de individuos de una población para ser sometidos a una operación genética como el crossover.
@@ -26,5 +27,12 @@ public interface Selector {
 	 */
 	@SuppressWarnings("rawtypes")
 	public List<Individual> executeN(int n);
+	
+	/**
+	 * Establece una población de trabajo
+	 * @param p
+	 */
+	@SuppressWarnings("rawtypes")
+	public void setPopulation(Population p);
 	
 }

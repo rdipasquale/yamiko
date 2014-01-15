@@ -14,6 +14,9 @@ import ar.edu.ungs.yamiko.workflow.Parameter;
 public class SerialGA<T> {
 
 		private Parameter<T> parameter;
+		private long generationNumber=0;
+		private double bestFitness=0;
+		private Individual<T> bestInd;
 
 		public SerialGA(Parameter<T> parameter) throws YamikoException{
 			super();
@@ -40,9 +43,14 @@ public class SerialGA<T> {
 			for (Individual<T> individual : p) 
 				parameter.getFitnessEvaluator().execute(individual);
 			
+			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
+			{
+				parameter.getSelector().setPopulation(p);
+				//parameter.getSelector().
+				//generationNumber++;
+			}
 			
-			
-			return null;
+			return bestInd;
 			
 		}
 	

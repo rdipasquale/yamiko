@@ -48,7 +48,7 @@ public class TestProbabilisticRouletteSelector {
 	@Test
 	public void testSelectBestInd() {
 		Selector sel=new ProbabilisticRouletteSelector();
-		((ProbabilisticRouletteSelector)sel).setP(population);
+		((ProbabilisticRouletteSelector)sel).setPopulation(population);
 		List<Individual> lista=sel.executeN(1000);
 		int iguales=0;
 		for (Individual individual : lista) {

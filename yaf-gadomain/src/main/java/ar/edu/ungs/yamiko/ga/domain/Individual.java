@@ -16,4 +16,6 @@ public interface Individual<T> {
 	public void setPhenotype(Phenotype phenotype);
 	public Double getFitness();
 	public void setFitness(Double fitness); 	
+	public long getId();
+	public void setId(long id);
 }

@@ -21,6 +21,7 @@ public class BasicIndividual<T> implements Individual<T>,Serializable {
 	private Double fitness;
 	private Genotype<T> genotype;
 	private Phenotype phenotype;
+	private long id;
 	
 	public BasicIndividual() {
 
@@ -50,6 +51,15 @@ public class BasicIndividual<T> implements Individual<T>,Serializable {
 		this.phenotype = phenotype;
 	}
 
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	
 	
 	
 	

@@ -24,7 +24,7 @@ public class ProbabilisticRouletteSelector implements Selector {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void setP(Population p) {
+	public void setPopulation(Population p) {
 		this.p = p;
 	}
 	

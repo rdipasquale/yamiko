@@ -27,7 +27,8 @@ public class Parameter<T> {
 	private Repair<T> repair;
 	private Selector selector;
 	private Population<T> populationInstance;
-	
+	private long maxGenerations;
+	private double optimalFitness;
 	
 	public double getMutationProbability() {
 		return mutationProbability;
@@ -69,23 +70,35 @@ public class Parameter<T> {
 		return selector;
 	}
 
-	public Parameter(double mutationProbability, double crossoverProbability,
-			int populationSize, AcceptEvaluator<T> acceptEvaluator,
-			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
-			IndividualValidator<T> individualValidator,
-			PopulationInitializer<T> populationInitializer, Repair<T> repair,
-			Selector selector) {
-		super();
-		this.mutationProbability = mutationProbability;
-		this.crossoverProbability = crossoverProbability;
-		this.populationSize = populationSize;
-		this.acceptEvaluator = acceptEvaluator;
-		this.fitnessEvaluator = fitnessEvaluator;
-		this.crossover = crossover;
-		this.individualValidator = individualValidator;
-		this.populationInitializer = populationInitializer;
-		this.repair = repair;
-		this.selector = selector;
+	public Population<T> getPopulationInstance() {
+		return populationInstance;
+	}
+
+	public void setPopulationInstance(Population<T> populationInstance) {
+		this.populationInstance = populationInstance;
+	}
+	
+
+	public long getMaxGenerations() {
+		return maxGenerations;
+	}
+
+	public double getOptimalFitness() {
+		return optimalFitness;
+	}
+
+	@Override
+	public String toString() {
+		return "Parameter [mutationProbability=" + mutationProbability
+				+ ", crossoverProbability=" + crossoverProbability
+				+ ", populationSize=" + populationSize + ", acceptEvaluator="
+				+ acceptEvaluator + ", fitnessEvaluator=" + fitnessEvaluator
+				+ ", crossover=" + crossover + ", individualValidator="
+				+ individualValidator + ", populationInitializer="
+				+ populationInitializer + ", repair=" + repair + ", selector="
+				+ selector + ", populationInstance=" + populationInstance
+				+ ", maxGenerations=" + maxGenerations + ", optimalFitness="
+				+ optimalFitness + "]";
 	}
 
 	@Override
@@ -106,11 +119,19 @@ public class Parameter<T> {
 				* result
 				+ ((individualValidator == null) ? 0 : individualValidator
 						.hashCode());
+		result = prime * result
+				+ (int) (maxGenerations ^ (maxGenerations >>> 32));
 		temp = Double.doubleToLongBits(mutationProbability);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(optimalFitness);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime
 				* result
 				+ ((populationInitializer == null) ? 0 : populationInitializer
+						.hashCode());
+		result = prime
+				* result
+				+ ((populationInstance == null) ? 0 : populationInstance
 						.hashCode());
 		result = prime * result + populationSize;
 		result = prime * result + ((repair == null) ? 0 : repair.hashCode());
@@ -152,13 +173,23 @@ public class Parameter<T> {
 				return false;
 		} else if (!individualValidator.equals(other.individualValidator))
 			return false;
+		if (maxGenerations != other.maxGenerations)
+			return false;
 		if (Double.doubleToLongBits(mutationProbability) != Double
 				.doubleToLongBits(other.mutationProbability))
+			return false;
+		if (Double.doubleToLongBits(optimalFitness) != Double
+				.doubleToLongBits(other.optimalFitness))
 			return false;
 		if (populationInitializer == null) {
 			if (other.populationInitializer != null)
 				return false;
 		} else if (!populationInitializer.equals(other.populationInitializer))
+			return false;
+		if (populationInstance == null) {
+			if (other.populationInstance != null)
+				return false;
+		} else if (!populationInstance.equals(other.populationInstance))
 			return false;
 		if (populationSize != other.populationSize)
 			return false;
@@ -175,27 +206,27 @@ public class Parameter<T> {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "Parameter [mutationProbability=" + mutationProbability
-				+ ", crossoverProbability=" + crossoverProbability
-				+ ", populationSize=" + populationSize + ", acceptEvaluator="
-				+ acceptEvaluator + ", fitnessEvaluator=" + fitnessEvaluator
-				+ ", crossover=" + crossover + ", individualValidator="
-				+ individualValidator + ", populationInitializer="
-				+ populationInitializer + ", repair=" + repair + ", selector="
-				+ selector + "]";
-	}
-
-	public Population<T> getPopulationInstance() {
-		return populationInstance;
-	}
-
-	public void setPopulationInstance(Population<T> populationInstance) {
+	public Parameter(double mutationProbability, double crossoverProbability,
+			int populationSize, AcceptEvaluator<T> acceptEvaluator,
+			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
+			IndividualValidator<T> individualValidator,
+			PopulationInitializer<T> populationInitializer, Repair<T> repair,
+			Selector selector, Population<T> populationInstance,
+			long maxGenerations, double optimalFitness) {
+		super();
+		this.mutationProbability = mutationProbability;
+		this.crossoverProbability = crossoverProbability;
+		this.populationSize = populationSize;
+		this.acceptEvaluator = acceptEvaluator;
+		this.fitnessEvaluator = fitnessEvaluator;
+		this.crossover = crossover;
+		this.individualValidator = individualValidator;
+		this.populationInitializer = populationInitializer;
+		this.repair = repair;
+		this.selector = selector;
 		this.populationInstance = populationInstance;
+		this.maxGenerations = maxGenerations;
+		this.optimalFitness = optimalFitness;
 	}
 
-	
-	
-	
 }
