@@ -13,7 +13,7 @@ import ar.edu.ungs.yamiko.ga.domain.Gene;
 public class StaticHelper {
 
 	private static Random ra=new Random(System.currentTimeMillis());
-	
+	private static long lastId=0L;
 	/**
 	 * Devuelve el tamaño total de un conjunto de genes.
 	 * @param col
@@ -48,13 +48,19 @@ public class StaticHelper {
 	}
 	
 	/**
-	 * Devuelve un número pseudoaleatorio.
+	 * Devuelve un número pseudoaleatorio con máximo "max".
 	 * @param max
 	 * @return
 	 */
 	public static double randomDouble(double max)
 	{
 		return ra.nextDouble()*max;
+	}
+	
+	public static synchronized long getNewId()
+	{
+			lastId++;
+			return lastId;
 	}
 	
 }

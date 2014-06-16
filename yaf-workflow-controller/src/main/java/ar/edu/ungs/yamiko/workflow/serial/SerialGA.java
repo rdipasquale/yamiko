@@ -1,5 +1,9 @@
 package ar.edu.ungs.yamiko.workflow.serial;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability;
@@ -9,6 +13,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
 public class SerialGA<T> {
@@ -35,19 +40,52 @@ public class SerialGA<T> {
 			if (parameter.getSelector()==null) throw new NullSelector() ;
 		}
 		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public Individual<T> run() throws YamikoException
 		{
 			Population<T> p=parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
 			
-			for (Individual<T> individual : p) 
-				parameter.getFitnessEvaluator().execute(individual);
 			
 			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
 			{
+				for (Individual<T> individual : p)
+					if (individual.getFitness()==null)
+					{
+						parameter.getFitnessEvaluator().execute(individual);
+						if (individual.getFitness()>bestFitness)
+						{
+							bestFitness=individual.getFitness();
+							bestInd=individual;
+						}
+					}
+
 				parameter.getSelector().setPopulation(p);
-				//parameter.getSelector().
-				//generationNumber++;
+				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
+				
+				Iterator ite=candidates.iterator();
+				while (ite.hasNext()) {
+					Individual<T> parentA=(Individual<T>)ite.next();
+					if (StaticHelper.randomDouble(1d)<=parameter.getCrossoverProbability() && ite.hasNext())
+					{
+						Individual<T> parentB=(Individual<T>)ite.next();
+						List<Individual<T>> parents=new ArrayList<Individual<T>>();
+						parents.add(parentA);
+						parents.add(parentB);
+						List<Individual<T>> children=parameter.getCrossover().execute(parents);
+						List<Individual<T>> acceptedChildren=parameter.getAcceptEvaluator().execute(children, parents);
+						for (int i=0;i<acceptedChildren.size();i++)
+							p.replaceIndividual(parents.get(i), acceptedChildren.get(i));						
+					}		
+				}
+				
+				for (Individual<T> ind : p) 
+					if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
+						parameter.getMutator().execute(ind);
+				
+				generationNumber++;
+				
+				
 			}
 			
 			return bestInd;

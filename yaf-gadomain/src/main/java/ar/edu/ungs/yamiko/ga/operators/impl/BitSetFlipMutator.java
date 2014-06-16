@@ -39,6 +39,8 @@ public class BitSetFlipMutator implements Mutator<BitSet>,Serializable{
 //			System.out.print(b);
 //		b.flip(StaticHelper.randomInt(b.length()));
 //		i.getGenotype().getChromosomes().remove(index);
-//		i.getGenotype().getChromosomes().add(index,new BasicChromosome<BitSet>(cName,b));		
+//		i.getGenotype().getChromosomes().add(index,new BasicChromosome<BitSet>(cName,b));
+		
+		i.setFitness(null);
 	}
 }

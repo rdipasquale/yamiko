@@ -95,6 +95,7 @@ public class BitsStaticHelper {
 		  cs.add(c);
 		  Genotype<BitSet> g=new BasicGenotype<BitSet>(cs);		  
 		  newBorn.setGenotype(g);
+		  newBorn.setId(StaticHelper.getNewId());
 		  return newBorn;
 	}
 	  

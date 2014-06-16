@@ -5,6 +5,7 @@ import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.IndividualValidator;
+import ar.edu.ungs.yamiko.ga.operators.Mutator;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.Repair;
 import ar.edu.ungs.yamiko.ga.operators.Selector;
@@ -22,6 +23,7 @@ public class Parameter<T> {
 	private AcceptEvaluator<T> acceptEvaluator;
 	private FitnessEvaluator<T> fitnessEvaluator;
 	private Crossover<T> crossover;
+	private Mutator<T> mutator;
 	private IndividualValidator<T> individualValidator;
 	private PopulationInitializer<T> populationInitializer;
 	private Repair<T> repair;
@@ -206,10 +208,67 @@ public class Parameter<T> {
 		return true;
 	}
 
+	public Mutator<T> getMutator() {
+		return mutator;
+	}
+
+	public void setMutator(Mutator<T> mutator) {
+		this.mutator = mutator;
+	}
+
+	public void setMutationProbability(double mutationProbability) {
+		this.mutationProbability = mutationProbability;
+	}
+
+	public void setCrossoverProbability(double crossoverProbability) {
+		this.crossoverProbability = crossoverProbability;
+	}
+
+	public void setPopulationSize(int populationSize) {
+		this.populationSize = populationSize;
+	}
+
+	public void setAcceptEvaluator(AcceptEvaluator<T> acceptEvaluator) {
+		this.acceptEvaluator = acceptEvaluator;
+	}
+
+	public void setFitnessEvaluator(FitnessEvaluator<T> fitnessEvaluator) {
+		this.fitnessEvaluator = fitnessEvaluator;
+	}
+
+	public void setCrossover(Crossover<T> crossover) {
+		this.crossover = crossover;
+	}
+
+	public void setIndividualValidator(IndividualValidator<T> individualValidator) {
+		this.individualValidator = individualValidator;
+	}
+
+	public void setPopulationInitializer(
+			PopulationInitializer<T> populationInitializer) {
+		this.populationInitializer = populationInitializer;
+	}
+
+	public void setRepair(Repair<T> repair) {
+		this.repair = repair;
+	}
+
+	public void setSelector(Selector selector) {
+		this.selector = selector;
+	}
+
+	public void setMaxGenerations(long maxGenerations) {
+		this.maxGenerations = maxGenerations;
+	}
+
+	public void setOptimalFitness(double optimalFitness) {
+		this.optimalFitness = optimalFitness;
+	}
+
 	public Parameter(double mutationProbability, double crossoverProbability,
 			int populationSize, AcceptEvaluator<T> acceptEvaluator,
 			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
-			IndividualValidator<T> individualValidator,
+			Mutator<T> mutator, IndividualValidator<T> individualValidator,
 			PopulationInitializer<T> populationInitializer, Repair<T> repair,
 			Selector selector, Population<T> populationInstance,
 			long maxGenerations, double optimalFitness) {
@@ -220,6 +279,7 @@ public class Parameter<T> {
 		this.acceptEvaluator = acceptEvaluator;
 		this.fitnessEvaluator = fitnessEvaluator;
 		this.crossover = crossover;
+		this.mutator = mutator;
 		this.individualValidator = individualValidator;
 		this.populationInitializer = populationInitializer;
 		this.repair = repair;
@@ -229,4 +289,7 @@ public class Parameter<T> {
 		this.optimalFitness = optimalFitness;
 	}
 
+	
+
+	
 }
