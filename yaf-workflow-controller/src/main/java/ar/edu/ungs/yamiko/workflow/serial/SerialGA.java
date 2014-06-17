@@ -13,6 +13,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
@@ -52,7 +53,8 @@ public class SerialGA<T> {
 				for (Individual<T> individual : p)
 					if (individual.getFitness()==null)
 					{
-						parameter.getFitnessEvaluator().execute(individual);
+						parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);
+						individual.setFitness(parameter.getFitnessEvaluator().execute(individual));
 						if (individual.getFitness()>bestFitness)
 						{
 							bestFitness=individual.getFitness();
@@ -85,11 +87,15 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
+				if (Math.IEEEremainder(generationNumber,1000)==0) System.out.println("Generation " + generationNumber);
+				
 				
 			}
 			
 			return bestInd;
 			
 		}
+		
+		
 	
 }

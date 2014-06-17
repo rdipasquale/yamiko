@@ -1,10 +1,12 @@
 package ar.edu.ungs.yamiko.workflow;
 
+import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.IndividualValidator;
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 import ar.edu.ungs.yamiko.ga.operators.Mutator;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.Repair;
@@ -19,7 +21,7 @@ public class Parameter<T> {
 
 	private double mutationProbability;
 	private double crossoverProbability;
-	private int populationSize;
+	private long populationSize;
 	private AcceptEvaluator<T> acceptEvaluator;
 	private FitnessEvaluator<T> fitnessEvaluator;
 	private Crossover<T> crossover;
@@ -31,6 +33,8 @@ public class Parameter<T> {
 	private Population<T> populationInstance;
 	private long maxGenerations;
 	private double optimalFitness;
+	private MorphogenesisAgent<T> morphogenesisAgent;
+	private Genome<T> genome;
 	
 	public double getMutationProbability() {
 		return mutationProbability;
@@ -40,7 +44,7 @@ public class Parameter<T> {
 		return crossoverProbability;
 	}
 
-	public int getPopulationSize() {
+	public long getPopulationSize() {
 		return populationSize;
 	}
 
@@ -135,7 +139,6 @@ public class Parameter<T> {
 				* result
 				+ ((populationInstance == null) ? 0 : populationInstance
 						.hashCode());
-		result = prime * result + populationSize;
 		result = prime * result + ((repair == null) ? 0 : repair.hashCode());
 		result = prime * result
 				+ ((selector == null) ? 0 : selector.hashCode());
@@ -266,12 +269,12 @@ public class Parameter<T> {
 	}
 
 	public Parameter(double mutationProbability, double crossoverProbability,
-			int populationSize, AcceptEvaluator<T> acceptEvaluator,
+			long populationSize, AcceptEvaluator<T> acceptEvaluator,
 			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
 			Mutator<T> mutator, IndividualValidator<T> individualValidator,
 			PopulationInitializer<T> populationInitializer, Repair<T> repair,
 			Selector selector, Population<T> populationInstance,
-			long maxGenerations, double optimalFitness) {
+			long maxGenerations, double optimalFitness,MorphogenesisAgent<T> morp,Genome<T> genome) {
 		super();
 		this.mutationProbability = mutationProbability;
 		this.crossoverProbability = crossoverProbability;
@@ -287,8 +290,29 @@ public class Parameter<T> {
 		this.populationInstance = populationInstance;
 		this.maxGenerations = maxGenerations;
 		this.optimalFitness = optimalFitness;
+		this.populationInstance.setSize(populationSize);
+		this.morphogenesisAgent=morp;
+		this.genome=genome;
 	}
 
+	public MorphogenesisAgent<T> getMorphogenesisAgent() {
+		return morphogenesisAgent;
+	}
+
+	public void setMorphogenesisAgent(MorphogenesisAgent<T> morphogenesisAgent) {
+		this.morphogenesisAgent = morphogenesisAgent;
+	}
+
+	public Genome<T> getGenome() {
+		return genome;
+	}
+
+	public void setGenome(Genome<T> genome) {
+		this.genome = genome;
+	}
+
+	
+	
 	
 
 	

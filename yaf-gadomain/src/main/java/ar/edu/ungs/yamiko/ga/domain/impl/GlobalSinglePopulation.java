@@ -25,6 +25,12 @@ public class GlobalSinglePopulation<T> implements Population<T>{
 		pop=new ArrayList<Individual<T>>();
 	}
 	
+	public GlobalSinglePopulation(Genome<T> g,long fixedSize) {
+		genome=g;
+		pop=new ArrayList<Individual<T>>();
+		size=fixedSize;
+	}	
+	
 	@Override
 	public void setSize(Long _size) {
 		size=_size;		
