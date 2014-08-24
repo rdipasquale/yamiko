@@ -13,7 +13,6 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
-import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
