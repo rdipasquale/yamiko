@@ -9,6 +9,19 @@ import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 
 public class CensusFitnessEvaluator implements FitnessEvaluator<BitSet>{
 
+	private static final double W1=0.6;
+	private static final double W2=0.4;
+	
+	private CensusFormulaCountHolder countHolder;
+
+	public CensusFormulaCountHolder getCountHolder() {
+		return countHolder;
+	}
+
+	public void setCountHolder(CensusFormulaCountHolder countHolder) {
+		this.countHolder = countHolder;
+	}
+
 	@Override
 	public double execute(Individual<BitSet> i) {
 		
