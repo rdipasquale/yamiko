@@ -1,6 +1,6 @@
 package ar.edu.ungs.garules;
 
-public class Contants {
+public class Constants {
 
 	public static enum CENSUS_FIELDS{
 		OC,SEX,AGE,HISPAN ,WHITE ,

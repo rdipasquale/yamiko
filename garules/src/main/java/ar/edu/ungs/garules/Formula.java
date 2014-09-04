@@ -36,7 +36,8 @@ public class Formula {
 		this.valor = valor;
 	}
 	public String getStrCampo() {
-		return null;
+		if (campo==null) return null;
+		return Constants.CENSUS_FIELDS_DESCRIPTIONS[campo];
 	}
 
 	public String getStrOperador() {
