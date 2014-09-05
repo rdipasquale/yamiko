@@ -77,7 +77,7 @@ public class CensusJob {
 	      
 	    public void map(Object key, Text value, Context context
 	                    ) throws IOException, InterruptedException {
-	      StringTokenizer itr = new StringTokenizer(value.toString());
+	      Integer[] rec=RecordAdaptor.adapt(value.toString());
 	      while (itr.hasMoreTokens()) {
 	        word.set(itr.nextToken());
 	        context.write(word, one);
@@ -179,6 +179,7 @@ public class CensusJob {
 	        job.setReducerClass(CensusReducer.class);
 	        job.setOutputKeyClass(Text.class);
 	        job.setOutputValueClass(IntWritable.class);
+	        
 	        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 	        job.waitForCompletion(true);
