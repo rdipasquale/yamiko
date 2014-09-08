@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,10 +78,14 @@ public class CensusJob {
 	      
 	    public void map(Object key, Text value, Context context
 	                    ) throws IOException, InterruptedException {
-	      Integer[] rec=RecordAdaptor.adapt(value.toString());
-	      while (itr.hasMoreTokens()) {
-	        word.set(itr.nextToken());
-	        context.write(word, one);
+	      
+	    	Integer[] rec=RecordAdaptor.adapt(value.toString());
+	    	
+	    	
+
+	    	while (itr.hasMoreTokens()) {
+	    		word.set(itr.nextToken());
+	    		context.write(word, one);
 	        
       }
     }
@@ -115,7 +120,6 @@ public class CensusJob {
 
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
-	    Configuration conf = new Configuration();
 	    String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 	    if (otherArgs.length != 2) {
 	    	otherArgs=new String[]{"/home/ricardo/hadoop/LICENSE.txt","hdfs://localhost:9000/salida"};
@@ -172,6 +176,17 @@ public class CensusJob {
 	    	 * Aca hay que armar el conjunto de condiciones y predicciones que los mappers deberán evaluar en el archivo del censo....
 	    	 */
 	    	
+		    Configuration conf = new Configuration();
+		    
+		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
+		    int contador=0;
+		    while (ite.hasNext())
+		    {
+		    	Individual<BitSet> ind=ite.next();
+		    	conf.set(String.valueOf(contador), RuleStringAdaptor.adapt(RuleAdaptor.adapt(ind)));
+		    	contador++;
+		    }
+		    
 	        Job job = new Job(conf, "GA rules - Generation " + i);
 	        job.setJarByClass(CensusJob.class);
 	        job.setMapperClass(CensusMapper.class);
@@ -179,6 +194,7 @@ public class CensusJob {
 	        job.setReducerClass(CensusReducer.class);
 	        job.setOutputKeyClass(Text.class);
 	        job.setOutputValueClass(IntWritable.class);
+	        
 	        
 	        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
