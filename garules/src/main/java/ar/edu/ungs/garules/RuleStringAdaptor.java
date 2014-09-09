@@ -6,8 +6,9 @@ public class RuleStringAdaptor {
 	{
 		String salida="";
 		if (r==null) return null;
-		for (Formula c : r.getCondiciones()) salida+=c.toString()+"|";
-		salida+=r.getPrediccion().toString();
+		for (Formula c : r.getCondiciones()) salida+=c.getCampo()+c.getStrOperador()+c.getValor()+"|";
+		salida=salida.substring(0,salida.length()-1);
+		salida+="/"+r.getPrediccion().getCampo()+r.getPrediccion().getStrOperador()+r.getPrediccion().getValor();
 		return salida;
 	}
 }

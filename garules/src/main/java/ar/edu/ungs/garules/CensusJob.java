@@ -37,7 +37,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
@@ -74,21 +73,83 @@ public class CensusJob {
 		 */
     
 	    private final static IntWritable one = new IntWritable(1);
-	    private Text word = new Text();
 	      
-	    public void map(Object key, Text value, Context context
-	                    ) throws IOException, InterruptedException {
+	    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 	      
 	    	Integer[] rec=RecordAdaptor.adapt(value.toString());
 	    	
-	    	
+	    	String ruleNr="1";
+	    	int iRuleNr=1;
+	    	while (context.getConfiguration().get(ruleNr)!=null)
+	    	{
+		    	StringTokenizer st=new StringTokenizer(context.getConfiguration().get(ruleNr), "/");
+		    	String cond=st.nextToken();
+		    	String pred=st.nextToken();
+		    	
+		    	st=new StringTokenizer(cond,"|");
+		    	boolean flag=true;
+		    	while (st.hasMoreElements() && flag)
+		    	{		    		
+		    		String cn=st.nextToken();
+		    		if (getOperador(cn).equals("="))
+		    			flag=(rec[Integer.parseInt(getCampo(cn))]==Integer.parseInt(getValor(cn)));
+		    		if (getOperador(cn).equals("<"))
+		    			flag=(rec[Integer.parseInt(getCampo(cn))]<Integer.parseInt(getValor(cn)));
+		    		if (getOperador(cn).equals(">"))
+		    			flag=(rec[Integer.parseInt(getCampo(cn))]>Integer.parseInt(getValor(cn)));
+		    		if (getOperador(cn).equals("!="))
+		    			flag=(rec[Integer.parseInt(getCampo(cn))]!=Integer.parseInt(getValor(cn)));		    		
+		    	}
+		    	
+		    	if (flag)
+		    	{
+			    	Text word = new Text(cond);
+			    	context.write(word, one);		    		
+		    	}
+			    
+		    	flag=false;
+	    		if (getOperador(pred).equals("="))
+	    			flag=(rec[Integer.parseInt(getCampo(pred))]==Integer.parseInt(getValor(pred)));
+	    		if (getOperador(pred).equals("<"))
+	    			flag=(rec[Integer.parseInt(getCampo(pred))]<Integer.parseInt(getValor(pred)));
+	    		if (getOperador(pred).equals(">"))
+	    			flag=(rec[Integer.parseInt(getCampo(pred))]>Integer.parseInt(getValor(pred)));
+	    		if (getOperador(pred).equals("!="))
+	    			flag=(rec[Integer.parseInt(getCampo(pred))]!=Integer.parseInt(getValor(pred)));		    		
 
-	    	while (itr.hasMoreTokens()) {
-	    		word.set(itr.nextToken());
-	    		context.write(word, one);
-	        
-      }
-    }
+		    	if (flag)
+		    	{
+			    	Text word = new Text(pred);
+			    	context.write(word, one);		    		
+		    	}
+
+		    	iRuleNr++;
+		    	ruleNr=String.valueOf(iRuleNr);
+	    		
+	    	}
+	    	
+	    }
+	    
+	    private String getCampo(String s)
+	    {
+	    	String op=getOperador(s);
+	    	return s.substring(0,s.indexOf(op));
+	    }
+	    
+	    private String getOperador(String s)
+	    {
+	    	if (s.contains("=")) return "=";
+	    	if (s.contains("<")) return "<";
+	    	if (s.contains(">")) return ">";
+	    	if (s.contains("!=")) return "!=";
+	    	return null;
+	    }
+	    
+	    private String getValor(String s)
+	    {
+	    	String op=getOperador(s);
+	    	return s.substring(s.indexOf(op)+1,s.length()-1);	    	
+	    }	    
   }
   
 	/**
@@ -120,9 +181,8 @@ public class CensusJob {
 
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
-	    String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-	    if (otherArgs.length != 2) {
-	    	otherArgs=new String[]{"/home/ricardo/hadoop/LICENSE.txt","hdfs://localhost:9000/salida"};
+	    if (args.length != 2) {
+	    	args=new String[]{"/home/ricardo/hadoop/LICENSE.txt","hdfs://localhost:9000/salida"};
 	    }
 	    
 	    // Preparacion del GA
@@ -196,8 +256,8 @@ public class CensusJob {
 	        job.setOutputValueClass(IntWritable.class);
 	        
 	        
-	        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
-	        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+	        FileInputFormat.addInputPath(job, new Path(args[0]));
+	        FileOutputFormat.setOutputPath(job, new Path(args[1]));
 	        job.waitForCompletion(true);
 	        
 	        /* TODO
