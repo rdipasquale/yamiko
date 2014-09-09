@@ -50,7 +50,10 @@ public class ParallelFitnessEvaluationGA<T> {
 		public void init()
 		{
 			p=parameter.getPopulationInstance();
-			parameter.getPopulationInitializer().execute(p);			
+			parameter.getPopulationInitializer().execute(p);
+			for (Individual<T> individual : p) {
+				parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);	
+			}			
 		}
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
