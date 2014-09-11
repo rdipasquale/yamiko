@@ -1,5 +1,8 @@
 package ar.edu.ungs.garules;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constants {
 
 	public static enum CENSUS_FIELDS{
@@ -36,6 +39,39 @@ public class Constants {
 		INCOTH ,INCTOT ,
 		EARNS ,POVERTY
 	}
+	public static final Map<Integer,String[]> CENSUS_FIELDS_VALUES=new HashMap<Integer, String[]>()
+			{
+				private static final long serialVersionUID = 1L;
+			{
+			     put(CENSUS_FIELDS.OC.ordinal(), new String[]{"No","Yes"});
+			     put(CENSUS_FIELDS.SEX.ordinal(), new String[]{null,"Male","Female"});
+			     put(CENSUS_FIELDS.AGE.ordinal(), null);
+			     put(CENSUS_FIELDS.HISPAN.ordinal(), new String[]{null,"Not Hispanic or Latino",
+			    	 "Mexican",
+			    	 "Puerto Rican",
+			    	 "Cuban",
+			    	 "Dominican",
+			    	 "Costa Rican",
+			    	 "Guatemalan",
+			    	 "Honduran",
+			    	 "Nicaraguan",
+			    	 "Panamanian",
+			    	 "Salvadoran",
+			    	 "Other Central American",
+			    	 "Argentinean",
+			    	 "Bolivian",
+			    	 "Chilean",
+			    	 "Colombian",
+			    	 "Ecuadorian",
+			    	 null,
+			    	 "Peruvian",
+			    	 "Uruguayan",
+			    	 "Venezuelan",
+			    	 "Other South American",
+			    	 "Spaniard",
+			    	 "Other Spanish or Latino"});
+			     
+			}};
 	
 	public static final String[] CENSUS_FIELDS_DESCRIPTIONS=new String[]{
 		"Own Child Indicator","Sex","Age","Hispanic or Latino Origin","White recode",

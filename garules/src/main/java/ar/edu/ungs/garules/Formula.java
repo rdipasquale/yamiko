@@ -46,7 +46,7 @@ public class Formula {
 	}
 
 	public String getStrValor() {
-		return null;
+		return String.valueOf(valor);
 	}
 
 	

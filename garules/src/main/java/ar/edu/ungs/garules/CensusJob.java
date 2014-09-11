@@ -38,10 +38,12 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+import ar.edu.ungs.yamiko.ga.domain.Chromosome;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Ribosome;
+import ar.edu.ungs.yamiko.ga.domain.impl.BasicChromosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome;
@@ -56,7 +58,22 @@ import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.parallel.hadoop2.ParallelFitnessEvaluationGA;
 
 public class CensusJob {
-
+	
+	public static final Gene genCondicionACampo=new BasicGene("Condicion A - Campo", 0, 8);
+	public static final Gene genCondicionAOperador=new BasicGene("Condicion A - Operador", 8, 2);
+	public static final Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 8);
+	public static final Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 18, 1);
+	public static final Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 19, 8);
+	public static final Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 27, 2);
+	public static final Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 29, 8);
+	public static final Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 37, 1);
+	public static final Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 38, 8);
+	public static final Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 46, 2);
+	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 48, 8);
+	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 56, 8);
+	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 64, 8);
+	public static final Chromosome<BitSet> chromosome=new BasicChromosome<BitSet>("A");
+			
 	/**
 	 * Mapper del CensusJob 
 	 * @author ricardo
@@ -64,15 +81,7 @@ public class CensusJob {
 	 */
 	public static class CensusMapper extends Mapper<Object, Text, Text, IntWritable>{
 		
-		/**
-		 * TODO 
-		 * Implementar.... Es una copia del mapper del wordcount...
-		 * Deberiamos ver si podemos sacar los mappers a otras clases, se va a hacer muy larga la clase CensusJob
-		 * Debe recibir como parametro el conjunto de condiciones y predicciones que debe evaluar, por otro lado lee cada registro del archivo del censo,
-		 *  y evaluar cada condicion/prediccion emitiendo una clave valor (formula , 1) por cada ocurrencia.
-		 */
-    
-	    private final static IntWritable one = new IntWritable(1);
+		private final static IntWritable one = new IntWritable(1);
 	      
 	    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 	      
@@ -188,19 +197,6 @@ public class CensusJob {
 	    // Preparacion del GA
 	    Set<Individual<BitSet>> bestIndividuals=new HashSet<Individual<BitSet>>();
 		List<Gene> genes=new ArrayList<Gene>();
-		Gene genCondicionACampo=new BasicGene("Condicion A - Campo", 0, 8);
-		Gene genCondicionAOperador=new BasicGene("Condicion A - Operador", 8, 2);
-		Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 8);
-		Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 18, 1);
-		Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 19, 8);
-		Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 27, 2);
-		Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 29, 8);
-		Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 37, 1);
-		Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 38, 8);
-		Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 46, 2);
-		Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 48, 8);
-		Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 56, 8);
-		Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 64, 8);
 		genes.add(genCondicionACampo);
 		genes.add(genCondicionAOperador);
 		genes.add(genCondicionAValor);
@@ -218,7 +214,7 @@ public class CensusJob {
 		Map<Gene,Ribosome<BitSet>> translators=new HashMap<Gene,Ribosome<BitSet>>();
 		for (Gene gene : genes) translators.put(gene, new BitSetToIntegerRibosome(0));
 		
-		Genome<BitSet> genome=new BitSetGenome("A", genes, translators);
+		Genome<BitSet> genome=new BitSetGenome(chromosome.name(), genes, translators);
 		
 	    Parameter<BitSet> par=	new Parameter<BitSet>(0.035, 0.9, 200, new DescendantAcceptEvaluator<BitSet>(), 
 	    						new CensusFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
