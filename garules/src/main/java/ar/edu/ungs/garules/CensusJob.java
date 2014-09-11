@@ -38,12 +38,10 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import ar.edu.ungs.yamiko.ga.domain.Chromosome;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Ribosome;
-import ar.edu.ungs.yamiko.ga.domain.impl.BasicChromosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome;
@@ -61,18 +59,18 @@ public class CensusJob {
 	
 	public static final Gene genCondicionACampo=new BasicGene("Condicion A - Campo", 0, 8);
 	public static final Gene genCondicionAOperador=new BasicGene("Condicion A - Operador", 8, 2);
-	public static final Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 8);
-	public static final Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 18, 1);
-	public static final Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 19, 8);
-	public static final Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 27, 2);
-	public static final Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 29, 8);
-	public static final Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 37, 1);
-	public static final Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 38, 8);
-	public static final Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 46, 2);
-	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 48, 8);
-	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 56, 8);
-	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 64, 8);
-	public static final Chromosome<BitSet> chromosome=new BasicChromosome<BitSet>("A");
+	public static final Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 11);
+	public static final Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 21, 1);
+	public static final Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 22, 8);
+	public static final Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 30, 2);
+	public static final Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 32, 11);
+	public static final Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 43, 1);
+	public static final Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 44, 8);
+	public static final Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 52, 2);
+	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 54, 11);
+	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 65, 8);
+	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 73, 11);
+
 			
 	/**
 	 * Mapper del CensusJob 
@@ -94,6 +92,7 @@ public class CensusJob {
 		    	StringTokenizer st=new StringTokenizer(context.getConfiguration().get(ruleNr), "/");
 		    	String cond=st.nextToken();
 		    	String pred=st.nextToken();
+		    	
 		    	
 		    	st=new StringTokenizer(cond,"|");
 		    	boolean flag=true;
@@ -214,7 +213,7 @@ public class CensusJob {
 		Map<Gene,Ribosome<BitSet>> translators=new HashMap<Gene,Ribosome<BitSet>>();
 		for (Gene gene : genes) translators.put(gene, new BitSetToIntegerRibosome(0));
 		
-		Genome<BitSet> genome=new BitSetGenome(chromosome.name(), genes, translators);
+		Genome<BitSet> genome=new BitSetGenome("Chromosome 1", genes, translators);
 		
 	    Parameter<BitSet> par=	new Parameter<BitSet>(0.035, 0.9, 200, new DescendantAcceptEvaluator<BitSet>(), 
 	    						new CensusFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
