@@ -59,17 +59,17 @@ public class CensusJob {
 	
 	public static final Gene genCondicionACampo=new BasicGene("Condicion A - Campo", 0, 8);
 	public static final Gene genCondicionAOperador=new BasicGene("Condicion A - Operador", 8, 2);
-	public static final Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 11);
-	public static final Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 21, 1);
-	public static final Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 22, 8);
-	public static final Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 30, 2);
-	public static final Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 32, 11);
-	public static final Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 43, 1);
-	public static final Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 44, 8);
-	public static final Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 52, 2);
-	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 54, 11);
-	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 65, 8);
-	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 73, 11);
+	public static final Gene genCondicionAValor=new BasicGene("Condicion A - Valor", 10, 12);
+	public static final Gene genCondicionBPresente=new BasicGene("Condicion B - Presente", 22, 1);
+	public static final Gene genCondicionBCampo=new BasicGene("Condicion B - Campo", 23, 8);
+	public static final Gene genCondicionBOperador=new BasicGene("Condicion B - Operador", 31, 2);
+	public static final Gene genCondicionBValor=new BasicGene("Condicion B - Valor", 33, 12);
+	public static final Gene genCondicionCPresente=new BasicGene("Condicion C - Presente", 45, 1);
+	public static final Gene genCondicionCCampo=new BasicGene("Condicion C - Campo", 46, 8);
+	public static final Gene genCondicionCOperador=new BasicGene("Condicion C - Operador", 54, 2);
+	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 56, 12);
+	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 68, 8);
+	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 76, 12);
 
 			
 	/**

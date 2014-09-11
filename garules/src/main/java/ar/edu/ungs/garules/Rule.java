@@ -55,7 +55,7 @@ public class Rule {
 		String salida="IF (";
 		for (Formula formula : condiciones) 
 			salida+=formula+" AND ";
-		salida=salida.substring(salida.length()-4, salida.length())+") THEN ";
+		salida=salida.substring(0,salida.length()-4)+") THEN ";
 		salida+=prediccion;
 		return salida;
 	}

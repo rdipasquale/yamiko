@@ -1,5 +1,6 @@
 package ar.edu.ungs.garules;
 
+
 public class Formula {
 	
 	public final static Integer OP_IGUAL=0;
@@ -46,7 +47,14 @@ public class Formula {
 	}
 
 	public String getStrValor() {
-		return String.valueOf(valor);
+		String[] valores= Constants.CENSUS_FIELDS_VALUES.get(campo);
+		if (valores==null)
+			return String.valueOf(valor);		
+		else 
+			if (valor>=valores.length)
+				return "INVALID VALUE";
+			else
+				return valores[valor];
 	}
 
 	

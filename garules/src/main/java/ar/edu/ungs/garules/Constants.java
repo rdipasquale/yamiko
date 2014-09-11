@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {
+	public static final int[] CENSUS_FIELDS_MAX_VALUE=new int[]{
+		2,2,91,25,2,2,2,2,2,2,6,4,8,17,3,3,555,6,2001,4,555,3,3,3,3,3,3,3,3,6,5,2,2,2,2,2,2,2,2,2,3,
+		16,7,9,556,13,7,169,121,4,4,4,4,5,3,998,998,10,3,53,100,176,127,51,19,14,13,53,38,5001,311,502
+	};
 
 	public static enum CENSUS_FIELDS{
 		OC,SEX,AGE,HISPAN ,WHITE ,
