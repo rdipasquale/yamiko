@@ -68,6 +68,12 @@ public class BasicGene implements Serializable,Gene{
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "BasicGene [size=" + size + ", loci=" + loci + ", name=" + name
+				+ "]";
+	}
+
 	
 	
 }
