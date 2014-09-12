@@ -83,58 +83,77 @@ public class CensusJob {
 	      
 	    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 	      
-	    	Integer[] rec=RecordAdaptor.adapt(value.toString());
-	    	
-	    	String ruleNr="1";
-	    	int iRuleNr=1;
-	    	while (context.getConfiguration().get(ruleNr)!=null)
-	    	{
-		    	StringTokenizer st=new StringTokenizer(context.getConfiguration().get(ruleNr), "/");
-		    	String cond=st.nextToken();
-		    	String pred=st.nextToken();
-		    	
-		    	
-		    	st=new StringTokenizer(cond,"|");
-		    	boolean flag=true;
-		    	while (st.hasMoreElements() && flag)
-		    	{		    		
-		    		String cn=st.nextToken();
-		    		if (getOperador(cn).equals("="))
-		    			flag=(rec[Integer.parseInt(getCampo(cn))]==Integer.parseInt(getValor(cn)));
-		    		if (getOperador(cn).equals("<"))
-		    			flag=(rec[Integer.parseInt(getCampo(cn))]<Integer.parseInt(getValor(cn)));
-		    		if (getOperador(cn).equals(">"))
-		    			flag=(rec[Integer.parseInt(getCampo(cn))]>Integer.parseInt(getValor(cn)));
-		    		if (getOperador(cn).equals("!="))
-		    			flag=(rec[Integer.parseInt(getCampo(cn))]!=Integer.parseInt(getValor(cn)));		    		
-		    	}
-		    	
-		    	if (flag)
-		    	{
-			    	Text word = new Text(cond);
-			    	context.write(word, one);		    		
-		    	}
-			    
-		    	flag=false;
-	    		if (getOperador(pred).equals("="))
-	    			flag=(rec[Integer.parseInt(getCampo(pred))]==Integer.parseInt(getValor(pred)));
-	    		if (getOperador(pred).equals("<"))
-	    			flag=(rec[Integer.parseInt(getCampo(pred))]<Integer.parseInt(getValor(pred)));
-	    		if (getOperador(pred).equals(">"))
-	    			flag=(rec[Integer.parseInt(getCampo(pred))]>Integer.parseInt(getValor(pred)));
-	    		if (getOperador(pred).equals("!="))
-	    			flag=(rec[Integer.parseInt(getCampo(pred))]!=Integer.parseInt(getValor(pred)));		    		
+	    	try {
+				if (value.getLength()==0) return;
+				if (value.charAt(0)=='H') return; // Home record
+				
+				Integer[] rec=null;
+				try {
+					rec = RecordAdaptor.adapt(value.toString());
+				} catch (Exception e) {
+					// TODO Catch Error formato
+					System.out.println("Error decodificando registro " + value.toString());
+					return;
+				}
+				
+				//Debug
+//			for (int nn=0;nn<Constants.CENSUS_FIELDS.values().length;nn++)
+//				System.out.println(Constants.CENSUS_FIELDS_DESCRIPTIONS[nn] + "="+ rec[nn]);
+				
+				String ruleNr="1";
+				int iRuleNr=1;
+				while (context.getConfiguration().get(ruleNr)!=null)
+				{
+					StringTokenizer st=new StringTokenizer(context.getConfiguration().get(ruleNr), "/");
+					String cond=st.nextToken();
+					String pred=st.nextToken();
+					
+					
+					st=new StringTokenizer(cond,"|");
+					boolean flag=true;
+					while (st.hasMoreElements() && flag)
+					{		    		
+						String cn=st.nextToken();
+						if (getOperador(cn).equals("="))
+							flag=(rec[Integer.parseInt(getCampo(cn))]==Integer.parseInt(getValor(cn)));
+						if (getOperador(cn).equals("<"))
+							flag=(rec[Integer.parseInt(getCampo(cn))]<Integer.parseInt(getValor(cn)));
+						if (getOperador(cn).equals(">"))
+							flag=(rec[Integer.parseInt(getCampo(cn))]>Integer.parseInt(getValor(cn)));
+						if (getOperador(cn).equals("!="))
+							flag=(rec[Integer.parseInt(getCampo(cn))]!=Integer.parseInt(getValor(cn)));		    		
+					}
+					
+					if (flag)
+					{
+				    	Text word = new Text(cond);
+				    	context.write(word, one);		    		
+					}
+				    
+					flag=false;
+					if (getOperador(pred).equals("="))
+						flag=(rec[Integer.parseInt(getCampo(pred))]==Integer.parseInt(getValor(pred)));
+					if (getOperador(pred).equals("<"))
+						flag=(rec[Integer.parseInt(getCampo(pred))]<Integer.parseInt(getValor(pred)));
+					if (getOperador(pred).equals(">"))
+						flag=(rec[Integer.parseInt(getCampo(pred))]>Integer.parseInt(getValor(pred)));
+					if (getOperador(pred).equals("!="))
+						flag=(rec[Integer.parseInt(getCampo(pred))]!=Integer.parseInt(getValor(pred)));		    		
 
-		    	if (flag)
-		    	{
-			    	Text word = new Text(pred);
-			    	context.write(word, one);		    		
-		    	}
+					if (flag)
+					{
+				    	Text word = new Text(pred);
+				    	context.write(word, one);		    		
+					}
 
-		    	iRuleNr++;
-		    	ruleNr=String.valueOf(iRuleNr);
-	    		
-	    	}
+					iRuleNr++;
+					ruleNr=String.valueOf(iRuleNr);
+					
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    	
 	    }
 	    
@@ -145,18 +164,18 @@ public class CensusJob {
 	    }
 	    
 	    private String getOperador(String s)
-	    {
+	    {	    	
+	    	if (s.contains("!=")) return "!=";
 	    	if (s.contains("=")) return "=";
 	    	if (s.contains("<")) return "<";
 	    	if (s.contains(">")) return ">";
-	    	if (s.contains("!=")) return "!=";
 	    	return null;
 	    }
 	    
 	    private String getValor(String s)
 	    {
 	    	String op=getOperador(s);
-	    	return s.substring(s.indexOf(op)+1,s.length()-1);	    	
+	    	return s.substring(s.indexOf(op)+op.length(),s.length());	    	
 	    }	    
   }
   
@@ -190,7 +209,7 @@ public class CensusJob {
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
 	    if (args.length != 2) {
-	    	args=new String[]{"/home/ricardo/hadoop/LICENSE.txt","hdfs://localhost:9000/salida"};
+	    	args=new String[]{"hdfs://localhost:9000/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
 	    }
 	    
 	    // Preparacion del GA
