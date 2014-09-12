@@ -29,14 +29,17 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
@@ -70,6 +73,7 @@ public class CensusJob {
 	public static final Gene genCondicionCValor=new BasicGene("Condicion C - Valor", 56, 12);
 	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 68, 8);
 	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 76, 12);
+	private static Map<String,Integer> ocurrencias=new HashMap<String, Integer>();
 
 			
 	/**
@@ -268,15 +272,17 @@ public class CensusJob {
 	        job.setReducerClass(CensusReducer.class);
 	        job.setOutputKeyClass(Text.class);
 	        job.setOutputValueClass(IntWritable.class);
-	        
+	        job.setOutputFormatClass(SequenceFileOutputFormat.class);
 	        
 	        FileInputFormat.addInputPath(job, new Path(args[0]));
-	        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+	        SequenceFileOutputFormat.setOutputPath(job, new Path(args[1]));
 	        job.waitForCompletion(true);
 	        
-	        /* TODO
+	        /* 
 	         * Aca calculamos el fitness en base a lo que arrojo el job y si hay un mejor individuo lo agregamos al set de mejores individuos....  
 	         */
+	        llenarOcurrencias(conf,args[1]);
+	        
 	        Individual<BitSet> winner= ga.run();
 	        bestIndividuals.add(winner);
 	
@@ -288,6 +294,25 @@ public class CensusJob {
 	//    	Map<Gene,Object> salida=winner.getPhenotype().getAlleleMap().values().iterator().next();    	
 	//        System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());    
 	    	
-	    }    
+	    }
   }
+
+	/**
+	 * Toma la salida del reducer del file system distribuido y la carga en el mapa "ocurrencias" en memoria
+	 * @param conf
+	 * @param path
+	 * @throws IOException
+	 */
+	private static void llenarOcurrencias(Configuration conf,String path) throws IOException
+	{
+        //FileSystem fs = FileSystem.get(conf);
+        //FileStatus[] st = fs.listStatus(new Path(args[1]));
+        SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(new Path(path+"/part-r-00000")));
+        Text key = new Text();
+        IntWritable value = new IntWritable();
+        while (reader.next(key, value)) 
+            ocurrencias.put(key.toString(), value.get());
+        reader.close();
+	}
+	
 }
