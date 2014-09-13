@@ -13,6 +13,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
@@ -51,9 +52,25 @@ public class ParallelFitnessEvaluationGA<T> {
 		{
 			p=parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
+		}
+
+		public void initGeneration()
+		{
 			for (Individual<T> individual : p) {
 				parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);	
 			}			
+		}
+		
+		/**
+		 * Sobrecarga para permitir el cambio de Evaluators sobre la marcha
+		 * @param fitnessEvaluator
+		 * @return
+		 * @throws YamikoException
+		 */
+		public Individual<T> run(FitnessEvaluator<T> fitnessEvaluator) throws YamikoException
+		{
+			parameter.setFitnessEvaluator(fitnessEvaluator);
+			return run();
 		}
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
