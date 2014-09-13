@@ -266,11 +266,11 @@ public class CensusJob {
 	        job.setOutputFormatClass(SequenceFileOutputFormat.class);
 	        
 	        FileInputFormat.addInputPath(job, new Path(args[0]));
-	        SequenceFileOutputFormat.setOutputPath(job, new Path(args[1]));
+	        SequenceFileOutputFormat.setOutputPath(job, new Path(args[1]+"g"+i));
 	        job.waitForCompletion(true);
 	        
 	        // Aca calculamos el fitness en base a lo que arrojo el job y si hay un mejor individuo lo agregamos al set de mejores individuos....  
-	        llenarOcurrencias(conf,args[1]);
+	        llenarOcurrencias(conf,args[1]+"g"+i);
 
 	        // Corremos GA para la generacion.
 	        Individual<BitSet> winnerGen= ga.run(new CensusFitnessEvaluator(ocurrencias));
