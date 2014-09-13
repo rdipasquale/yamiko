@@ -28,7 +28,8 @@ public class RuleAdaptor {
 		if (flagCondition2==1) salida.addCondition(condition2);
 		if (flagCondition3==1) salida.addCondition(condition3);
 
-		System.out.println(salida);
+		// Debug
+		//System.out.println(salida);
 		
 		return salida;
 

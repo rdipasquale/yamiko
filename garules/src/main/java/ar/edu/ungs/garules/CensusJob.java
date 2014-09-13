@@ -72,7 +72,8 @@ public class CensusJob {
 	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 68, 8);
 	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 76, 12);
 	private static Map<String,Integer> ocurrencias=new HashMap<String, Integer>();
-
+	private static final String[] DEFAULT_ARGS=new String[]{"hdfs://localhost:9000/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
+	public static final Text N_TAG=new Text("N");
 			
 	/**
 	 * Mapper del CensusJob 
@@ -93,11 +94,14 @@ public class CensusJob {
 				try {
 					rec = RecordAdaptor.adapt(value.toString());
 				} catch (Exception e) {
-					// TODO Catch Error formato
+					// Catch Error formato
 					System.out.println("Error decodificando registro " + value.toString());
 					return;
 				}
-				
+
+				//Count
+				context.write(N_TAG, one);
+
 				//Debug
 //			for (int nn=0;nn<Constants.CENSUS_FIELDS.values().length;nn++)
 //				System.out.println(Constants.CENSUS_FIELDS_DESCRIPTIONS[nn] + "="+ rec[nn]);
@@ -126,6 +130,7 @@ public class CensusJob {
 							flag=(rec[Integer.parseInt(getCampo(cn))]!=Integer.parseInt(getValor(cn)));		    		
 					}
 					
+					boolean flagCond=flag;
 					if (flag)
 					{
 				    	Text word = new Text(cond);
@@ -133,14 +138,7 @@ public class CensusJob {
 					}
 				    
 					flag=false;
-					if (getOperador(pred).equals("="))
 						flag=(rec[Integer.parseInt(getCampo(pred))]==Integer.parseInt(getValor(pred)));
-					if (getOperador(pred).equals("<"))
-						flag=(rec[Integer.parseInt(getCampo(pred))]<Integer.parseInt(getValor(pred)));
-					if (getOperador(pred).equals(">"))
-						flag=(rec[Integer.parseInt(getCampo(pred))]>Integer.parseInt(getValor(pred)));
-					if (getOperador(pred).equals("!="))
-						flag=(rec[Integer.parseInt(getCampo(pred))]!=Integer.parseInt(getValor(pred)));		    		
 
 					if (flag)
 					{
@@ -148,6 +146,10 @@ public class CensusJob {
 				    	context.write(word, one);		    		
 					}
 
+					// Si se dan las condiciones y la prediccion
+					if (flag && flagCond)
+						context.write(new Text(cond+"/"+pred), one);
+					
 					iRuleNr++;
 					ruleNr=String.valueOf(iRuleNr);
 					
@@ -182,18 +184,12 @@ public class CensusJob {
   }
   
 	/**
-	 * Reducer del Census Job
+	 * Reducer del Census Job -> Sumariza las ocurrencias de cada formula de las condiciones y predicciones
 	 * @author ricardo
 	 *
 	 */
 	public static class CensusReducer  extends Reducer<Text,IntWritable,Text,IntWritable> {
 
-		/**
-		 * TODO 
-		 * Implementar.... Es una copia del Reducer del wordcount...
-		 * Sumariza las ocurrencias de cada formula de las condiciones y predicciones
-		 */
-    
 		private IntWritable result = new IntWritable();
 
 	    public void reduce(Text key, Iterable<IntWritable> values, 
@@ -210,9 +206,9 @@ public class CensusJob {
 
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
-	    if (args.length != 2) {
-	    	args=new String[]{"hdfs://localhost:9000/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
-	    }
+
+        Individual<BitSet> bestInd=null;
+		if (args.length != 2) args=DEFAULT_ARGS;
 	    
 	    // Preparacion del GA
 	    Set<Individual<BitSet>> bestIndividuals=new HashSet<Individual<BitSet>>();
@@ -247,13 +243,10 @@ public class CensusJob {
 	
 	    for (int i=0;i<par.getMaxGenerations();i++)
 	    {
-	    	/* TODO
-	    	 * Escribo sin tildes para no tener problemas con los encodings....
-	    	 * Aca hay que armar el conjunto de condiciones y predicciones que los mappers deberán evaluar en el archivo del censo....
-	    	 */
-	    	
-		    Configuration conf = new Configuration();
-		    
+		    ga.initGeneration();
+	    	Configuration conf = new Configuration();
+
+		    // Pasamos como parámetro las condiciones a evaluar
 		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
 		    int contador=0;
 		    while (ite.hasNext())
@@ -276,21 +269,27 @@ public class CensusJob {
 	        SequenceFileOutputFormat.setOutputPath(job, new Path(args[1]));
 	        job.waitForCompletion(true);
 	        
-	        /* 
-	         * Aca calculamos el fitness en base a lo que arrojo el job y si hay un mejor individuo lo agregamos al set de mejores individuos....  
-	         */
+	        // Aca calculamos el fitness en base a lo que arrojo el job y si hay un mejor individuo lo agregamos al set de mejores individuos....  
 	        llenarOcurrencias(conf,args[1]);
+
+	        // Corremos GA para la generacion.
+	        Individual<BitSet> winnerGen= ga.run(new CensusFitnessEvaluator(ocurrencias));
+
+	        // Mantenemos los mejores individuos
+	        if (bestInd==null) 
+	        	{
+	        		bestInd=winnerGen; 
+	        		bestIndividuals.add(winnerGen); 
+	        	}
+	        else
+	        	if (winnerGen.getFitness()>bestInd.getFitness()) 
+	        	{
+	        		bestInd=winnerGen;
+	        		bestIndividuals.add(winnerGen);
+	        	}
 	        
-	        Individual<BitSet> winner= ga.run();
-	        bestIndividuals.add(winner);
-	
-	        /*
-	         * TODO
-	         * Para mostrar el mejor individuo combiene tener la lista de valores (diccionario de datos bien armado así en vez de mostrar nros, mostramos
-	         * los valores del censo....
-	         */
-	//    	Map<Gene,Object> salida=winner.getPhenotype().getAlleleMap().values().iterator().next();    	
-	//        System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());    
+	        // Debug
+	        System.out.println("Mejor Individuo Generacion " + i + " => " + RuleAdaptor.adapt(bestInd) + " => Fitness = " + bestInd.getFitness());
 	    	
 	    }
   }
