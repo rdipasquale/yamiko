@@ -1,6 +1,10 @@
 package ar.edu.ungs.garules;
 
-
+/**
+ * Formula. Entidad del modelo de dominio de Reglas. Representa una condición atómica en la que un campo es sometido a una comparación con un valor.
+ * @author ricardo
+ *
+ */
 public class Formula {
 	
 	public final static Integer OP_IGUAL=0;
@@ -11,7 +15,6 @@ public class Formula {
 	public final static String[] OPERADORES=new String[]{"=","<",">","!="};
 	
 	public Formula() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	private Integer campo;

@@ -3,10 +3,15 @@ package ar.edu.ungs.garules;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Rule. Entidad del modelo de dominio de Reglas. Representa una regla. Contiene una lista de fórmulas que representan las condiciones (conjunciones) y una fórmula 
+ * quer reresenta la predicción. Esta última siempre trabaja con el operador "igual". 
+ * @author ricardo
+ *
+ */
 public class Rule {
 
 	public Rule() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	private List<Formula> condiciones;

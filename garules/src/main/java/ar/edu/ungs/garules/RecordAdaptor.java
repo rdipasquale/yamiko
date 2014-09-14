@@ -1,7 +1,11 @@
 package ar.edu.ungs.garules;
 
-
-
+/**
+ * Adapter de Registros. Toma una línea del archivo y la convierte en un Array de enteros. Este array de enteros se conforma a partir del Enum CENSUS_FIELD declarado
+ * entre las constantes del sistema.
+ * @author ricardo
+ *
+ */
 public class RecordAdaptor {
 
 	public RecordAdaptor() {

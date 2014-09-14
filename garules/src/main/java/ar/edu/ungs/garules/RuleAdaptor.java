@@ -6,10 +6,14 @@ import java.util.Map;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 
+/**
+ * Adapter de Reglas. Toma un individuo del algoritmo genético y lo adapta a Regla. 
+ * @author ricardo
+ *
+ */
 public class RuleAdaptor {
 
 	public RuleAdaptor() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static Rule adapt(Individual<BitSet> i)
@@ -28,9 +32,6 @@ public class RuleAdaptor {
 		if (flagCondition2==1) salida.addCondition(condition2);
 		if (flagCondition3==1) salida.addCondition(condition3);
 
-		// Debug
-		//System.out.println(salida);
-		
 		return salida;
 
 	}

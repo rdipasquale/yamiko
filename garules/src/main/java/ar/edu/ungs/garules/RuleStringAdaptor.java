@@ -1,5 +1,11 @@
 package ar.edu.ungs.garules;
 
+/**
+ * Adapter cuya función es la de tomar una regla y adaptar sus condiciones y predicciones a una cadena de caracteres con el fin de ser procesada (enviada como parámetro)
+ * en el mapper del job map-reduce.
+ * @author ricardo
+ *
+ */
 public class RuleStringAdaptor {
 
 	public static String adapt(Rule r)
