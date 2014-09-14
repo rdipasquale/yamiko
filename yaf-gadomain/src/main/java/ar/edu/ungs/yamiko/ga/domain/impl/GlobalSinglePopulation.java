@@ -58,10 +58,11 @@ public class GlobalSinglePopulation<T> implements Population<T>{
 	
 	public void replaceIndividual(Individual<T> i1, Individual<T> i2) {
 		if (!pop.contains(i2))
-		{
-			pop.remove(i1);
-			pop.add(i2);					
-		}
+			if (pop.contains(i1))
+			{
+				pop.remove(i1);
+				pop.add(i2);					
+			}
 	}
 	
 	@Override
