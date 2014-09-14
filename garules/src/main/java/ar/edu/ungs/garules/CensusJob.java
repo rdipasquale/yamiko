@@ -20,6 +20,9 @@ package ar.edu.ungs.garules;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -243,7 +246,7 @@ public class CensusJob {
 	    Parameter<BitSet> par=	new Parameter<BitSet>(0.035, 0.9, 200, new DescendantAcceptEvaluator<BitSet>(), 
 	    						new CensusFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
 	    						null, new BitSetRandomPopulationInitializer(), null, new ProbabilisticRouletteSelector(), 
-	    						new GlobalSinglePopulation<BitSet>(genome), 5000, 100d,new BitSetMorphogenesisAgent(),genome);
+	    						new GlobalSinglePopulation<BitSet>(genome), 500, 100d,new BitSetMorphogenesisAgent(),genome);
 		
 	    ParallelFitnessEvaluationGA<BitSet> ga=new ParallelFitnessEvaluationGA<BitSet>(par);
 	    ga.init();
@@ -255,12 +258,11 @@ public class CensusJob {
 		    
 		    // Debug
 		    //showPopulation(ga.getPopulation());
-		    System.out.println((System.currentTimeMillis()-time)/1000 + "s transcurridos desde el inicio");
+		    //System.out.println((System.currentTimeMillis()-time)/1000 + "s transcurridos desde el inicio");
 		    
 	    	Configuration conf = new Configuration();
 
 		    // Pasamos como parámetro las condiciones a evaluar
-	    	System.out.println("Individuos: " + ga.getPopulation().getAll().size());
 		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
 		    int contador=0;
 		    Set<String> expUnicas=new HashSet<String>();
@@ -313,7 +315,15 @@ public class CensusJob {
 	        System.out.println("Mejor Individuo Generacion " + i + " => " + RuleAdaptor.adapt(bestInd) + " => Fitness = " + bestInd.getFitness());
 	    	
 	    }
-  }
+	    List<Individual<BitSet>> bestIndList=new ArrayList<Individual<BitSet>>(bestIndividuals);
+	    Collections.sort(bestIndList, new Comparator<Individual<BitSet>>() {
+	        public int compare(Individual<BitSet> o1, Individual<BitSet>o2) {
+	            return (o1.getFitness() > o2.getFitness() ? -1 : (o1.getFitness() == o2.getFitness() ? 0 : 1));
+	        }
+	    });
+	    showPopulation(bestIndList);
+
+	}
 
 	/**
 	 * Toma la salida del reducer del file system distribuido y la carga en el mapa "ocurrencias" en memoria
@@ -335,11 +345,12 @@ public class CensusJob {
 	 * Imprime la población al system.out
 	 * @param p
 	 */
-	private static void showPopulation(Population<BitSet> p)
+	@SuppressWarnings("unused")
+	private static void showPopulation(Collection<Individual<BitSet>> p)
 	{
 		int j=0;
  
-		for (Individual<BitSet> i : p.getAll())
+		for (Individual<BitSet> i : p)
 		{
 			j++;
 			System.out.println("Individuo Nro " + j + " - " +RuleAdaptor.adapt(i) + " - Fitness: " + i.getFitness());
