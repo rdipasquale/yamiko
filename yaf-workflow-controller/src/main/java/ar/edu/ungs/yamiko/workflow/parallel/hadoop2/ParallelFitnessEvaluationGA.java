@@ -56,7 +56,8 @@ public class ParallelFitnessEvaluationGA<T> {
 		public void initGeneration()
 		{
 			for (Individual<T> individual : p) {
-				parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);	
+				if (individual.getFitness()==null)
+					parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);	
 			}			
 		}
 		
@@ -75,6 +76,7 @@ public class ParallelFitnessEvaluationGA<T> {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public Individual<T> run() throws YamikoException
 		{
+			System.out.println("Principio de Etapa 2 -> Población: " + p.size());
 			for (Individual<T> individual : p)
 				if (individual.getFitness()==null)
 				{
@@ -109,7 +111,9 @@ public class ParallelFitnessEvaluationGA<T> {
 			for (Individual<T> ind : p) 
 				if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
 					parameter.getMutator().execute(ind);
-	
+
+			System.out.println("Final de Etapa 2 -> Población: " + p.size());
+
 			return bestInd;
 			
 		}

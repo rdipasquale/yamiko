@@ -91,6 +91,8 @@ public class CensusJob {
 				if (value.getLength()==0) return;
 				if (value.charAt(0)=='H') return; // Home record
 				
+				Set<Text> emit=new HashSet<Text>();
+				
 				Integer[] rec=null;
 				try {
 					rec = RecordAdaptor.adapt(value.toString());
@@ -104,8 +106,8 @@ public class CensusJob {
 				context.write(N_TAG, one);
 
 				//Debug
-//			for (int nn=0;nn<Constants.CENSUS_FIELDS.values().length;nn++)
-//				System.out.println(Constants.CENSUS_FIELDS_DESCRIPTIONS[nn] + "="+ rec[nn]);
+//				for (int nn=0;nn<Constants.CENSUS_FIELDS.values().length;nn++)
+//					System.out.println(Constants.CENSUS_FIELDS_DESCRIPTIONS[nn] + "="+ rec[nn]);
 				
 				String ruleNr="1";
 				int iRuleNr=1;
@@ -135,7 +137,7 @@ public class CensusJob {
 					if (flag)
 					{
 				    	Text word = new Text(cond);
-				    	context.write(word, one);		    		
+						emit.add(word);
 					}
 				    
 					flag=false;
@@ -144,17 +146,21 @@ public class CensusJob {
 					if (flag)
 					{
 				    	Text word = new Text(pred);
-				    	context.write(word, one);		    		
+				    	emit.add(word);	    		
 					}
 
 					// Si se dan las condiciones y la prediccion
 					if (flag && flagCond)
-						context.write(new Text(cond+"/"+pred), one);
-					
+						emit.add(new Text(cond+"/"+pred));
+				
 					iRuleNr++;
 					ruleNr=String.valueOf(iRuleNr);
 					
 				}
+				
+				for (Text t: emit) 
+			    	context.write(t, one);
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -208,6 +214,7 @@ public class CensusJob {
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
 
+		long time=System.currentTimeMillis();
         Individual<BitSet> bestInd=null;
 		if (args.length != 2) args=DEFAULT_ARGS;
 	    
@@ -236,7 +243,7 @@ public class CensusJob {
 	    Parameter<BitSet> par=	new Parameter<BitSet>(0.035, 0.9, 200, new DescendantAcceptEvaluator<BitSet>(), 
 	    						new CensusFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
 	    						null, new BitSetRandomPopulationInitializer(), null, new ProbabilisticRouletteSelector(), 
-	    						new GlobalSinglePopulation<BitSet>(genome), 5000, 5000d,new BitSetMorphogenesisAgent(),genome);
+	    						new GlobalSinglePopulation<BitSet>(genome), 5000, 100d,new BitSetMorphogenesisAgent(),genome);
 		
 	    ParallelFitnessEvaluationGA<BitSet> ga=new ParallelFitnessEvaluationGA<BitSet>(par);
 	    ga.init();
@@ -247,23 +254,28 @@ public class CensusJob {
 		    ga.initGeneration();
 		    
 		    // Debug
-		    showPopulation(ga.getPopulation());
+		    //showPopulation(ga.getPopulation());
+		    System.out.println((System.currentTimeMillis()-time)/1000 + "s transcurridos desde el inicio");
 		    
 	    	Configuration conf = new Configuration();
 
 		    // Pasamos como parámetro las condiciones a evaluar
+	    	System.out.println("Individuos: " + ga.getPopulation().size());
 		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
 		    int contador=0;
+		    Set<String> expUnicas=new HashSet<String>();
 		    while (ite.hasNext())
 		    {
 		    	Individual<BitSet> ind=ite.next();
 		    	String rep= RuleStringAdaptor.adapt(RuleAdaptor.adapt(ind));
+		    	expUnicas.add(rep);
+		    }
+		    for (String rep : expUnicas) 
 		    	if (ocurrencias.get(rep)==null)
 		    	{
 			    	conf.set(String.valueOf(contador),rep);
 			    	contador++;		    		
 		    	}
-		    }
 		    
 	        Job job = new Job(conf, "GA rules - Generation " + i);
 	        job.setJarByClass(CensusJob.class);
