@@ -260,7 +260,7 @@ public class CensusJob {
 	    	Configuration conf = new Configuration();
 
 		    // Pasamos como parámetro las condiciones a evaluar
-	    	System.out.println("Individuos: " + ga.getPopulation().size());
+	    	System.out.println("Individuos: " + ga.getPopulation().getAll().size());
 		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
 		    int contador=0;
 		    Set<String> expUnicas=new HashSet<String>();
@@ -338,11 +338,13 @@ public class CensusJob {
 	private static void showPopulation(Population<BitSet> p)
 	{
 		int j=0;
-		for (Individual<BitSet> i : p)
+ 
+		for (Individual<BitSet> i : p.getAll())
 		{
 			j++;
-			System.out.println("Individuo Nro " + j + " - " +RuleAdaptor.adapt(i));
-		}	
+			System.out.println("Individuo Nro " + j + " - " +RuleAdaptor.adapt(i) + " - Fitness: " + i.getFitness());
+		}
+ 		
 	}
 	
 }
