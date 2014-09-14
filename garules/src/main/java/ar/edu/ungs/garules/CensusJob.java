@@ -42,6 +42,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
@@ -244,6 +245,10 @@ public class CensusJob {
 	    for (int i=0;i<par.getMaxGenerations();i++)
 	    {
 		    ga.initGeneration();
+		    
+		    // Debug
+		    showPopulation(ga.getPopulation());
+		    
 	    	Configuration conf = new Configuration();
 
 		    // Pasamos como parámetro las condiciones a evaluar
@@ -252,8 +257,12 @@ public class CensusJob {
 		    while (ite.hasNext())
 		    {
 		    	Individual<BitSet> ind=ite.next();
-		    	conf.set(String.valueOf(contador), RuleStringAdaptor.adapt(RuleAdaptor.adapt(ind)));
-		    	contador++;
+		    	String rep= RuleStringAdaptor.adapt(RuleAdaptor.adapt(ind));
+		    	if (ocurrencias.get(rep)==null)
+		    	{
+			    	conf.set(String.valueOf(contador),rep);
+			    	contador++;		    		
+		    	}
 		    }
 		    
 	        Job job = new Job(conf, "GA rules - Generation " + i);
@@ -308,6 +317,20 @@ public class CensusJob {
         while (reader.next(key, value)) 
             ocurrencias.put(key.toString(), value.get());
         reader.close();
+	}
+	
+	/**
+	 * Imprime la población al system.out
+	 * @param p
+	 */
+	private static void showPopulation(Population<BitSet> p)
+	{
+		int j=0;
+		for (Individual<BitSet> i : p)
+		{
+			j++;
+			System.out.println("Individuo Nro " + j + " - " +RuleAdaptor.adapt(i));
+		}	
 	}
 	
 }

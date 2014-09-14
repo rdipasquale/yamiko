@@ -22,6 +22,7 @@ public class Rule {
 
 	public void setCondiciones(List<Formula> condiciones) {
 		this.condiciones = condiciones;
+		
 	}
 
 
