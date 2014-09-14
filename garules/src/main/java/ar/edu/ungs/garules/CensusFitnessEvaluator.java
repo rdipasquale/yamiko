@@ -17,21 +17,21 @@ public class CensusFitnessEvaluator implements FitnessEvaluator<BitSet>{
 	@Override
 	public double execute(Individual<BitSet> i) {
 		
-		long N=ocurrencias.get(CensusJob.N_TAG.toString());
+		double N=ocurrencias.get(CensusJob.N_TAG.toString());
 
 		Rule rule=RuleAdaptor.adapt(i);
-		int c=ocurrencias.get(RuleStringAdaptor.adaptConditions(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adaptConditions(rule));
-		int cYp=ocurrencias.get(RuleStringAdaptor.adapt(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adapt(rule));
-		int p=ocurrencias.get(RuleStringAdaptor.adaptPrediction(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adaptPrediction(rule));
+		double c=ocurrencias.get(RuleStringAdaptor.adaptConditions(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adaptConditions(rule));
+		double cYp=ocurrencias.get(RuleStringAdaptor.adapt(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adapt(rule));
+		double p=ocurrencias.get(RuleStringAdaptor.adaptPrediction(rule))==null?0:ocurrencias.get(RuleStringAdaptor.adaptPrediction(rule));
 		double a=p/N;
 		double b=0;
 		if (c!=0) b=cYp/c;
 		double j1=0;
-		if (a==0) 
+		if (a==0 || b==0) 
 			j1=(c/N)*b;
 		else 
 			j1=(c/N)*b*Math.log(b/a);
-		int conditions=rule.getCondiciones().size();
+		double conditions=rule.getCondiciones().size();
 		
 		return (W1*j1+W2*conditions/ATTR)/(W1+W2);
 		

@@ -302,8 +302,6 @@ public class CensusJob {
 	 */
 	private static void llenarOcurrencias(Configuration conf,String path) throws IOException
 	{
-        //FileSystem fs = FileSystem.get(conf);
-        //FileStatus[] st = fs.listStatus(new Path(args[1]));
         SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(new Path(path+"/part-r-00000")));
         Text key = new Text();
         IntWritable value = new IntWritable();
