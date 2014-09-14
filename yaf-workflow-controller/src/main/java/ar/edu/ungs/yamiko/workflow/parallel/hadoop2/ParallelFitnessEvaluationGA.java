@@ -20,7 +20,6 @@ import ar.edu.ungs.yamiko.workflow.Parameter;
 public class ParallelFitnessEvaluationGA<T> {
 
 		private Parameter<T> parameter;
-		private long generationNumber=0;
 		private double bestFitness=0;
 		private Individual<T> bestInd;
 		private Population<T> p;
@@ -110,11 +109,7 @@ public class ParallelFitnessEvaluationGA<T> {
 			for (Individual<T> ind : p) 
 				if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
 					parameter.getMutator().execute(ind);
-			
-			generationNumber++;
-			
-			if (Math.IEEEremainder(generationNumber,1000)==0) System.out.println("Generation " + generationNumber);
-			
+	
 			return bestInd;
 			
 		}
