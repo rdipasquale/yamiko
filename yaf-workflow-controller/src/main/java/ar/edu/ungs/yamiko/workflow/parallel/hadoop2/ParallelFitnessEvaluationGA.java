@@ -76,7 +76,6 @@ public class ParallelFitnessEvaluationGA<T> {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public Individual<T> run() throws YamikoException
 		{
-			System.out.println("Principio de Etapa 2 -> Población: " + p.size());
 			for (Individual<T> individual : p)
 				if (individual.getFitness()==null)
 				{
@@ -104,16 +103,14 @@ public class ParallelFitnessEvaluationGA<T> {
 					List<Individual<T>> children=parameter.getCrossover().execute(parents);
 					List<Individual<T>> acceptedChildren=parameter.getAcceptEvaluator().execute(children, parents);
 					for (int i=0;i<acceptedChildren.size();i++)
-						p.replaceIndividual(parents.get(i), acceptedChildren.get(i));						
+						p.replaceIndividual(parents.get(i), acceptedChildren.get(i));
+			
 				}		
 			}
 			
 			for (Individual<T> ind : p) 
 				if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
 					parameter.getMutator().execute(ind);
-
-			System.out.println("Final de Etapa 2 -> Población: " + p.size());
-
 			return bestInd;
 			
 		}
