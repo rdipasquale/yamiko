@@ -6,6 +6,15 @@ import java.util.Map;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 
+/**
+ * Evaluador de fitness para el problema del censo. El cálculo está basado en la J-measure propuesta por Smith y Goodman, que intenta cuantificar la pertinencia
+ * de una regla. Mientras más alto sea el J-measure, mas "interesante" será la regla. |C| es la cantidad de instancias en donde se verifica la parte de la condición
+ * de la regla (puede ser una conjunción de fórmulas). Análogo a |C| está |P|, que es la cantidad de instancias en donde se verifica la perte de la predicción de la 
+ * regla. |C y P| es la cantidad de instancias en donde se verifican ambas condiciones.N es la cantidad de registros existentes. |C|/N es una métrica de la generalidad
+ * de la condición.
+ * @author ricardo
+ *
+ */
 public class CensusFitnessEvaluator implements FitnessEvaluator<BitSet>{
 
 	private static final double W1=0.6;
@@ -41,6 +50,10 @@ public class CensusFitnessEvaluator implements FitnessEvaluator<BitSet>{
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * Este constructor admite la inyección de un mapa de ocurrencias calculado en otra etapa del proceso.
+	 * @param ocurrencias
+	 */
 	public CensusFitnessEvaluator(Map<String, Integer> ocurrencias) {
 		super();
 		this.ocurrencias = ocurrencias;

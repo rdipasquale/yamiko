@@ -3,13 +3,26 @@ package ar.edu.ungs.garules;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Constantes y parámetro de la ejecución del proceso de Censo.
+ * @author ricardo
+ *
+ */
 public class Constants {
 
+	/**
+	 * Valores máximos posibles para cada campo. Se utiliza para calcular el módulo del valor que viene en los campos "Valor" de cada fórmula en los individuos.
+	 */
 	public static final int[] CENSUS_FIELDS_MAX_VALUE=new int[]{
 		2,3,91,25,2,2,2,2,2,2,6,4,8,17,3,3,555,6,2001,4,555,3,3,3,3,3,3,3,3,6,5,2,2,2,2,2,2,2,2,2,3,
 		16,7,9,556,13,7,169,121,4,4,4,4,5,3,998,998,10,3,53,100,176,127,51,19,14,13,53,38,5001,311,502
 	};
 
+	/**
+	 * Enum con los atributos relevantes del arhivo
+	 * @author ricardo
+	 *
+	 */
 	public static enum CENSUS_FIELDS{
 		OC,SEX,AGE,HISPAN ,WHITE ,
 		BLACK ,AIAN ,ASIAN ,
@@ -45,6 +58,9 @@ public class Constants {
 		EARNS ,POVERTY
 	}
 	
+	/**
+	 * Descripciones de los campos
+	 */
 	public static final String[] CENSUS_FIELDS_DESCRIPTIONS=new String[]{
 		"Own Child Indicator","Sex","Age","Hispanic or Latino Origin","White recode",
 		"Black or African American","American Indian and Alaska Native","Asian",
@@ -80,16 +96,25 @@ public class Constants {
 		"Person’s Total Earnings in 1999","Person’s Poverty Status"
 	};
 
+	/**
+	 * Starting position de cada campo
+	 */
 	public static final int[] CENSUS_FIELDS_POS_FROM=new int[]{
 		20,23,25,28,32,33,34,35,36,37,44,49,51,53,64,70,72,76,78,83,85,119,121,123,125,127,129,132,134,136,138,140,141,142,143,144,145,146,147,148,150,
 		152,154,156,157,191,194,196,200,204,205,206,207,208,209,211,223,234,236,238,241,244,251,258,265,271,277,283,290,297,305,312
 	};
 	
+	/**
+	 * Longitud de cada campo
+	 */
 	public static final int[] CENSUS_FIELDS_LENGTH=new int[]{
 		1,1,2,2,1,1,1,1,1,1,1,1,1,2,1,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 		2,1,1,2,2,1,2,3,1,1,1,1,1,1,3,3,1,1,2,2,6,6,6,5,5,5,6,6,7,7,3
 	};
 	
+	/**
+	 * Diccionario de datos
+	 */
 	public static final Map<Integer,String[]> CENSUS_FIELDS_VALUES=new HashMap<Integer, String[]>()
 			{
 				private static final long serialVersionUID = 1L;

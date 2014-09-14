@@ -45,7 +45,6 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
-import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome;
@@ -80,14 +79,21 @@ public class CensusJob {
 	public static final Text N_TAG=new Text("N");
 			
 	/**
-	 * Mapper del CensusJob 
+	 * Mapper del CensusJob: Recibe los registros del archivo de Censo y toma del contexto la lista de reglas a evaluar. Descarta los registros de hogares, y sobre
+	 * los registros de personas comienza a trabajar. Emite por cada registro procesado un 1 con etiqueta "N" para ser utilizado luego por el evaluador de fitness.
+	 * Luego divide las condiciones y predicciones propuestas, evaluando su pertinencia en el registro que está procesando. Por cada formula que se verifique como
+	 * real, sera agregada a un conjunto (criterio de unicidad y eliminación de repetidos) para luego emitir un 1 por cada expresión que haya verificado el valor de
+	 * verdad.
 	 * @author ricardo
 	 *
 	 */
 	public static class CensusMapper extends Mapper<Object, Text, Text, IntWritable>{
 		
 		private final static IntWritable one = new IntWritable(1);
-	      
+	    
+		/**
+		 * Funcion standard map
+		 */
 	    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 	      
 	    	try {
@@ -171,12 +177,22 @@ public class CensusJob {
 	    	
 	    }
 	    
+	    /**
+	     * Método auxiliar para obtener el campo de la formula serializada en String.
+	     * @param s
+	     * @return
+	     */
 	    private String getCampo(String s)
 	    {
 	    	String op=getOperador(s);
 	    	return s.substring(0,s.indexOf(op));
 	    }
 	    
+	    /**
+	     * Método auxiliar para obtener el operador de la formula serializada en String.
+	     * @param s
+	     * @return
+	     */
 	    private String getOperador(String s)
 	    {	    	
 	    	if (s.contains("!=")) return "!=";
@@ -186,6 +202,11 @@ public class CensusJob {
 	    	return null;
 	    }
 	    
+	    /**
+	     * Método auxiliar para obtener el valor de la formula serializada en String.
+	     * @param s
+	     * @return
+	     */
 	    private String getValor(String s)
 	    {
 	    	String op=getOperador(s);
@@ -202,18 +223,22 @@ public class CensusJob {
 
 		private IntWritable result = new IntWritable();
 
-	    public void reduce(Text key, Iterable<IntWritable> values, 
-	                       Context context
-	                       ) throws IOException, InterruptedException {
-	      int sum = 0;
-	      for (IntWritable val : values) {
-	        sum += val.get();
-	      }
-	      result.set(sum);
-	      context.write(key, result);
-	    }
-	  }
+	    /**
+	     * Método reduce standard
+	     */
+		public void reduce(Text key, Iterable<IntWritable> values,  Context context) throws IOException, InterruptedException {
+		      int sum = 0;
+		      for (IntWritable val : values) sum += val.get();
+		      result.set(sum);
+		      context.write(key, result);
+		}
+	}
 
+	/**
+	 * Main -> Ejecucion del proceso
+	 * @param args
+	 * @throws Exception
+	 */
 	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
 
@@ -222,6 +247,7 @@ public class CensusJob {
 		if (args.length != 2) args=DEFAULT_ARGS;
 	    
 	    // Preparacion del GA
+		// --------------------------------------------------------------------------------------------------------------
 	    Set<Individual<BitSet>> bestIndividuals=new HashSet<Individual<BitSet>>();
 		List<Gene> genes=new ArrayList<Gene>();
 		genes.add(genCondicionACampo);
@@ -250,18 +276,19 @@ public class CensusJob {
 		
 	    ParallelFitnessEvaluationGA<BitSet> ga=new ParallelFitnessEvaluationGA<BitSet>(par);
 	    ga.init();
+		// --------------------------------------------------------------------------------------------------------------
 	    // Fin de Preparacion del GA
 	
+	    // Itera hasta el maximo de generaciones permitidas 
 	    for (int i=0;i<par.getMaxGenerations();i++)
 	    {
 		    ga.initGeneration();
-		    
+	    	Configuration conf = new Configuration();
+
 		    // Debug
 		    //showPopulation(ga.getPopulation());
 		    //System.out.println((System.currentTimeMillis()-time)/1000 + "s transcurridos desde el inicio");
 		    
-	    	Configuration conf = new Configuration();
-
 		    // Pasamos como parámetro las condiciones a evaluar
 		    Iterator<Individual<BitSet>> ite=ga.getPopulation().iterator();
 		    int contador=0;
@@ -278,7 +305,8 @@ public class CensusJob {
 			    	conf.set(String.valueOf(contador),rep);
 			    	contador++;		    		
 		    	}
-		    
+
+		    // Configuracion del job i
 	        Job job = new Job(conf, "GA rules - Generation " + i);
 	        job.setJarByClass(CensusJob.class);
 	        job.setMapperClass(CensusMapper.class);
@@ -286,10 +314,11 @@ public class CensusJob {
 	        job.setReducerClass(CensusReducer.class);
 	        job.setOutputKeyClass(Text.class);
 	        job.setOutputValueClass(IntWritable.class);
-	        job.setOutputFormatClass(SequenceFileOutputFormat.class);
-	        
+	        job.setOutputFormatClass(SequenceFileOutputFormat.class);	        
 	        FileInputFormat.addInputPath(job, new Path(args[0]));
 	        SequenceFileOutputFormat.setOutputPath(job, new Path(args[1]+"g"+i));
+	        
+	        // Corrida del trabajo map-reduce representando a la generacion i
 	        job.waitForCompletion(true);
 	        
 	        // Aca calculamos el fitness en base a lo que arrojo el job y si hay un mejor individuo lo agregamos al set de mejores individuos....  
@@ -315,6 +344,8 @@ public class CensusJob {
 	        System.out.println("Mejor Individuo Generacion " + i + " => " + RuleAdaptor.adapt(bestInd) + " => Fitness = " + bestInd.getFitness());
 	    	
 	    }
+	    
+	    // Ordenamos y mostramos los mejores individuos
 	    List<Individual<BitSet>> bestIndList=new ArrayList<Individual<BitSet>>(bestIndividuals);
 	    Collections.sort(bestIndList, new Comparator<Individual<BitSet>>() {
 	        public int compare(Individual<BitSet> o1, Individual<BitSet>o2) {
@@ -322,6 +353,7 @@ public class CensusJob {
 	        }
 	    });
 	    showPopulation(bestIndList);
+	    System.out.println("Tiempo total de corrida " +(System.currentTimeMillis()-time)/1000 + "s");
 
 	}
 
@@ -345,7 +377,6 @@ public class CensusJob {
 	 * Imprime la población al system.out
 	 * @param p
 	 */
-	@SuppressWarnings("unused")
 	private static void showPopulation(Collection<Individual<BitSet>> p)
 	{
 		int j=0;
