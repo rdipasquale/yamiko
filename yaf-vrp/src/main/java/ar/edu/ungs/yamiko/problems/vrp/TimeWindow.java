@@ -9,12 +9,13 @@ public class TimeWindow {
 	private int minuteStart;
 	private int hourEnd;
 	private int minuteEnd;
+	Calendar c1=Calendar.getInstance();
+	Calendar c2=Calendar.getInstance();
 	
 	public TimeWindow(Date start,Date end) {
-		Calendar c1=Calendar.getInstance();
-		Calendar c2=Calendar.getInstance();
 		c1.setTime(start);
 		c2.setTime(end);
+		if (c1.after(c2)) c2.add(Calendar.DATE, 1);
 		this.hourEnd=c2.get(Calendar.HOUR_OF_DAY);
 		this.hourStart=c1.get(Calendar.HOUR_OF_DAY);
 		this.minuteEnd=c2.get(Calendar.MINUTE);
@@ -26,6 +27,24 @@ public class TimeWindow {
 		this.hourStart=hourStart;
 		this.minuteEnd=minuteEnd;
 		this.minuteStart=minuteStart;
+		c1.set(Calendar.HOUR_OF_DAY, hourStart);
+		c1.set(Calendar.MINUTE, minuteStart);
+		c1.set(Calendar.SECOND, 0);
+		c1.set(Calendar.MILLISECOND, 0);
+		c2.set(Calendar.HOUR_OF_DAY, hourEnd);
+		c2.set(Calendar.MINUTE, minuteEnd);
+		c2.set(Calendar.SECOND, 0);
+		c2.set(Calendar.MILLISECOND, 0);		
+		if (c1.after(c2)) c2.add(Calendar.DATE, 1);
+	}
+	
+	/**
+	 * Devuelve la longitud de la ventana en minutos
+	 * @return
+	 */
+	public int length()
+	{
+		return (int)((c2.getTimeInMillis()-c1.getTimeInMillis())/60000);
 	}
 	
 
