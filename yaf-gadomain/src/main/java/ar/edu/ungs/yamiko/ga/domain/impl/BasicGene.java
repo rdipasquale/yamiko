@@ -9,7 +9,7 @@ import ar.edu.ungs.yamiko.ga.domain.Gene;
  * @author ricardo
  *
  */
-public class BasicGene implements Serializable,Gene{
+public class BasicGene implements Serializable,Gene {
 
 	/**
 	 * 
@@ -41,6 +41,11 @@ public class BasicGene implements Serializable,Gene{
 
 	public String getName() {
 		return name;
+	}
+	
+	@Override
+	public void setName(String _name) {
+		name=_name;
 	}
 
 	@Override
@@ -74,6 +79,10 @@ public class BasicGene implements Serializable,Gene{
 				+ "]";
 	}
 
-	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
 	
 }

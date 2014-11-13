@@ -8,7 +8,7 @@ package ar.edu.ungs.yamiko.ga.domain;
  * @created 08-Oct-2013 11:39:23 p.m.
  * @param <T>
  */
-public interface Gene {
+public interface Gene extends Cloneable{
 	
 	/**
 	 * Tamaño del Gen
@@ -27,4 +27,8 @@ public interface Gene {
 	 * @return
 	 */
 	public String getName();
+	public void setName(String name);
+
+	abstract Object clone() throws CloneNotSupportedException;
+	
 }

@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,30 +8,41 @@ import java.util.Map;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Ribosome;
-import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 
 /**
- * Implementación de Genoma orientado a tiras de longitud estática de tipo T.
+ * Implementación de Genoma de longitud dinámica de tipo T.
  * @author ricardo
  *
  */
-public class BasicGenome<T> implements Genome<T>{
+public class DynamicLengthGenome<T> implements Genome<T>{
 
 	private Map<String,List<Gene>> structure;
 	private int size;
 	private Map<Gene,Ribosome<T>> translators;
 
-	public BasicGenome(String uniqueCrhomosomeName,List<Gene> genes, Map<Gene,Ribosome<T>> _translators) 
+	public DynamicLengthGenome(String uniqueCrhomosomeName,Gene repetitiveGenes, Ribosome<T> ribosome,int maxLength) 
 	{
 		structure=new HashMap<String, List<Gene>>();
+		List<Gene> genes=new ArrayList<Gene>();
+		for (int i=0;i<maxLength;i++)
+		{
+			Gene x;
+			try {
+				x = (Gene)repetitiveGenes.clone();
+			} catch (CloneNotSupportedException e) {
+				x=new BasicGene("Unnamed", 0, 0);
+			}
+			x.setName(x.getName()+"[" + i + "]");
+			genes.add(x);
+		}				
 		structure.put(uniqueCrhomosomeName,genes);
-		size=StaticHelper.calcGeneSize(structure.get(uniqueCrhomosomeName));
-		translators=_translators;
+		size=maxLength;
+		translators=new HashMap<Gene,Ribosome<T>>();
+		translators.put(repetitiveGenes, ribosome);
 	}
 	
 	public Map<String, List<Gene>> getStructure() {
 		return structure;
-		
 		}
 	
 	public int size() {
