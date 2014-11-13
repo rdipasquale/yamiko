@@ -5,10 +5,6 @@ import java.util.Date;
 
 public class TimeWindow {
 
-	private int hourStart;
-	private int minuteStart;
-	private int hourEnd;
-	private int minuteEnd;
 	Calendar c1=Calendar.getInstance();
 	Calendar c2=Calendar.getInstance();
 	
@@ -16,17 +12,10 @@ public class TimeWindow {
 		c1.setTime(start);
 		c2.setTime(end);
 		if (c1.after(c2)) c2.add(Calendar.DATE, 1);
-		this.hourEnd=c2.get(Calendar.HOUR_OF_DAY);
-		this.hourStart=c1.get(Calendar.HOUR_OF_DAY);
-		this.minuteEnd=c2.get(Calendar.MINUTE);
-		this.minuteStart=c1.get(Calendar.MINUTE);		
+	
 	}
 	
 	public TimeWindow(int hourStart,int minuteStart, int hourEnd, int minuteEnd) {
-		this.hourEnd=hourEnd;
-		this.hourStart=hourStart;
-		this.minuteEnd=minuteEnd;
-		this.minuteStart=minuteStart;
 		c1.set(Calendar.HOUR_OF_DAY, hourStart);
 		c1.set(Calendar.MINUTE, minuteStart);
 		c1.set(Calendar.SECOND, 0);
@@ -46,6 +35,23 @@ public class TimeWindow {
 	{
 		return (int)((c2.getTimeInMillis()-c1.getTimeInMillis())/60000);
 	}
+
+	/**
+	 * Comienzo del intervalo
+	 * @return
+	 */
+	public Calendar from()
+	{
+		return c1;
+	}
 	
+	/**
+	 * Fin del intervalo
+	 * @return
+	 */
+	public Calendar to()
+	{
+		return c2;
+	}	
 
 }
