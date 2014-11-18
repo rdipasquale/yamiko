@@ -17,6 +17,18 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  */
 public class UniqueIntegerPopulationInitializer implements PopulationInitializer<Integer[]>{
 
+	private int maxZeros;
+	
+	
+	
+	public int getMaxZeros() {
+		return maxZeros;
+	}
+
+	public void setMaxZeros(int maxZeros) {
+		this.maxZeros = maxZeros;
+	}
+
 	public void execute(Population<Integer[]> population) {
 		if (population==null) return;
 		
