@@ -47,6 +47,7 @@ public class GVRCrossover implements Crossover<Integer[]>{
 		Individual<Integer[]> i1 = individuals.get(0);
 		Individual<Integer[]> i2 = individuals.get(1);		
 		
+		List<Route> i1.getPhenotype().getAlleles().iterator().next().values().iterator().next();
 		Integer[] c1=i1.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation();
 		Integer[] c2=i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation();
 		int point=StaticHelper.randomInt(c1.length);
