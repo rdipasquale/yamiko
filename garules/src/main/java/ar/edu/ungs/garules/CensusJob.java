@@ -18,6 +18,7 @@
 package ar.edu.ungs.garules;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -32,7 +33,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
@@ -75,7 +78,12 @@ public class CensusJob {
 	public static final Gene genPrediccionCampo=new BasicGene("Prediccion - Campo", 68, 8);
 	public static final Gene genPrediccionValor=new BasicGene("Prediccion- Valor", 76, 12);
 	private static Map<String,Integer> ocurrencias=new HashMap<String, Integer>();
-	private static final String[] DEFAULT_ARGS=new String[]{"hdfs://localhost:9000/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
+	private static final String[] DEFAULT_ARGS=new String[]{"hdfs://LIR-A-211:9091/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
+	private static final String DEFAULT_FILE_SYSTEM_HOST="localhost";
+	private static final int DEFAULT_FILE_SYSTEM_PORT=9000;
+//	private static final String[] DEFAULT_ARGS=new String[]{"hdfs://localhost:9000/user/ricardo/PUMS5.TXT","hdfs://localhost:9000/salida-"+System.currentTimeMillis()};
+//	private static final String DEFAULT_FILE_SYSTEM_HOST="localhost";
+//	private static final int DEFAULT_FILE_SYSTEM_PORT=9000;
 	public static final Text N_TAG=new Text("N");
 			
 	/**
@@ -239,7 +247,6 @@ public class CensusJob {
 	 * @param args
 	 * @throws Exception
 	 */
-	@SuppressWarnings("deprecation")
   	public static void main(String[] args) throws Exception {
 
 		long time=System.currentTimeMillis();
@@ -363,9 +370,12 @@ public class CensusJob {
 	 * @param path
 	 * @throws IOException
 	 */
+	@SuppressWarnings("deprecation")
 	private static void llenarOcurrencias(Configuration conf,String path) throws IOException
 	{
-        SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(new Path(path+"/part-r-00000")));
+		FileSystem fs=new DistributedFileSystem(new InetSocketAddress(DEFAULT_FILE_SYSTEM_HOST, DEFAULT_FILE_SYSTEM_PORT), conf);
+        SequenceFile.Reader reader = new SequenceFile.Reader(fs, new Path(path+"/part-r-00000"),conf);
+        
         Text key = new Text();
         IntWritable value = new IntWritable();
         while (reader.next(key, value)) 
