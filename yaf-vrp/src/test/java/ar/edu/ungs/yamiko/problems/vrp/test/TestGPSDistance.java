@@ -23,5 +23,13 @@ public class TestGPSDistance {
 		double metros=GPSHelper.TwoDimensionalCalculation(-34.621405, -58.425799, -35.123506, -60.492426);
 		assertTrue( Math.abs(197000-metros)<1000);
 	}
-
+	
+	@Test
+	public void testStress() {
+		double metros=0;
+		for(int i=0;i<1000000;i++)
+			metros=GPSHelper.TwoDimensionalCalculation(-34.621405, -58.425799, -35.123506, -60.492426);
+		assertTrue( Math.abs(197000-metros)<1000);			
+	}
+	
 }
