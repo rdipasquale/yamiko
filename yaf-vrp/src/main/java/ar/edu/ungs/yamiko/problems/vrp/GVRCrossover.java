@@ -1,9 +1,8 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
@@ -17,7 +16,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  * Francisco B. Pereira, Jorge Tavares, Penousal Machado y Ernesto Costa. 
  * El algoritmo es el siguiente:
  *  1) Se toma una subruta del individuo 2
- *  2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente.
+ *  2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente al primero de la subruta seleccionada.
  *  3) Inserta la subruta después de la ocurrencia de c en el individuo 1
  *  4) Remueve del individuo 1 todas las ocurrencias de los clientes que estén en la subruta seleccionada en el punto 1.
  * 
@@ -30,6 +29,17 @@ public class GVRCrossover implements Crossover<Integer[]>{
 
 	}
 	
+	private DistanceMatrix matrix;
+	
+	
+	public DistanceMatrix getMatrix() {
+		return matrix;
+	}
+
+	public void setMatrix(DistanceMatrix matrix) {
+		this.matrix = matrix;
+	}
+
 	/**
 	 * Validaciones de nulidad y de formato.
 	 * @param individuals
@@ -47,104 +57,42 @@ public class GVRCrossover implements Crossover<Integer[]>{
 		Individual<Integer[]> i1 = individuals.get(0);
 		Individual<Integer[]> i2 = individuals.get(1);		
 		
-		List<Route> i1.getPhenotype().getAlleles().iterator().next().values().iterator().next();
-		Integer[] c1=i1.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation();
-		Integer[] c2=i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation();
-		int point=StaticHelper.randomInt(c1.length);
-		Integer[] desc1=new Integer[c1.length];
-		Integer[] desc2=new Integer[c1.length];
-
-		// Calculo complementos
-		Set<Integer> aux11=new HashSet<Integer>();
-		Set<Integer> aux21=new HashSet<Integer>();
-		Set<Integer> aux12=new HashSet<Integer>();
-		Set<Integer> aux22=new HashSet<Integer>();
-		for (int i=0;i<c1.length;i++)
+		// 1) Se toma una subruta del individuo 2
+		Integer[] arrayI2=((Integer[])i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation());
+		int lengthI2=arrayI2.length;
+		int point=0;
+		while (arrayI2[point]==0)
+			point=StaticHelper.randomInt(lengthI2);
+		int aux1=point;
+		List<Integer> subRouteI2=new ArrayList<Integer>();
+		while (arrayI2[point]!=0 && aux1<=lengthI2)
 		{
-			if (i<point)
-			{
-				aux11.add(c1[i]);
-				aux21.add(c2[i]);
-				desc1[i]=c1[i];
-				desc2[i]=c2[i];
-			}
-			else
-			{
-				aux12.add(c1[i]);
-				aux22.add(c2[i]);
-			}
-			
-		}
-		Set<Integer> desc1Set=new HashSet<Integer>();
-		Set<Integer> desc2Set=new HashSet<Integer>();
-		desc1Set.addAll(aux11);
-		desc2Set.addAll(aux21);
-		
-		for (int i=point;i<c1.length;i++)
-		{
-			if (aux11.contains(c2[i]))
-			{
-				desc1[i]=c1[i];
-				aux11.add(c1[i]);				
-			}
-			else				
-				desc1[i]=c2[i];
-			if (aux21.contains(c1[i]))
-			{
-				desc2[i]=c2[i];
-				aux21.add(c2[i]);				
-			}
-			else				
-				desc2[i]=c1[i];		
-			desc1Set.add(desc1[i]);
-			desc2Set.add(desc2[i]);
+			subRouteI2.add(arrayI2[point]);
+			aux1++;
 		}
 
-		//Check
-		while (desc1Set.size()<c1.length)
-		{
-			Set<Integer> aux=new HashSet<Integer>();
-			for (int i=0;i<c1.length;i++)
-			{
-				if (aux.contains(desc1[i]))
+		// 2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente al primero de la subruta seleccionada.
+		int auxC=0;
+		double auxD=Double.MAX_VALUE;
+		int pivote=subRouteI2.get(0);
+		for (int i=0;i<this.getMatrix().getMatrix()[0].length;i++)
+			if (!subRouteI2.contains(i))
+				if (this.getMatrix().getMatrix()[pivote][i]<auxD)
 				{
-					// Reemplazar
-					for (int j=0;j<c1.length;j++) 
-						if (!desc1Set.contains(c1[j]))
-						{
-							desc1[i]=c1[j];
-							break;
-						}
-				}					
-				aux.add(desc1[i]);
-				desc1Set.add(desc1[i]);
-			}
-		}
+					auxC=i;
+					auxD=this.getMatrix().getMatrix()[pivote][i];
+				}
 
-		while (desc2Set.size()<c2.length)
-		{
-			Set<Integer> aux=new HashSet<Integer>();
-			for (int i=0;i<c2.length;i++)
-			{
-				if (aux.contains(desc2[i]))
-				{
-					// Reemplazar
-					for (int j=0;j<c2.length;j++) 
-						if (!desc2Set.contains(c2[j]))
-						{
-							desc2[i]=c2[j];
-							break;
-						}
-				}					
-				aux.add(desc2[i]);
-				desc2Set.add(desc2[i]);
-			}
-		}
+		//  4) Remueve del individuo 1 todas las ocurrencias de los clientes que estén en la subruta seleccionada en el punto 1.
+		List<Integer> l1= Arrays.asList(((Integer[])i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation()));
+		l1.removeAll(subRouteI2);
 		
+		//  3) Inserta la subruta después de la ocurrencia de c en el individuo 1
+		l1.addAll(l1.indexOf(auxC),subRouteI2);
+		
+		Integer[] desc1=l1.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(i1.getGenotype().getChromosomes().get(0).name(), desc1);
-		Individual<Integer[]> d2=IntegerStaticHelper.create(i2.getGenotype().getChromosomes().get(0).name(), desc2);		
 		descendants.add(d1);
-		descendants.add(d2);
 		return descendants;
 		
 	}
