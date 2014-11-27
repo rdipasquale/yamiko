@@ -16,9 +16,9 @@ import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 
 public class TestIntArrayToRouteRibosome {
 
-	RoutesMorphogenesisAgent ribo;
-	Map<Integer, Customer> customers;
-	
+	private RoutesMorphogenesisAgent rma;
+	private Map<Integer, Customer> customers;
+
 	@Before
 	public void setUp() throws Exception {
 		customers=new HashMap<Integer,Customer>();
@@ -26,7 +26,7 @@ public class TestIntArrayToRouteRibosome {
 		customers.put(2,new Customer(2, "Cliente 2", null, 0, 0));
 		customers.put(3,new Customer(3, "Cliente 3", null, 0, 0));		
 		customers.put(3,new Customer(4, "Cliente 4", null, 0, 0));		
-		ribo=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent(customers);
 	}
 
 	@After
@@ -35,8 +35,8 @@ public class TestIntArrayToRouteRibosome {
 
 	@SuppressWarnings({ "unchecked" })
 	@Test
-	public void test() {
-		List<Route> r=(List<Route>)ribo.translate(new Integer[]{0,3,2,0,4,1});
+	public void testTranslate() {
+		List<Route> r=(List<Route>)rma.translate(new Integer[]{0,3,2,0,4,1});
 		assertEquals(r.size(),2);
 		assertEquals((int)(r.get(0).getRouteModel().get(0)),3);
 		assertEquals((int)(r.get(0).getRouteModel().get(1)),2);
