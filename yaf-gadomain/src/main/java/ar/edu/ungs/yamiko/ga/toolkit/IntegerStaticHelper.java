@@ -37,4 +37,16 @@ public class IntegerStaticHelper {
 			salida+=ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()[i]+" ";
 		return salida;
 	}
+	
+	public static String toStringIntArray(Integer[] b)
+	{
+		if (b==null) return "";
+		if (b.length==0) return "{}";
+		String salida="{";
+		for (int i=0;i<b.length;i++)
+		  salida+=b[i]+" ; ";
+		salida=salida.substring(0,salida.length()-2)+"}";
+		return salida;
+	} 	
+	
 }

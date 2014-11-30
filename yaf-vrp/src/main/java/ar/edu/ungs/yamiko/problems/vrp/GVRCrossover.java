@@ -63,19 +63,18 @@ public class GVRCrossover implements Crossover<Integer[]>{
 		int point=0;
 		while (arrayI2[point]==0)
 			point=StaticHelper.randomInt(lengthI2);
-		int aux1=point;
 		List<Integer> subRouteI2=new ArrayList<Integer>();
-		while (arrayI2[point]!=0 && aux1<=lengthI2)
-		{
-			subRouteI2.add(arrayI2[point]);
-			aux1++;
-		}
+		for (int aux1=point;aux1<lengthI2;aux1++)
+			if (arrayI2[aux1]==0)
+				break;
+			else
+				subRouteI2.add(arrayI2[aux1]);
 
 		// 2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente al primero de la subruta seleccionada.
 		int auxC=0;
 		double auxD=Double.MAX_VALUE;
 		int pivote=subRouteI2.get(0);
-		for (int i=0;i<this.getMatrix().getMatrix()[0].length;i++)
+		for (int i=1;i<this.getMatrix().getMatrix()[0].length;i++)
 			if (!subRouteI2.contains(i))
 				if (this.getMatrix().getMatrix()[pivote][i]<auxD)
 				{
@@ -84,11 +83,12 @@ public class GVRCrossover implements Crossover<Integer[]>{
 				}
 
 		//  4) Remueve del individuo 1 todas las ocurrencias de los clientes que estén en la subruta seleccionada en el punto 1.
-		List<Integer> l1= Arrays.asList(((Integer[])i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation()));
+		List<Integer> l1= Arrays.asList(((Integer[])i1.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation()));
+		l1=new ArrayList<Integer>(l1); // Soporta removeAll
 		l1.removeAll(subRouteI2);
 		
 		//  3) Inserta la subruta después de la ocurrencia de c en el individuo 1
-		l1.addAll(l1.indexOf(auxC),subRouteI2);
+		l1.addAll(l1.indexOf(auxC)+1,subRouteI2);
 		
 		Integer[] desc1=l1.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(i1.getGenotype().getChromosomes().get(0).name(), desc1);

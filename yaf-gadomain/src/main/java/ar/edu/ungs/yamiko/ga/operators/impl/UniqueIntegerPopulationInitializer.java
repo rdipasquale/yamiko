@@ -18,8 +18,18 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 public class UniqueIntegerPopulationInitializer implements PopulationInitializer<Integer[]>{
 
 	private int maxZeros=1;
-	private boolean startWithZero=false;
+	private boolean startWithZero=false;	
+	private int maxValue;
 	
+	
+	public int getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(int maxValue) {
+		this.maxValue = maxValue;
+	}
+
 	public boolean isStartWithZero() {
 		return startWithZero;
 	}
@@ -50,12 +60,15 @@ public class UniqueIntegerPopulationInitializer implements PopulationInitializer
 				zeros++;
 				numeros[0]=0;
 			}
+			int maxNum=population.getGenome().size();
+			if (this.getMaxValue()>0) maxNum=this.getMaxValue();
 			for (int j=zeros;j<population.getGenome().size();j++)
 			{
-				Integer rand=StaticHelper.randomInt(population.getGenome().size());
+				Integer rand=StaticHelper.randomInt(maxNum);
 				while (zeros>maxZeros || verificador.contains(rand))
-					rand=StaticHelper.randomInt(population.getGenome().size());
-				verificador.add(rand);
+					rand=StaticHelper.randomInt(maxNum+1);
+				if (rand!=0)
+					verificador.add(rand);
 				numeros[j]=rand;
 				if (rand==0) zeros++;
 			}

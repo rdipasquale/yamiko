@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
@@ -9,9 +11,13 @@ public class DistanceMatrix {
 	private double[][] matrix;
 	private int[] closer;
 	
+	public DistanceMatrix(Collection<Customer> c) {
+		this(new ArrayList<Customer>(c));		
+	}
+
 	public DistanceMatrix(List<Customer> c) {		
-		matrix=new double[c.size()][c.size()];
-		closer=new int[c.size()];
+		matrix=new double[c.size()+1][c.size()+1];
+		closer=new int[c.size()+1];
 		for (Customer i : c) {
 			int custCerc=0;
 			double custCercDist=0d;
