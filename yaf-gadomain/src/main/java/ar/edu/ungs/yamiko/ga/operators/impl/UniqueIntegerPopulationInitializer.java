@@ -65,8 +65,16 @@ public class UniqueIntegerPopulationInitializer implements PopulationInitializer
 			for (int j=zeros;j<population.getGenome().size();j++)
 			{
 				Integer rand=StaticHelper.randomInt(maxNum);
+				
+				int count=0;
 				while (zeros>maxZeros || verificador.contains(rand))
+				{
 					rand=StaticHelper.randomInt(maxNum+1);
+					count++;
+					if (Math.IEEEremainder(count, 1000)==0)
+						System.out.println("Se ha llegado a 1000 intentos sin poder incluir un elemento más a la lista");
+					
+				}
 				if (rand!=0)
 					verificador.add(rand);
 				numeros[j]=rand;
