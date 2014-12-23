@@ -67,7 +67,7 @@ public class UniqueIntegerPopulationInitializer implements PopulationInitializer
 				Integer rand=StaticHelper.randomInt(maxNum);
 				
 				int count=0;
-				while (zeros>maxZeros || verificador.contains(rand))
+				while ((zeros>maxZeros && rand==0) || verificador.contains(rand))
 				{
 					rand=StaticHelper.randomInt(maxNum+1);
 					count++;
