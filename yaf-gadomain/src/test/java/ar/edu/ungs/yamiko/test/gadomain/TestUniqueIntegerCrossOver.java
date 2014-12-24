@@ -28,7 +28,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 public class TestUniqueIntegerCrossOver {
 
 	@Test
-	public void test() {
+	public void testUniqueIntegerCrossOve() {
 		Gene gene=new BasicGene("Gene X", 0, 20);
 		List<Gene> genes=new ArrayList<Gene>();
 		genes.add(gene);
@@ -38,6 +38,9 @@ public class TestUniqueIntegerCrossOver {
 		Population<Integer[]> pop=new GlobalSingleSparkPopulation<>(genome);		
 		pop.setSize(2L);
 		UniqueIntegerPopulationInitializer popInit=new UniqueIntegerPopulationInitializer();
+		popInit.setMaxValue(100);
+		popInit.setMaxZeros(1);
+		popInit.setStartWithZero(true);
 		popInit.execute(pop);
 		for (Individual<Integer[]> i: pop) 
 			System.out.println(IntegerStaticHelper.toStringIndiviudal(i));

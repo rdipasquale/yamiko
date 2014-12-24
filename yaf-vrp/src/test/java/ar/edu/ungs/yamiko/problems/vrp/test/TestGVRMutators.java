@@ -18,15 +18,14 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
-import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
-import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
-import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutator;
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorInversion;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
+import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 public class TestGVRMutators {
 
@@ -41,6 +40,7 @@ public class TestGVRMutators {
 	private Ribosome<Integer[]> ribosome=new ByPassRibosome();
 	private Map<Integer, Customer> customers;
 	private GVRMutator mutator=new GVRMutatorSwap();
+	private GVRMutator mutatorInv=new GVRMutatorInversion();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -114,5 +114,35 @@ public class TestGVRMutators {
 		System.out.println(MUTATIONS + " mutations in " + (t2-t) + "ms"); 
 	}
 		
+	@Test
+	public void testInvertRoute() {
+		List<Integer> subRoute=RouteHelper.selectRandomSubRouteFromInd(i1);
+		List<Integer> subRouteInv=RouteHelper.invertRoute(subRoute);
+		String s1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		System.out.println("Ind 1 -> " + s1);
+		RouteHelper.replaceSequence(i1, subRoute, subRouteInv);
+		String ss1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		System.out.println("Ind 1' -> " + ss1);	
+	}
+	
+	@Test
+	public void testVRPMutatorInversion() {
+		
+		String s1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String s2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1 -> " + s1);
+		System.out.println("Ind 2 -> " + s2);
+		
+		mutatorInv.execute(i1);
+		mutatorInv.execute(i2);
+		
+		String ss1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String ss2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1' -> " + ss1);
+		System.out.println("Ind 2' -> " + ss2);
+
+	}	
 
 }

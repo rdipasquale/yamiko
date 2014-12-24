@@ -9,7 +9,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
-import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 /**
  * Operador de Crossover implementado de manera similar a lo publicado en "GVR: a New Genetic Representation for the Vehicle Routing Problem" de
@@ -58,17 +58,7 @@ public class GVRCrossover implements Crossover<Integer[]>{
 		Individual<Integer[]> i2 = individuals.get(1);		
 		
 		// 1) Se toma una subruta del individuo 2
-		Integer[] arrayI2=((Integer[])i2.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation());
-		int lengthI2=arrayI2.length;
-		int point=0;
-		while (arrayI2[point]==0)
-			point=StaticHelper.randomInt(lengthI2);
-		List<Integer> subRouteI2=new ArrayList<Integer>();
-		for (int aux1=point;aux1<lengthI2;aux1++)
-			if (arrayI2[aux1]==0)
-				break;
-			else
-				subRouteI2.add(arrayI2[aux1]);
+		List<Integer> subRouteI2=RouteHelper.selectRandomSubRouteFromInd(i2);
 
 		// 2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente al primero de la subruta seleccionada.
 		int auxC=0;
