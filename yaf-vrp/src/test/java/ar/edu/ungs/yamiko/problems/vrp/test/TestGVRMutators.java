@@ -23,6 +23,8 @@ import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutator;
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorDisplacement;
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorInsertion;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorInversion;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
@@ -41,6 +43,8 @@ public class TestGVRMutators {
 	private Map<Integer, Customer> customers;
 	private GVRMutator mutator=new GVRMutatorSwap();
 	private GVRMutator mutatorInv=new GVRMutatorInversion();
+	private GVRMutator mutatorIns=new GVRMutatorInsertion();
+	private GVRMutator mutatorDis=new GVRMutatorDisplacement();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -144,5 +148,68 @@ public class TestGVRMutators {
 		System.out.println("Ind 2' -> " + ss2);
 
 	}	
+	
+	@Test
+	public void testVRPMutatorInsertion() {
+		
+		String s1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String s2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1 -> " + s1);
+		System.out.println("Ind 2 -> " + s2);
+		
+		mutatorIns.execute(i1);
+		mutatorIns.execute(i2);
+		
+		String ss1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String ss2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1' -> " + ss1);
+		System.out.println("Ind 2' -> " + ss2);
 
+		org.junit.Assert.assertTrue(!s1.equals(ss1));
+		org.junit.Assert.assertTrue(!s2.equals(ss2));	
+		
+	}	
+	
+	@Test
+	public void testVRPMutatorInsertStress() {
+		long t=System.currentTimeMillis();
+		for (int i=0;i<MUTATIONS;i++)
+			mutatorIns.execute(i1);
+		long t2=System.currentTimeMillis();
+		System.out.println(MUTATIONS + " Insert mutations in " + (t2-t) + "ms"); 
+	}
+
+	@Test
+	public void testVRPMutatorDisplacement() {
+		
+		String s1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String s2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1 -> " + s1);
+		System.out.println("Ind 2 -> " + s2);
+		
+		mutatorDis.execute(i1);
+		mutatorDis.execute(i2);
+		
+		String ss1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		String ss2=IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
+		
+		System.out.println("Ind 1' -> " + ss1);
+		System.out.println("Ind 2' -> " + ss2);
+
+		org.junit.Assert.assertTrue(!s1.equals(ss1));
+		org.junit.Assert.assertTrue(!s2.equals(ss2));	
+		
+	}	
+	
+	@Test
+	public void testVRPMutatorDisplacementStress() {
+		long t=System.currentTimeMillis();
+		for (int i=0;i<MUTATIONS;i++)
+			mutatorDis.execute(i1);
+		long t2=System.currentTimeMillis();
+		System.out.println(MUTATIONS + " Displacement mutations in " + (t2-t) + "ms"); 
+	}
 }
