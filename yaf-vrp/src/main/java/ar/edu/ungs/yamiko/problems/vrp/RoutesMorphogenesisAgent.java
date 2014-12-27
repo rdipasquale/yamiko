@@ -10,7 +10,7 @@ import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicPhenotype;
-import ar.edu.ungs.yamiko.ga.exceptions.NullGenomeException;
+import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.exceptions.NullGenotypeException;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
@@ -36,7 +36,7 @@ public class RoutesMorphogenesisAgent implements MorphogenesisAgent<Integer[]> {
 	 */
 	public void develop(Genome<Integer[]> genome, Individual<Integer[]> ind) throws YamikoException
 	{
-		if (genome==null) throw new NullGenomeException(this.getClass().getSimpleName()+" - develop -> Null genome");
+		if (genome==null) throw new IndividualNotDeveloped(this.getClass().getSimpleName()+" - develop -> Null genome");
 		if (ind==null) throw new NullIndividualException(this.getClass().getSimpleName()+" - develop -> Null Individual");
 		if (ind.getGenotype()==null) throw new NullGenotypeException(this.getClass().getSimpleName()+" - develop -> Null Genotype");
 

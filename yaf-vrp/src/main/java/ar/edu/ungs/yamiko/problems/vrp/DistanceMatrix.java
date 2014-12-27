@@ -2,7 +2,9 @@ package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
 
@@ -10,12 +12,15 @@ public class DistanceMatrix {
 
 	private double[][] matrix;
 	private int[] closer;
+	private List<Customer> customers;
+	private Map<Integer, List<Integer>> distanceMap=new HashMap<Integer, List<Integer>>();
 	
 	public DistanceMatrix(Collection<Customer> c) {
 		this(new ArrayList<Customer>(c));		
 	}
 
-	public DistanceMatrix(List<Customer> c) {		
+	public DistanceMatrix(List<Customer> c) {
+		customers=c;
 		matrix=new double[c.size()+1][c.size()+1];
 		closer=new int[c.size()+1];
 		for (Customer i : c) {
@@ -61,5 +66,12 @@ public class DistanceMatrix {
 	{
 		return getCloserCustomer(i.getId());
 	}
+
+	public List<Customer> getCustomers() {
+		return customers;
+	}
+	
+	
+	
 	
 }
