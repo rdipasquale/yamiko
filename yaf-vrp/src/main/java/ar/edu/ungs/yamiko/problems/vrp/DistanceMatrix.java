@@ -2,12 +2,22 @@ package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
 
+/**
+ * Representa la matriz de distancia y abstrae algunas operaciones básicas relacionadas con las distancias entre clientes.
+ * @author ricardo
+ *
+ */
 public class DistanceMatrix {
 
 	private double[][] matrix;
@@ -71,7 +81,34 @@ public class DistanceMatrix {
 		return customers;
 	}
 	
-	
+	/**
+	 * Devuelve una lista con los clientes más cercanos a c
+	 * @param c
+	 * @return
+	 */
+	public List<Integer> getMostCloserCustomerList(Integer c)
+	{
+		if (distanceMap.containsKey(c))
+			return distanceMap.get(c);
+		List<Pair<Integer, Double>> pares=new ArrayList<Pair<Integer,Double>>();
+		for (int i=1;i<matrix[c].length;i++)
+			if (i!=c)
+				pares.add(new ImmutablePair<Integer, Double>(i, matrix[c][i]));
+		Collections.sort(pares, new Comparator<Pair<Integer, Double>>() 
+				{
+					@Override
+					public int compare(Pair<Integer, Double> o1,
+							Pair<Integer, Double> o2) {
+						return o1.getRight().compareTo(o2.getRight());
+					}
+				});
+		List<Integer> salida=new ArrayList<Integer>();
+		for (Pair<Integer, Double> pair : pares) 
+			salida.add(pair.getLeft());
+		distanceMap.put(c, salida);
+		return salida;
+		
+	}
 	
 	
 }
