@@ -35,14 +35,19 @@ public class TestUniqueIntegerPopInit {
 		
 		Population<Integer[]> pop=new GlobalSingleSparkPopulation<>(genome);		
 		pop.setSize(1L);
+		
 		UniqueIntegerPopulationInitializer popInit=new UniqueIntegerPopulationInitializer();
+		popInit.setMaxValue(10);
+		popInit.setMaxZeros(1);
+		popInit.setStartWithZero(true);
 		popInit.execute(pop);
+		
 
 		for (Individual<Integer[]> i: pop) {
 			Set<Integer> nros=new HashSet<>();
 			for (int j=0;j<10;j++)
 				nros.add(i.getGenotype().getChromosomes().get(0).getFullRawRepresentation()[j]);
-			if (nros.size()!=10) fail("Hay repetidos!");			
+			if (nros.size()<10) fail("Hay repetidos!");			
 		}
 		
 	}

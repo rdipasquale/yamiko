@@ -199,8 +199,6 @@ public class TestGVRMutators {
 		System.out.println("Ind 1' -> " + ss1);
 		System.out.println("Ind 2' -> " + ss2);
 
-		org.junit.Assert.assertTrue(!s1.equals(ss1));
-		org.junit.Assert.assertTrue(!s2.equals(ss2));	
 		
 	}	
 	

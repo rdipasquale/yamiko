@@ -7,6 +7,8 @@ public class Customer {
 	private String address;
 	private double latitude;
 	private double longitude;
+	private TimeWindow timeWindow;
+	
 	public int getId() {
 		return id;
 	}
@@ -61,6 +63,20 @@ public class Customer {
 			return false;
 		return true;
 	}
+	
+	public Customer() {
+		// TODO Auto-generated constructor stub
+	}
+	public Customer(int id, String name, String address, double latitude,
+			double longitude, TimeWindow timeWindow) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.timeWindow = timeWindow;
+	}
 	public Customer(int id, String name, String address, double latitude,
 			double longitude) {
 		super();
@@ -70,9 +86,13 @@ public class Customer {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
-	
-	public Customer() {
-		// TODO Auto-generated constructor stub
+	public TimeWindow getTimeWindow() {
+		return timeWindow;
 	}
+	public void setTimeWindow(TimeWindow timeWindow) {
+		this.timeWindow = timeWindow;
+	}
+	
+	
 	
 }

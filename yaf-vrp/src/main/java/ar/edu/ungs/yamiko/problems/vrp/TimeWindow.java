@@ -53,5 +53,23 @@ public class TimeWindow {
 	{
 		return c2;
 	}	
+	
+	public boolean intersects(TimeWindow t2,int marginInMinutes,Double timeTravel, int timeServe)
+	{
+		if (t2==null) return true; // Algo con restricción intersecta a algo sin restricción
+		Calendar travelF=Calendar.getInstance();
+		Calendar travelT=Calendar.getInstance();
+		travelF.setTime(c1.getTime());
+		travelT.setTime(c2.getTime());
+		travelF.add(Calendar.MINUTE, timeTravel.intValue()+timeServe-marginInMinutes);
+		travelT.add(Calendar.MINUTE, timeTravel.intValue()+timeServe+marginInMinutes);
+		
+		if ( 
+				(travelF.before(t2.from()) && travelT.after(t2.from())) ||
+				(travelF.before(t2.to()) && travelT.after(t2.to())) 
+			)
+			return true;
+		return false;
+	}
 
 }

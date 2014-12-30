@@ -6,6 +6,7 @@ import java.util.List;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.Route;
 
@@ -87,8 +88,42 @@ public class RouteHelper {
 	public static final boolean insertClientBCTW(Integer client,List<Integer> dest, DistanceMatrix matrix)
 	{
 		List<Integer> mostC=matrix.getMostCloserCustomerList(client);
-		
+		for (Integer c : mostC) {
+			// Vemos después de c....
+			Customer cust=matrix.getCustomerMap().get(c);
+			if (cust.getTimeWindow()==null)
+			{
+				dest.add(dest.indexOf(c)+1, client);
+				return true;
+			}
+			else
+			{
+				double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
+				if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, Constants.DISPATCH_TIME_MINUTES))
+						{
+					dest.add(dest.indexOf(c)+1, client);
+					return true;
+				}						
+			}
+		}
 		return false;
+	}
+	
+	/**
+	 * Devuelve la subruta perteneciente a la ruta en donde se encuentre el cliente "client" (en dest) desde el depósito hasta el cliente.
+	 * @param client
+	 * @param dest
+	 * @return
+	 */
+	public static final List<Integer> getSubrouteUntilClient(Integer client,List<Integer> dest)
+	{
+		if (dest==null) return null;
+		if (client==0) return null;
+		if (!dest.contains(client)) return null;
+		int positionTo=dest.indexOf(client);
+		int positionFrom=positionTo;
+		while (positionFrom>=0 && dest.get(positionFrom)!=0) positionFrom--;
+		return dest.subList(positionFrom, positionTo);
 	}
 	
 }

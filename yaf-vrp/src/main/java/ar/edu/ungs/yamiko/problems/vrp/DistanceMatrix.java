@@ -23,6 +23,7 @@ public class DistanceMatrix {
 	private double[][] matrix;
 	private int[] closer;
 	private List<Customer> customers;
+	private Map<Integer,Customer> customerMap=new HashMap<Integer, Customer>();
 	private Map<Integer, List<Integer>> distanceMap=new HashMap<Integer, List<Integer>>();
 	
 	public DistanceMatrix(Collection<Customer> c) {
@@ -31,6 +32,8 @@ public class DistanceMatrix {
 
 	public DistanceMatrix(List<Customer> c) {
 		customers=c;
+		for (Customer customer : c) 
+			customerMap.put(customer.getId(), customer);
 		matrix=new double[c.size()+1][c.size()+1];
 		closer=new int[c.size()+1];
 		for (Customer i : c) {
@@ -51,6 +54,10 @@ public class DistanceMatrix {
 			}
 			closer[i.getId()]=custCerc;
 		}
+	}
+
+	public Map<Integer, Customer> getCustomerMap() {
+		return customerMap;
 	}
 
 	public double[][] getMatrix() {

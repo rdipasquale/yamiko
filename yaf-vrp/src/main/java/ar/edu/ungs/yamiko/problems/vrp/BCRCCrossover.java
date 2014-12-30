@@ -67,7 +67,7 @@ public class BCRCCrossover implements Crossover<Integer[]>{
 		
 		// 4) Se crea el descendiente D1 a partir de P1', insertándole los clientes de R por el criterio de mínimo costo en alguna ruta existente. Si es imposible, se crea una nueva ruta.
 		for (Integer c : routeI2)
-			if (!RouteHelper.insertClientBCTW(c, plprima,matrix))
+			if (!RouteHelper.insertClientBCTW(c, p1prima,matrix));
 			
 		
 		// 2) Busca un cliente c que (no perteneciendo a la subruta tomada en el punto 1) sea el más cercano geográficamente al primero de la subruta seleccionada.
