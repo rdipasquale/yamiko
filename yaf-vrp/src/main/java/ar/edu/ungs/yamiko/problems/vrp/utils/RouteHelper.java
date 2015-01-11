@@ -108,7 +108,7 @@ public class RouteHelper {
 			{
 				double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
 				if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, Constants.DISPATCH_TIME_MINUTES))
-						{
+				{
 					dest.add(dest.indexOf(c)+1, client);
 					return true;
 				}						
@@ -163,7 +163,7 @@ public class RouteHelper {
 		if (!dest.contains(client)) return null;
 		int positionTo=dest.indexOf(client);
 		int positionFrom=positionTo;
-		while (positionFrom>=0 && dest.get(positionFrom)!=0) positionFrom--;
+		while (positionFrom>0 && dest.get(positionFrom)!=0) positionFrom--;
 		return dest.subList(positionFrom, positionTo);
 	}
 	
