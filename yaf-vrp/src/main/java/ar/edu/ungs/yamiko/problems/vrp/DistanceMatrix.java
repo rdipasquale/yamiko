@@ -106,7 +106,10 @@ public class DistanceMatrix {
 		if (distanceMap.containsKey(c))
 			return distanceMap.get(c);
 		List<Pair<Integer, Double>> pares=new ArrayList<Pair<Integer,Double>>();
-		for (int i=1;i<matrix[c].length;i++)
+		int inicio=0;
+		if (customerMap.get(0)==null)
+			inicio=1;		
+		for (int i=inicio;i<matrix[c].length;i++)
 			if (i!=c)
 				pares.add(new ImmutablePair<Integer, Double>(i, matrix[c][i]));
 		Collections.sort(pares, new Comparator<Pair<Integer, Double>>() 

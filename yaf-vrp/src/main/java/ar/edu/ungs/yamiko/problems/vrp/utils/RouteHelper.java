@@ -97,22 +97,28 @@ public class RouteHelper {
 	{
 		List<Integer> mostC=matrix.getMostCloserCustomerList(client);
 		for (Integer c : mostC) {
-			// Vemos después de c....
-			Customer cust=matrix.getCustomerMap().get(c);
-			if (cust.getTimeWindow()==null)
+			// Si c está en dest
+			if (dest.contains(c))
 			{
-				dest.add(dest.indexOf(c)+1, client);
-				return true;
-			}
-			else
-			{
-				double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
-				if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, Constants.DISPATCH_TIME_MINUTES))
+				
+				// Vemos después de c....
+				Customer cust=matrix.getCustomerMap().get(c);
+				if (cust.getTimeWindow()==null)
 				{
 					dest.add(dest.indexOf(c)+1, client);
 					return true;
-				}						
+				}
+				else
+				{
+					double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
+					if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, Constants.DISPATCH_TIME_MINUTES))
+					{
+						dest.add(dest.indexOf(c)+1, client);
+						return true;
+					}						
+				}
 			}
+
 		}
 		return false;
 	}
