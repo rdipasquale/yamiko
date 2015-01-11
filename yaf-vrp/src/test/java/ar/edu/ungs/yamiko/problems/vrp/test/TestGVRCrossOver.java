@@ -85,7 +85,6 @@ public class TestGVRCrossOver {
 		System.out.println("Parent 1 -> " + IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 		System.out.println("Parent 2 -> " + IntegerStaticHelper.toStringIntArray(i2.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 		System.out.println("Desc   1 -> " + IntegerStaticHelper.toStringIntArray(desc.get(0).getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-		org.junit.Assert.assertTrue( (desc.get(0).getGenotype().getChromosomes().get(0).getFullRawRepresentation())[0]==0);	
 	}
 
 	@Test

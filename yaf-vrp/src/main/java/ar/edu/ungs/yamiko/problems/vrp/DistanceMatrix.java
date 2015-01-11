@@ -34,8 +34,16 @@ public class DistanceMatrix {
 		customers=c;
 		for (Customer customer : c) 
 			customerMap.put(customer.getId(), customer);
-		matrix=new double[c.size()+1][c.size()+1];
-		closer=new int[c.size()+1];
+		if (customerMap.get(0)==null)
+		{
+			matrix=new double[c.size()+1][c.size()+1];
+			closer=new int[c.size()+1];			
+		}
+		else
+		{
+			matrix=new double[c.size()][c.size()];
+			closer=new int[c.size()];						
+		}
 		for (Customer i : c) {
 			int custCerc=0;
 			double custCercDist=0d;
@@ -117,5 +125,21 @@ public class DistanceMatrix {
 		
 	}
 	
+	@Override
+	public String toString() {
+		if (matrix==null) return "Null";
+		String salida="-\t";
+		for (int i=0;i<matrix[0].length;i++)
+			salida+= i + "\t";
+		salida+="\n";
+		for (int i=0;i<matrix[0].length;i++)
+		{
+			salida+= i + "\t";
+			for (int j=0;j<matrix[0].length;j++)
+				salida+=new Double(matrix[i][j]).intValue()+"\t";
+			salida+="\n";
+		}
+		return salida;
+	}
 	
 }
