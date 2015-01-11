@@ -3,6 +3,8 @@ package ar.edu.ungs.yamiko.problems.vrp.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.ListUtils;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -85,6 +87,14 @@ public class RouteHelper {
 			}
 	}
 
+	/**
+	 * Inserta el Cliente "client" en la Lista "dest" con el criterio de Mejor Costo y Time Window.
+	 * Si no puede hacerlo devuelve false.
+	 * @param client
+	 * @param dest
+	 * @param matrix
+	 * @return
+	 */
 	public static final boolean insertClientBCTW(Integer client,List<Integer> dest, DistanceMatrix matrix)
 	{
 		List<Integer> mostC=matrix.getMostCloserCustomerList(client);
@@ -107,6 +117,17 @@ public class RouteHelper {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Crea una nueva ruta en la lista dest detectando donde hay 2 ceros seguidos e insertando el cliente "client".
+	 * Si no hay dos ceros seguidos, agrega el client al final de la lista (agregando un cero si no hay).
+	 * @param client
+	 * @param dest
+	 */
+	public static final void createNewRouteAndInsertClient(Integer client,List<Integer> dest)
+	{
+		
 	}
 	
 	/**
