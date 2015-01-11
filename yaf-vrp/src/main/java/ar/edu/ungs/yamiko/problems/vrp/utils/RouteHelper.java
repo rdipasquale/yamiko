@@ -3,8 +3,6 @@ package ar.edu.ungs.yamiko.problems.vrp.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
-
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -127,7 +125,29 @@ public class RouteHelper {
 	 */
 	public static final void createNewRouteAndInsertClient(Integer client,List<Integer> dest)
 	{
-		
+		int primeraOcurrencia=dest.indexOf(0);
+		if (primeraOcurrencia==-1)
+		{
+			// Inserta al final
+			dest.add(0);
+			dest.add(client);
+			return;
+		}
+		for (int i=primeraOcurrencia+1;i<dest.size();i++)
+			if (dest.get(i-1)==0)
+				if (dest.get(i)==0)
+				{
+					dest.add(i,client);
+					return;
+				}
+		if (dest.get(dest.size()-1)==0)
+		{
+			dest.add(client);
+			return;			
+		}
+		dest.add(0);
+		dest.add(client);
+		return;		
 	}
 	
 	/**
