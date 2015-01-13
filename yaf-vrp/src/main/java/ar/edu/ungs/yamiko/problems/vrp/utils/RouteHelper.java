@@ -1,6 +1,8 @@
 package ar.edu.ungs.yamiko.problems.vrp.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -241,6 +243,62 @@ public class RouteHelper {
 		for (int i=0;i<index;i++)
 			salida.add(l.get(i));
 		return salida;
+	}
+
+	/**
+	 * Devuelve las rutas ordenadas por logitud decreciente a partir de una lista de individuos
+	 * @param inds
+	 * @return
+	 * @throws IndividualNotDeveloped
+	 */
+	@SuppressWarnings("unchecked")
+	public static final List<List<Integer>> getOrdereredRouteList(List<Individual<Integer[]>> inds) throws IndividualNotDeveloped
+	{
+		List<Route> rutasNoVacias=new ArrayList<Route>();
+		List<Route> rutasCompletas=new ArrayList<Route>();
+		for (Individual<Integer[]> ind : inds) {
+			if (ind.getPhenotype()==null) throw new IndividualNotDeveloped();
+			Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
+			rutasCompletas.addAll(((List<Route>)rutas[0]));
+		}
+		for (Route r : rutasCompletas) 
+			if (r.getRouteModel().size()>0)
+				rutasNoVacias.add(r);		
+		List<List<Integer>> salida=new ArrayList<List<Integer>>();
+		for (Route r : rutasNoVacias)
+			salida.add(r.getRouteModel());
+		Collections.sort(salida, 
+				new Comparator<List<Integer>>() 
+				{
+					@Override
+					public int compare(List<Integer> o1, List<Integer> o2) {
+						return new Integer(o2.size()).compareTo(o1.size());
+					}
+				});
+		return salida;
+	}
+	
+	/**
+	 * Devuelve las rutas ordenadas por logitud decreciente a partir de una lista de rutas (enteros)
+	 * @param inds
+	 * @return
+	 * @throws IndividualNotDeveloped
+	 */
+	public static final List<List<Integer>> getOrdereredRouteListFromList(List<List<Integer>> inds) 
+	{
+		List<List<Integer>> rutasNoVacias=new ArrayList<List<Integer>>();
+		for (List<Integer> ind : inds) 
+			if (ind.size()>0)
+				rutasNoVacias.add(ind);		
+		Collections.sort(rutasNoVacias, 
+				new Comparator<List<Integer>>() 
+				{
+					@Override
+					public int compare(List<Integer> o1, List<Integer> o2) {
+						return new Integer(o2.size()).compareTo(o1.size());
+					}
+				});
+		return rutasNoVacias;
 	}
 	
 }

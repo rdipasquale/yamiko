@@ -18,6 +18,8 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  *  4) Se crea el descendiente D1 a partir de P1', insertándole los clientes de R por el criterio de mínimo costo en alguna ruta existente. Si es imposible, se crea una nueva ruta.
  *  5) Se crea el descendiente D2 de manera recíproca analogando los puntos 1-4.
  * 
+ * El diseño de BCRC lleva a la minización de rutas, dado que los nodos a ser reemplazados pueden formar la ruta en el segundo padre, y existe la posibilidad de que la ruta entera sea removida en la descendencia.
+ * 
  * @author ricardo
  *
  */

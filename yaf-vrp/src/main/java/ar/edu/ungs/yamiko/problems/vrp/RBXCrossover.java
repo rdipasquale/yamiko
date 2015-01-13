@@ -18,6 +18,9 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  *  4) Se agrega la ruta R2 a a D1.
  *  5) Se agrega cada visita de R1 a D1 según criterio de mejor costo.
  *  6) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-5.
+ *  
+ *  RBX preserva la factibilidad de la descendencia. Dado que las rutas seleccionadas aleatoriamente en ambos padres pueden no tener clientes en común, es posible que se minimce 
+ *  la cantidad de rutas. 
  * @author ricardo
  *
  */
