@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
-import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
@@ -22,32 +21,10 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class GVRCrossover implements VRPCrossover{
+public class GVRCrossover extends VRPCrossover{
 
 	public GVRCrossover() {
 
-	}
-	
-	private DistanceMatrix matrix;
-	
-	
-	public DistanceMatrix getMatrix() {
-		return matrix;
-	}
-
-	public void setMatrix(DistanceMatrix matrix) {
-		this.matrix = matrix;
-	}
-
-	/**
-	 * Validaciones de nulidad y de formato.
-	 * @param individuals
-	 */
-	private void validaciones(List<Individual<Integer[]>> individuals)
-	{
-		if (individuals==null) throw new NullIndividualException();
-		if (individuals.size()<2) throw new NullIndividualException();
-		if (individuals.get(0)==null || individuals.get(1)==null) throw new NullIndividualException();
 	}
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {

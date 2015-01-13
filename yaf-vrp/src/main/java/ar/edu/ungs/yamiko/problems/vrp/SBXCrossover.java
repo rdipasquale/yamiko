@@ -9,26 +9,30 @@ import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 /**
- * Best Cost Route Crossover. Operador de Crossover implementado de manera similar a lo publicado en "Multi-Objective Genetic Algorithms for Vehicle Routing 
- * Problem with Time Windows" de Ombuki et al (2006), citado en "Genetic algorithms and VRP: the behaviour of a crossover operator" de Vaira y Kurosova (2013). 
- * El algoritmo es el siguiente:
- *  1) A partir de 2 padres P1 y P2 
- *  2) Se toma una ruta completa R del individuo P2
- *  3) Se hace una copia de P1 (P1') y se le restan los clientes que se encuentran en R.
- *  4) Se crea el descendiente D1 a partir de P1', insertándole los clientes de R por el criterio de mínimo costo en alguna ruta existente. Si es imposible, se crea una nueva ruta.
- *  5) Se crea el descendiente D2 de manera recíproca analogando los puntos 1-4.
- * 
+ * Sequence Based Crossover. Operador de Crossover implementado de manera similar a lo publicado en "The Vehicle Routing Problem with Time Windows Part II: Genetic Search" 
+ * de Potvin, J.-Y., Bengio, S. (1996), citado en "Genetic algorithms and VRP: the behaviour of a crossover operator" de Vaira y Kurosova (2013). 
+ * El algoritmo selecciona dos rutas de los progenitores y los mezcla seleccionando un punto de corte en cada ruta. El algoritmos es el siguiente:
+ *  1) A partir de 2 padres P1 y P2 Se hace una copia (deep) de cada uno (D1 y D2) .
+ *  2) Se toma una ruta (Random) completa R1 del individuo P1 y R2 del individuo P2.
+ *  3) Se crea una nueva ruta Snew agregando todas las visitas de R1 desde el principio hasta un punto aleatorio de corte.
+ *  4) Se agregan a Snew las visitas de R2 desde el puntod e corte seleccionado en "3" hasta el final.
+ *  5) Se remueven duplicados de Snew
+ *  6) Se remueven de D1 todas las visitas que están en Snew.
+ *  7) Se remueven de D1 todas las visitas que están en R1. Se define Ttemp con todas las visitas de R1.
+ *  8) Se agrega todo Snew a D1.
+ *  9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.
+ *  10) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-9.
  * @author ricardo
  *
  */
-public class BCRCCrossover extends VRPCrossover{
+public class SBXCrossover extends VRPCrossover{
 
-	public BCRCCrossover() {
+	public SBXCrossover() {
 
 	}
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
-		super.validaciones(individuals);
+		validaciones(individuals);
 		List<Individual<Integer[]>> descendants=new ArrayList<Individual<Integer[]>>();
 		Individual<Integer[]> p1 = individuals.get(0);
 		Individual<Integer[]> p2 = individuals.get(1);		
