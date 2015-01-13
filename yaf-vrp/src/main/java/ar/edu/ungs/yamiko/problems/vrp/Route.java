@@ -90,5 +90,20 @@ public class Route {
 		this.routeModel.addAll(Arrays.asList(route));
 		buildRouteRepresentation(customers);
 	}
+
+	@Override
+	public String toString() {
+		String salida="Route [ ";
+		if (routeModel==null)
+			salida+=" Null ";
+		else
+			for (Integer i : routeModel) 
+				salida+=" " + i + " ";
+		
+		salida+="]";
+		return salida;
+				
+	}
+	
 	
 }

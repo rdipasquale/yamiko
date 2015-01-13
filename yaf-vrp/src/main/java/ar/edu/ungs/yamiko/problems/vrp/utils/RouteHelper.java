@@ -39,16 +39,24 @@ public class RouteHelper {
 	}
 
 	/**
-	 * Selecciona una ruta completa al azar a partir de un individuo desarrollado
+	 * Selecciona una ruta (no vacía) completa al azar a partir de un individuo desarrollado
 	 * @param i2
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static final List<Integer> selectRandomRouteFromInd(Individual<Integer[]> i2) throws IndividualNotDeveloped
 	{
 			if (i2==null) throw new IndividualNotDeveloped();
 			if (i2.getPhenotype()==null) throw new IndividualNotDeveloped();
 			Object[] rutas=i2.getPhenotype().getAlleleMap().get(i2.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
-			return ((Route)(rutas[StaticHelper.randomInt(rutas.length)])).getRouteModel();
+			List<Route> rutasCompletas=((List<Route>)rutas[0]);
+			List<Route> rutasNoVacias=new ArrayList<Route>();
+			for (Route r : rutasCompletas) 
+				if (r.getRouteModel().size()>0)
+					rutasNoVacias.add(r);
+			if (rutasNoVacias.size()==1)
+				return rutasNoVacias.get(0).getRouteModel();
+			return rutasNoVacias.get(StaticHelper.randomInt(rutasNoVacias.size())).getRouteModel();
 	}
 
 	/**
@@ -172,6 +180,19 @@ public class RouteHelper {
 		while (positionFrom>0 && dest.get(positionFrom)!=0) positionFrom--;
 		return dest.subList(positionFrom, positionTo);
 	}
-		
+
+	/**
+	 * Convierte una Lista de Rutas a una única lista de enteros.
+	 * @param routes
+	 * @return
+	 */
+	public static final List<Integer> convertRouteList(List<Route> routes)
+	{
+		if (routes==null) return null;
+		List<Integer> salida=new ArrayList<Integer>();
+		for (Route r : routes) 
+			salida.addAll(r.getRouteModel());
+		return salida;
+	}
 	
 }

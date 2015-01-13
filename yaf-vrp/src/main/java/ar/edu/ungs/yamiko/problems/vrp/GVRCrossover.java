@@ -7,7 +7,6 @@ import java.util.List;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
-import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
@@ -23,7 +22,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class GVRCrossover implements Crossover<Integer[]>{
+public class GVRCrossover implements VRPCrossover{
 
 	public GVRCrossover() {
 

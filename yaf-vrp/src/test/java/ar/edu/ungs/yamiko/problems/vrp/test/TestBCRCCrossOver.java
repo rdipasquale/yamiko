@@ -21,12 +21,14 @@ import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.BCRCCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
-import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
+import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
+import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 
-public class TestGVRCrossOver {
+public class TestBCRCCrossOver {
 
 	private static final int CROSSOVERS=1000000;
 	private VRPCrossover cross; 
@@ -39,21 +41,23 @@ public class TestGVRCrossOver {
 	private String chromosomeName="The Chromosome";
 	private Ribosome<Integer[]> ribosome=new ByPassRibosome();
 	private Map<Integer, Customer> customers;
+	private RoutesMorphogenesisAgent rma;
 	
 	@Before
 	public void setUp() throws Exception {
 		customers=new HashMap<Integer,Customer>();
-		customers.put(1,new Customer(1, "Cliente 1", null, -34.626754, -58.420035));
-		customers.put(2,new Customer(2, "Cliente 2", null, -34.551934, -58.487048));
-		customers.put(3,new Customer(3, "Cliente 3", null, -34.520542, -58.699564));		
-		customers.put(4,new Customer(4, "Cliente 4", null, -34.640675, -58.516573));		
-		customers.put(5,new Customer(5, "Cliente 5", null, -34.607338, -58.414263));		
-		customers.put(6,new Customer(6, "Cliente 6", null, -34.653103, -58.397097));		
-		customers.put(7,new Customer(7, "Cliente 7", null, -34.618075, -58.425593));		
-		customers.put(8,new Customer(8, "Cliente 8", null, -34.597730, -58.372378));		
-		customers.put(9,new Customer(9, "Cliente 9", null, -34.661575, -58.477091));		
-		customers.put(10,new Customer(10, "Cliente 10", null, -34.557589, -58.418383));		
-		cross=new GVRCrossover();
+		customers.put(0,new Customer(0, "Deposito", null, -34.625, -58.439));
+		customers.put(1,new Customer(1, "Cliente 1", null, -34.626754, -58.420035,new TimeWindow(8,0, 11, 0)));
+		customers.put(2,new Customer(2, "Cliente 2", null, -34.551934, -58.487048,new TimeWindow(9,0, 12, 0)));
+		customers.put(3,new Customer(3, "Cliente 3", null, -34.520542, -58.699564,new TimeWindow(10,0, 15, 0)));		
+		customers.put(4,new Customer(4, "Cliente 4", null, -34.640675, -58.516573,new TimeWindow(8,0, 10, 0)));		
+		customers.put(5,new Customer(5, "Cliente 5", null, -34.607338, -58.414263,new TimeWindow(8,0, 10, 0)));		
+		customers.put(6,new Customer(6, "Cliente 6", null, -34.653103, -58.397097,new TimeWindow(8,0, 10, 0)));		
+		customers.put(7,new Customer(7, "Cliente 7", null, -34.618075, -58.425593,new TimeWindow(8,0, 10, 0)));		
+		customers.put(8,new Customer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 10, 0)));		
+		customers.put(9,new Customer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 10, 0)));		
+		customers.put(10,new Customer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));	
+		cross=new BCRCCrossover();
 		i1=new BasicIndividual<Integer[]>();
 		i2=new BasicIndividual<Integer[]>();
 		popI=new UniqueIntegerPopulationInitializer();
@@ -67,6 +71,9 @@ public class TestGVRCrossOver {
 		population=new GlobalSinglePopulation<Integer[]>(genome);
 		population.setSize(2L);
 		popI.execute(population);
+		rma=new RoutesMorphogenesisAgent(customers);
+		for (Individual<Integer[]> ind: population) 
+			rma.develop(genome, ind);		
 		i1=population.getAll().get(0);
 		i2=population.getAll().get(1);
 		cross.setMatrix(new DistanceMatrix(customers.values()));
@@ -79,7 +86,7 @@ public class TestGVRCrossOver {
 
 
 	@Test
-	public void testVRPCrossOver() {
+	public void testBCRCCrossOver() {
 		
 		List<Individual<Integer[]>> desc= cross.execute(population.getAll());
 		System.out.println("Parent 1 -> " + IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
@@ -88,7 +95,7 @@ public class TestGVRCrossOver {
 	}
 
 	@Test
-	public void testVRPCrossOverStress() {
+	public void testBCRCCrossOverStress() {
 		long t=System.currentTimeMillis();
 		for (int i=0;i<CROSSOVERS;i++)
 			cross.execute(population.getAll());
