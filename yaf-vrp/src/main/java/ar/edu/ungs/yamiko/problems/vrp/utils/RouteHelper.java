@@ -130,10 +130,43 @@ public class RouteHelper {
 		}
 		return false;
 	}
+
+	/**
+	 * Crea una nueva ruta en la lista dest detectando donde hay 2 ceros seguidos e insertando los clientes de la ruta "client".
+	 * Si no hay dos ceros seguidos, agrega los clientes al final de la lista (agregando un cero si no hay).
+	 * @param client
+	 * @param dest
+	 */
+	public static final void createNewRouteAndInsertRoute(List<Integer> client,List<Integer> dest)
+	{
+		int primeraOcurrencia=dest.indexOf(0);
+		if (primeraOcurrencia==-1)
+		{
+			// Inserta al final
+			dest.add(0);
+			dest.addAll(client);
+			return;
+		}
+		for (int i=primeraOcurrencia+1;i<dest.size();i++)
+			if (dest.get(i-1)==0)
+				if (dest.get(i)==0)
+				{
+					dest.addAll(i,client);
+					return;
+				}
+		if (dest.get(dest.size()-1)==0)
+		{
+			dest.addAll(client);
+			return;			
+		}
+		dest.add(0);
+		dest.addAll(client);
+		return;				
+	}
 	
 	/**
 	 * Crea una nueva ruta en la lista dest detectando donde hay 2 ceros seguidos e insertando el cliente "client".
-	 * Si no hay dos ceros seguidos, agrega el client al final de la lista (agregando un cero si no hay).
+	 * Si no hay dos ceros seguidos, agrega el cliente al final de la lista (agregando un cero si no hay).
 	 * @param client
 	 * @param dest
 	 */
@@ -192,6 +225,21 @@ public class RouteHelper {
 		List<Integer> salida=new ArrayList<Integer>();
 		for (Route r : routes) 
 			salida.addAll(r.getRouteModel());
+		return salida;
+	}
+	
+	/**
+	 * Copia todos los elementos de una ruta desde el principio hasta un indice determinado
+	 * @param l
+	 * @param index
+	 * @return
+	 */
+	public static final List<Integer> copyRouteUntilIndex(List<Integer> l, int index)
+	{
+		if (l==null) return null;
+		List<Integer> salida=new ArrayList<Integer>();
+		for (int i=0;i<index;i++)
+			salida.add(l.get(i));
 		return salida;
 	}
 	

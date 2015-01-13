@@ -100,7 +100,7 @@ public class TestBCRCCrossOver {
 		for (int i=0;i<CROSSOVERS;i++)
 			cross.execute(population.getAll());
 		long t2=System.currentTimeMillis();
-		System.out.println(CROSSOVERS + " crossovers in " + (t2-t) + "ms"); 
+		System.out.println(CROSSOVERS + " BCRC crossovers in " + (t2-t) + "ms"); 
 	}
 		
 
