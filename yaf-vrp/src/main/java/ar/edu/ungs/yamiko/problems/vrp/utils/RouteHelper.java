@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
@@ -317,7 +321,7 @@ public class RouteHelper {
 	{
 		if (ind.getPhenotype()==null) throw new IndividualNotDeveloped();
 		Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
-		Graph<Integer, DefaultEdge> g=new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		Graph<Integer, DefaultEdge> g=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
 		for (Integer i : m.getVertexSet())
 			g.addVertex(i);
 		for (Route r : ((List<Route>)rutas[0])) 
@@ -332,13 +336,67 @@ public class RouteHelper {
 		return g;
 	}
 	
+	/**
+	 * Devuelve un nuevo grafo con el mismo conjunto de nodos y los arcos que están en ambos grafos (la intersección de dichos conjuntos).
+	 * @param g1
+	 * @param g2
+	 * @return
+	 */
 	public static final Graph<Integer, DefaultEdge> intersectGraph(Graph<Integer, DefaultEdge> g1,Graph<Integer, DefaultEdge> g2)
 	{
-		Graph<Integer, DefaultEdge> g=new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		Graph<Integer, DefaultEdge> g=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
 		for (Integer i : g1.vertexSet())
-			g1.addVertex(i);
+			g.addVertex(i);
+		for (DefaultEdge e : g1.edgeSet()) 
+			if (g2.containsEdge(g1.getEdgeSource(e),g1.getEdgeTarget(e)))
+				g.addEdge(g1.getEdgeSource(e),g1.getEdgeTarget(e));
 		return g;
-
 	}
+
+	/**
+	 * Devuelve una ruta en formato de lista a partir de un grafo
+	 * @param g
+	 * @return
+	 */
+	public static final List<Integer> graphToRoute(Graph<Integer, DefaultEdge> g)
+	{
+		if (g==null) return null;
+		DirectedGraph<Integer, DefaultEdge> dg=(DirectedGraph<Integer, DefaultEdge> )g;
+		List<Integer> salida=new ArrayList<Integer>();
+		List<DefaultEdge> aBorrar=new ArrayList<DefaultEdge>();
+		for (DefaultEdge e : dg.incomingEdgesOf(0)) {
+			DijkstraShortestPath<Integer, DefaultEdge> sp=new DijkstraShortestPath<Integer, DefaultEdge>(dg,0, dg.getEdgeSource(e));
+			if (sp.getPathEdgeList()!=null)
+			{
+				salida.add(0);
+				aBorrar.add(e);
+				for (DefaultEdge e2 : sp.getPathEdgeList()) 
+				{
+					salida.add(dg.getEdgeTarget(e2));
+					aBorrar.add(e2);
+				}				
+			}
+		}
+		for (DefaultEdge e : aBorrar)
+			dg.removeEdge(e);
+			
+		if (dg.edgeSet().size()>0)
+		{
+			ConnectivityInspector<Integer, DefaultEdge> ci=new ConnectivityInspector<Integer, DefaultEdge>(dg);
+			for (Set<Integer> s : ci.connectedSets()) 
+				if (s.size()>1)
+				{
+				salida.add(0);
+					for (Integer i : s) 
+						if (i!=0)
+							salida.add(i);
+				}
+		}
+
+		if (salida.size()>0)
+			if (salida.get(salida.size()-1)!=0)
+				salida.add(0);
+		return salida;
+	}	
 	
 }

@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -459,6 +461,190 @@ public class TestRouteHelper {
 		assertTrue(salida.containsEdge(5, 0));
 		assertFalse(salida.containsEdge(3, 1));
 		assertFalse(salida.containsEdge(15, 0));
+
+	}
+
+	@Test
+	public void testGetGraphIntersection() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		Graph<Integer, DefaultEdge> g2=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+		{
+			g1.addVertex(i);
+			g2.addVertex(i);			
+		}
+		g1.addEdge(0, 1);
+		g1.addEdge(1, 2);
+		g1.addEdge(2, 3);
+		g1.addEdge(3, 4);
+		g1.addEdge(4, 0);
+		g2.addEdge(0, 1);
+		g2.addEdge(5, 6);
+		g2.addEdge(6, 7);
+		g2.addEdge(7, 8);
+		g2.addEdge(8, 9);
+		g2.addEdge(9, 0);
+		
+		Graph<Integer, DefaultEdge> salida=RouteHelper.intersectGraph(g1, g2);
+		
+		assertTrue(salida.containsEdge(0, 1));
+		assertFalse(salida.containsEdge(1, 2));
+		assertFalse(salida.containsEdge(2, 3));
+		assertFalse(salida.containsEdge(3, 4));
+		assertFalse(salida.containsEdge(4, 0));
+		assertFalse(salida.containsEdge(0, 5));
+		assertFalse(salida.containsEdge(5, 0));
+		assertFalse(salida.containsEdge(3, 1));
+		assertFalse(salida.containsEdge(15, 0));
+
+	}
+
+	@Test
+	public void testGetGraphIntersectionEmpty() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		Graph<Integer, DefaultEdge> g2=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+		{
+			g1.addVertex(i);
+			g2.addVertex(i);			
+		}
+		g1.addEdge(0, 1);
+		g1.addEdge(1, 2);
+		g1.addEdge(2, 3);
+		g1.addEdge(3, 4);
+		g1.addEdge(4, 0);
+		g2.addEdge(5, 6);
+		g2.addEdge(6, 7);
+		g2.addEdge(7, 8);
+		g2.addEdge(8, 9);
+		g2.addEdge(9, 0);
+		
+		Graph<Integer, DefaultEdge> salida=RouteHelper.intersectGraph(g1, g2);
+		
+		assertFalse(salida.containsEdge(0, 1));
+		assertFalse(salida.containsEdge(1, 2));
+		assertFalse(salida.containsEdge(2, 3));
+		assertFalse(salida.containsEdge(3, 4));
+		assertFalse(salida.containsEdge(4, 0));
+		assertFalse(salida.containsEdge(0, 5));
+		assertFalse(salida.containsEdge(5, 0));
+		assertFalse(salida.containsEdge(3, 1));
+		assertFalse(salida.containsEdge(15, 0));
+
+		assertTrue(salida.edgeSet().isEmpty());
+	}
+
+	@Test
+	public void testGraphToRoute() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+			g1.addVertex(i);
+		g1.addEdge(2, 3);
+		g1.addEdge(3, 4);
+		g1.addEdge(0, 1);
+		g1.addEdge(1, 2);
+		g1.addEdge(4, 0);
+		
+		List<Integer> salida=RouteHelper.graphToRoute(g1);
+		
+		assertFalse(salida.isEmpty());
+		assertTrue(salida.get(0)==0);
+		assertTrue(salida.get(1)==1);
+		assertTrue(salida.get(2)==2);
+		assertTrue(salida.get(3)==3);
+		assertTrue(salida.get(4)==4);
+		assertTrue(salida.get(5)==0);
+		assertTrue(salida.size()==6);
+
+	}
+
+	@Test
+	public void testGraphToRouteComplex() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+			g1.addVertex(i);
+		g1.addEdge(2, 3);
+		g1.addEdge(3, 4);
+		g1.addEdge(0, 1);
+		g1.addEdge(1, 2);
+		g1.addEdge(4, 0);
+		g1.addEdge(0, 8);
+		g1.addEdge(8, 0);
+		
+		List<Integer> salida=RouteHelper.graphToRoute(g1);
+		
+		assertFalse(salida.isEmpty());
+		assertTrue(salida.get(0)==0);
+		assertTrue(salida.get(1)==1);
+		assertTrue(salida.get(2)==2);
+		assertTrue(salida.get(3)==3);
+		assertTrue(salida.get(4)==4);
+		assertTrue(salida.get(5)==0);
+		assertTrue(salida.get(6)==8);
+		assertTrue(salida.get(7)==0);
+		assertTrue(salida.size()==8);
+
+	}
+
+	@Test
+	public void testGraphToRouteComplex2() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+			g1.addVertex(i);
+		g1.addEdge(2, 3);
+		g1.addEdge(3, 4);
+		g1.addEdge(0, 1);
+		g1.addEdge(1, 2);
+		g1.addEdge(4, 0);
+		g1.addEdge(0, 8);
+		g1.addEdge(8, 0);
+		g1.addEdge(0, 9);
+		g1.addEdge(9, 6);
+		g1.addEdge(6, 0);
+		g1.addEdge(5, 7);
+		
+		List<Integer> salida=RouteHelper.graphToRoute(g1);
+		
+		assertFalse(salida.isEmpty());
+		assertTrue(salida.get(0)==0);
+		assertTrue(salida.get(1)==1);
+		assertTrue(salida.get(2)==2);
+		assertTrue(salida.get(3)==3);
+		assertTrue(salida.get(4)==4);
+		assertTrue(salida.get(5)==0);
+		assertTrue(salida.get(6)==8);
+		assertTrue(salida.get(7)==0);
+		assertTrue(salida.get(8)==9);
+		assertTrue(salida.get(9)==6);
+		assertTrue(salida.get(10)==0);
+		assertTrue(salida.get(11)==5);
+		assertTrue(salida.get(12)==7);
+		assertTrue(salida.get(13)==0);
+		
+		assertTrue(salida.size()==14);
+
+	}
+
+	@Test
+	public void testGraphToRouteSinDeposito() {
+		Graph<Integer, DefaultEdge> g1=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (int i=0;i<=10;i++)
+			g1.addVertex(i);
+		g1.addEdge(2, 3);
+		g1.addEdge(1, 4);
+
+		List<Integer> salida=RouteHelper.graphToRoute(g1);
+		
+		assertFalse(salida.isEmpty());
+		assertTrue(salida.get(0)==0);
+		assertTrue(salida.get(1)==1);
+		assertTrue(salida.get(2)==4);
+		assertTrue(salida.get(3)==0);
+		assertTrue(salida.get(4)==2);
+		assertTrue(salida.get(5)==3);
+		assertTrue(salida.get(6)==0);
+		
+		assertTrue(salida.size()==7);
 
 	}
 	
