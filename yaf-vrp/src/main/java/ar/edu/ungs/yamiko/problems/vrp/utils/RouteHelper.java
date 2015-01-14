@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -299,6 +303,42 @@ public class RouteHelper {
 					}
 				});
 		return rutasNoVacias;
+	}
+
+	/**
+	 * Crea un grafo representando la solución al VRP a partir de un individuo
+	 * @param ind
+	 * @param m
+	 * @return
+	 * @throws IndividualNotDeveloped
+	 */
+	@SuppressWarnings("unchecked")
+	public static final Graph<Integer, DefaultEdge> getGraphFromIndividual(Individual<Integer[]> ind,DistanceMatrix m) throws IndividualNotDeveloped
+	{
+		if (ind.getPhenotype()==null) throw new IndividualNotDeveloped();
+		Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
+		Graph<Integer, DefaultEdge> g=new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (Integer i : m.getVertexSet())
+			g.addVertex(i);
+		for (Route r : ((List<Route>)rutas[0])) 
+		{
+			if (r.getRouteModel().size()>0)
+			{
+				for (int i=0;i<r.getRouteModel().size();i++)
+					g.addEdge(i==0?0:r.getRouteModel().get(i-1), r.getRouteModel().get(i));
+				g.addEdge(r.getRouteModel().get(r.getRouteModel().size()-1),0);
+			}
+		}
+		return g;
+	}
+	
+	public static final Graph<Integer, DefaultEdge> intersectGraph(Graph<Integer, DefaultEdge> g1,Graph<Integer, DefaultEdge> g2)
+	{
+		Graph<Integer, DefaultEdge> g=new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (Integer i : g1.vertexSet())
+			g1.addVertex(i);
+		return g;
+
 	}
 	
 }

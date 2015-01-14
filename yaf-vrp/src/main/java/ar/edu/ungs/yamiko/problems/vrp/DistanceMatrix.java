@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,7 +26,16 @@ public class DistanceMatrix {
 	private List<Customer> customers;
 	private Map<Integer,Customer> customerMap=new HashMap<Integer, Customer>();
 	private Map<Integer, List<Integer>> distanceMap=new HashMap<Integer, List<Integer>>();
-	
+
+    //Number of vertices
+    static int size = 10;
+
+    public Set<Integer> getVertexSet()
+    {
+    	if (customerMap==null) return null;
+    	return customerMap.keySet();
+    }
+
 	public DistanceMatrix(Collection<Customer> c) {
 		this(new ArrayList<Customer>(c));		
 	}

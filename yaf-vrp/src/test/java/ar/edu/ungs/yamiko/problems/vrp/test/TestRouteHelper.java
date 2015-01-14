@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -389,6 +391,75 @@ public class TestRouteHelper {
 		assertTrue(salida.get(1).size()==4);
 		assertTrue(salida.get(2).size()==2);
 		assertTrue(salida.get(3).size()==1);		
+	}
+
+	
+	@Test
+	public void testGetGraphFromIndividual() {
+		List<Integer> l =new ArrayList<Integer>();
+		l.add(0);
+		l.add(0);
+		l.add(0);
+		l.add(1);
+		l.add(2);
+		l.add(3);
+		l.add(4);
+		l.add(0);
+		l.add(5);
+		l.add(0);
+		Genome<Integer[]> genome;
+		Gene gene;
+		String chromosomeName="The Chromosome";
+		gene=new BasicGene("Gene X", 0, 15);
+		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
+		Ribosome<Integer[]> ribosome=new ByPassRibosome();
+		translators.put(gene, ribosome);
+		Individual<Integer[]> i1;
+		Population<Integer[]> population;
+		PopulationInitializer<Integer[]> popI;		
+		i1=new BasicIndividual<Integer[]>();
+		popI=new UniqueIntegerPopulationInitializer();
+		((UniqueIntegerPopulationInitializer)popI).setMaxZeros(5);
+		((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
+		((UniqueIntegerPopulationInitializer)popI).setMaxValue(10);	
+		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,15);
+		population=new GlobalSinglePopulation<Integer[]>(genome);
+		population.setSize(1L);
+		popI.execute(population);
+		Map<Integer, Customer> customers=new HashMap<Integer,Customer>();
+		customers.put(0,new Customer(0, "Deposito", null, -34.625, -58.439));
+		customers.put(1,new Customer(1, "Cliente 1", null, -34.626754, -58.420035,new TimeWindow(8,0, 11, 0)));
+		customers.put(2,new Customer(2, "Cliente 2", null, -34.551934, -58.487048,new TimeWindow(9,0, 12, 0)));
+		customers.put(3,new Customer(3, "Cliente 3", null, -34.520542, -58.699564,new TimeWindow(10,0, 15, 0)));		
+		customers.put(4,new Customer(4, "Cliente 4", null, -34.640675, -58.516573,new TimeWindow(8,0, 19, 0)));		
+		customers.put(5,new Customer(5, "Cliente 5", null, -34.607338, -58.414263,new TimeWindow(8,0, 19, 0)));		
+		customers.put(6,new Customer(6, "Cliente 6", null, -34.653103, -58.397097,new TimeWindow(8,0, 19, 0)));		
+		customers.put(7,new Customer(7, "Cliente 7", null, -34.618075, -58.425593,new TimeWindow(8,0, 19, 0)));		
+		customers.put(8,new Customer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 19, 0)));		
+		customers.put(9,new Customer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 19, 0)));		
+		customers.put(10,new Customer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));		
+		RoutesMorphogenesisAgent rma=new RoutesMorphogenesisAgent(customers);
+		for (Individual<Integer[]> ind: population) 
+			rma.develop(genome, ind);		
+		i1=population.getAll().get(0);
+		
+		Individual<Integer[]> d1=IntegerStaticHelper.create(i1.getGenotype().getChromosomes().get(0).name(), l.toArray(new Integer[0]));
+		rma.develop(genome, d1);
+		List<Individual<Integer[]>> inds=new ArrayList<Individual<Integer[]>>();
+		inds.add(d1);
+
+		Graph<Integer, DefaultEdge> salida=RouteHelper.getGraphFromIndividual(d1, new DistanceMatrix(customers.values()));
+		
+		assertTrue(salida.containsEdge(0, 1));
+		assertTrue(salida.containsEdge(1, 2));
+		assertTrue(salida.containsEdge(2, 3));
+		assertTrue(salida.containsEdge(3, 4));
+		assertTrue(salida.containsEdge(4, 0));
+		assertTrue(salida.containsEdge(0, 5));
+		assertTrue(salida.containsEdge(5, 0));
+		assertFalse(salida.containsEdge(3, 1));
+		assertFalse(salida.containsEdge(15, 0));
+
 	}
 	
 }
