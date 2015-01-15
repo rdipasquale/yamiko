@@ -86,5 +86,22 @@ public class IntegerStaticHelper {
 		if (p1==null) return null;
 		return new ArrayList<Integer>(Arrays.asList(((Integer[])p1.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation())));
 	}
+	
+	/**
+	 * "A fast algorithm for computing a longest common increasing subsequence" - I-Hsuan Yang et al (2003).
+	 * Let A = a1, a2,...,am and B = b1, b2,...,bn be two sequences, where each pair of elements in the sequences is
+	 * comparable. A common increasing subsequence of A and B is a subsequence ai1 = bj1 , ai2 = bj2 ,...,ail = bjl, where
+	 * i1 < i2 < ··· < il and j1 < j2 < ··· < jl, such that for all 1  k<l, we have aik < aik+1 . A longest common increasing
+	 * subsequence of A and B is a common increasing subsequence of the maximum length. This paper presents an algorithm for
+	 * delivering a longest common increasing subsequence in O(mn) time and O(mn) space.
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static final List<Integer> longestCommonIncSubseq(List<Integer> s1, List<Integer> s2)
+	{
+		return s1;
+	}
 
 }
