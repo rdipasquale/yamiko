@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import ar.edu.ungs.yamiko.ga.domain.Chromosome;
 import ar.edu.ungs.yamiko.ga.domain.Genotype;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -99,9 +102,98 @@ public class IntegerStaticHelper {
 	 * @param s2
 	 * @return
 	 */
-	public static final List<Integer> longestCommonIncSubseq(List<Integer> s1, List<Integer> s2)
+	@SuppressWarnings("unchecked")
+	public static final List<Integer> longestCommonIncSubseq(List<Integer> a, List<Integer> b)
 	{
-		return s1;
+		// Validación
+		if (a==null) return null;
+		if (b==null) return null;
+
+		// Inicialización
+		List<Integer> salida=new ArrayList<Integer>();
+		int n=b.size();
+		int m=a.size();
+		int x=-1;
+		int p=-1;
+		Pair<Integer, Integer>[][] prev=new ImmutablePair[m][n];
+		Pair<Integer, Integer>[][] lIndex= new ImmutablePair[m][n];
+		int[][] l=new int[n][n];
+		
+		for (int j = 0;j< n;j++)
+			for (int k = 0;k<n ; k++)
+				l[j][k]=Integer.MAX_VALUE;
+		for (int j = 0;j<m;j++)
+			for (int k =0;k<m; k++)
+			prev[j][k]= new ImmutablePair<Integer,Integer>(-1,-1);
+
+		// Algoritmo
+		for (int i = 0;i<m;i++)
+		{
+			x=-1;
+			p=0;
+			for (int j = 0;j< n;j++)
+				if (a.get(i) == b.get(j))
+				{
+					p= lisInsert(l[j] , lIndex[j] , prev, a.get(i) , p, i, j );
+					x=p;
+				}
+				else
+				{
+					if ( (x!=-1))
+						if (l[j-1][x] < l[j][x]) 
+							l[j][x]=l[j-1][x];
+					else
+						x=-1;
+				}
+		}
+		
+		//recover a longest common increasing subsequence in reverse order
+		for (int i=l[n-1].length-1;i>=0;i--)
+			if (l[n-1][i]<Integer.MAX_VALUE)
+				{
+					x=i;
+					break;
+				}
+		if (x==-1) return null;
+		Pair<Integer,Integer> parY=lIndex[n-1][x];
+		salida.add(0,a.get(parY.getLeft()));
+		while( prev[parY.getLeft()][parY.getRight()].getLeft()!=-1 && prev[parY.getLeft()][parY.getRight()].getRight()!=-1)
+		{
+			parY=prev[parY.getLeft()][parY.getRight()];
+			salida.add(0,a.get(parY.getLeft()));				
+		}
+
+		return salida;
 	}
+	
+	/**
+	 * Auxiliar de longestCommonIncSubseq.
+	 * inserts an element a into L, makes a link Prev[i, j ] to the former number in L, and returns the insertion index.
+	 * @param l
+	 * @param lIndex
+	 * @param prev
+	 * @param a
+	 * @param p
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	private static final int lisInsert(int[] l,Pair<Integer, Integer>[] lIndex,Pair<Integer, Integer>[][] prev,int a,int p,int i,int j)
+	{
+		int x=p;
+		if (x<0)
+			x=0;
+		while (l[x] < a)
+			x++;
+		l[x]=a;
+		lIndex[x]=new ImmutablePair<Integer, Integer>(i, j) ;
+		if (x != 0) 
+			if (lIndex[x-1]==null)
+				prev[i][j] = new ImmutablePair<Integer, Integer>(-1, -1) ;
+			else
+				prev[i][j]=lIndex[x-1];
+		return x;
+	}
+	
 
 }
