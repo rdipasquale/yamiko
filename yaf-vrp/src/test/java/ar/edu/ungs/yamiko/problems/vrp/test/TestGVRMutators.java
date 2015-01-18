@@ -8,6 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -121,7 +123,7 @@ public class TestGVRMutators {
 	@Test
 	public void testInvertRoute() {
 		List<Integer> subRoute=RouteHelper.selectRandomSubRouteFromInd(i1);
-		List<Integer> subRouteInv=RouteHelper.invertRoute(subRoute);
+		List<Integer> subRouteInv=Lists.reverse(subRoute);
 		String s1=IntegerStaticHelper.toStringIntArray(i1.getGenotype().getChromosomes().get(0).getFullRawRepresentation());
 		System.out.println("Ind 1 -> " + s1);
 		RouteHelper.replaceSequence(i1, subRoute, subRouteInv);

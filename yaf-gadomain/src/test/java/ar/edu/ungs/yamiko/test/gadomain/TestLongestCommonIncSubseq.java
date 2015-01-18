@@ -23,12 +23,21 @@ public class TestLongestCommonIncSubseq {
 	}
 
 	@Test
-	public void testVairaEtAlPag177() {
+	public void testLCISSameSize() {
 		List<Integer> a=new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13));
 		List<Integer> b=new ArrayList<Integer>(Arrays.asList(1,2,4,7,6,5,8,9,11,10,3,13,12));
 		List<Integer> salida=IntegerStaticHelper.longestCommonIncSubseq(a, b);
 		assertNotNull(salida);
-		assertArrayEquals(salida.toArray(new Integer[0]),new Integer[]{1,2,4,7,8,9,11,12});
+		assertArrayEquals(salida.toArray(new Integer[0]),new Integer[]{1,2,4,7,8,9,11,13});
 	}
+	
+	@Test
+	public void testLCISDifferentSize() {
+		List<Integer> a=new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13));
+		List<Integer> b=new ArrayList<Integer>(Arrays.asList(1,14));
+		List<Integer> salida=IntegerStaticHelper.longestCommonIncSubseq(a, b);
+		assertNotNull(salida);
+		assertArrayEquals(salida.toArray(new Integer[0]),new Integer[]{1});
+	}	
 
 }

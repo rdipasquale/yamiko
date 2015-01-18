@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import ar.edu.ungs.yamiko.ga.domain.Chromosome;
 import ar.edu.ungs.yamiko.ga.domain.Genotype;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicChromosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenotype;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual;
+
+import com.google.common.collect.Lists;
 
 /**
  * Funciones útiles asociadas al uso de individuos basados en arrays de enteros.
@@ -91,109 +90,154 @@ public class IntegerStaticHelper {
 	}
 	
 	/**
-	 * "A fast algorithm for computing a longest common increasing subsequence" - I-Hsuan Yang et al (2003).
-	 * Let A = a1, a2,...,am and B = b1, b2,...,bn be two sequences, where each pair of elements in the sequences is
-	 * comparable. A common increasing subsequence of A and B is a subsequence ai1 = bj1 , ai2 = bj2 ,...,ail = bjl, where
-	 * i1 < i2 < ··· < il and j1 < j2 < ··· < jl, such that for all 1  k<l, we have aik < aik+1 . A longest common increasing
-	 * subsequence of A and B is a common increasing subsequence of the maximum length. This paper presents an algorithm for
-	 * delivering a longest common increasing subsequence in O(mn) time and O(mn) space.
+	 * Longest Common Increasing Subsequence
 	 * 
 	 * @param s1
 	 * @param s2
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static final List<Integer> longestCommonIncSubseq(List<Integer> a, List<Integer> b)
 	{
-		// Validación
 		if (a==null) return null;
 		if (b==null) return null;
-
-		// Inicialización
-		List<Integer> salida=new ArrayList<Integer>();
-		int n=b.size();
-		int m=a.size();
-		int x=-1;
-		int p=-1;
-		Pair<Integer, Integer>[][] prev=new ImmutablePair[m][n];
-		Pair<Integer, Integer>[][] lIndex= new ImmutablePair[m][n];
-		int[][] l=new int[n][n];
+	    int n=a.size();
+	    int m=b.size();
+	    int i,j;
+	    int[] c=new int[m]; // C(M,0);
+	    int[] prev=new int[m]; //(M,0);
+		List<Integer> res=new ArrayList<Integer>();
+	     
+	    for (i=0;i<n;i++)
+	    {
+	        int cur=0,last=-1;
+	        for (j=0;j<m;j++)
+	        {
+	            if (a.get(i)==b.get(j) && cur+1>c[j])
+	            {
+	               c[j]=cur+1;
+	               prev[j]=last;
+	            }
+	            if (b.get(j)<a.get(i) && cur<c[j])
+	            {
+	               cur=c[j];
+	               last=j;
+	            }
+	        }
+	    }
+	     
+	    int length=0,index=-1;
+	    for (i=0;i<m;i++)
+	        if (c[i]>length)
+	        {
+	           length=c[i];
+	           index=i;
+	        }
+//	    System.out.println("The length of LCIS is %d\n" + length);
+	    if (length>0)
+	    {
+//	    	System.out.println("The LCIS is \n");
+	    	while (index!=-1)
+	    	{
+	             res.add(b.get(index));
+	             index=prev[index];
+	    	}
+	    	res=Lists.reverse(res);
+//	    	for (i=0;i<length;i++)
+//	           System.out.println(res.get(i)+ i==length-1?"\n":" ");
+	    	
+	    }
+	    
+	    return res;
 		
-		for (int j = 0;j< n;j++)
-			for (int k = 0;k<n ; k++)
-				l[j][k]=Integer.MAX_VALUE;
-		for (int j = 0;j<m;j++)
-			for (int k =0;k<m; k++)
-			prev[j][k]= new ImmutablePair<Integer,Integer>(-1,-1);
-
-		// Algoritmo
-		for (int i = 0;i<m;i++)
-		{
-			x=-1;
-			p=0;
-			for (int j = 0;j< n;j++)
-				if (a.get(i) == b.get(j))
-				{
-					p= lisInsert(l[j] , lIndex[j] , prev, a.get(i) , p, i, j );
-					x=p;
-				}
-				else
-				{
-					if ( (x!=-1))
-						if (l[j-1][x] < l[j][x]) 
-							l[j][x]=l[j-1][x];
-					else
-						x=-1;
-				}
-		}
+		// TODO: Arreglar implementación de http://www.cs.au.dk/~gerth/papers/jda11.pdf
+		/*
+		 Faster Algorithms for Computing Longest Common Increasing Subsequences - Martin Kutz et al.
+			Abstract. We present algorithms for finding a longest common increasing subsequence of two or
+			more input sequences. For two sequences of lengths n and m, where m ≥ n, we present an algorithm
+			with an output-dependent expected running time of O((m + nℓ) log log σ + Sort) and O(m) space,
+			where ℓ is the length of an LCIS, σ is the size of the alphabet, and Sort is the time to sort each
+			input sequence. For k ≥ 3 length-n sequences we present an algorithm which improves the previous
+			best bound by more than a factor k for many inputs. In both cases, our algorithms are conceptually
+			quite simple but rely on existing sophisticated data structures. Finally, we introduce the problem of
+			longest common weakly-increasing (or non-decreasing) subsequences (LCWIS), for which we present
+			an O(min{m + n log n, m log log m})-time algorithm for the 3-letter alphabet case. For the extensively
+			studied longest common subsequence problem, comparable speedups have not been achieved for small
+			alphabets.
+		 */
 		
-		//recover a longest common increasing subsequence in reverse order
-		for (int i=l[n-1].length-1;i>=0;i--)
-			if (l[n-1][i]<Integer.MAX_VALUE)
-				{
-					x=i;
-					break;
-				}
-		if (x==-1) return null;
-		Pair<Integer,Integer> parY=lIndex[n-1][x];
-		salida.add(0,a.get(parY.getLeft()));
-		while( prev[parY.getLeft()][parY.getRight()].getLeft()!=-1 && prev[parY.getLeft()][parY.getRight()].getRight()!=-1)
-		{
-			parY=prev[parY.getLeft()][parY.getRight()];
-			salida.add(0,a.get(parY.getLeft()));				
-		}
-
-		return salida;
+//		if (s1==null) return null;
+//		if (s2==null) return null;
+//		
+//		List<Integer> a=new ArrayList<Integer>();
+//		List<Integer> b=new ArrayList<Integer>();
+//		
+//		(if s1.size()<=s2.size())
+//		{
+//			a.addAll(s1);
+//			b.addAll(s2);
+//		}
+//		else
+//		{
+//			b.addAll(s1);
+//			a.addAll(s2);
+//		}
+//				
+//		// Preprocess (* Clean A and B and build Occs for every s *)
+//		
+//		Collections.sort(a);
+//		Collections.sort(b);
+//		
+//		int n=a.size();
+//		int m=b.size();
+//		
+//		int[] occ=new int[n];
+//		
+//		for (int i=0;i<n;i++)
+//		{
+//			occ[i]=b.indexOf(a.get(i));
+//			if (occ[i]==-1) occ[i]=Integer.MAX_VALUE;
+//		}
+//			
+//		int i=0;
+//		int[] l1=new int[n];
+//		
+//		for (j=0;j<n;j++)
+//			l1[j]= occ[j];
+//		
+//		while (i<n && li[j]<Integer.MAX_VALUE) // for some j
+//		{
+//			VEBHeap h=new VEBHeap(0, m);
+//			i++;
+//			for (int j=0;j<n;j++)
+//			{
+//				li[j]=Integer.MAX_VALUE;
+//				h.
+//		, κ′
+//		) ← BoundedMin(H, aj )
+//		if (j
+//		′
+//		, κ′
+//		) 6= “invalid” then
+//		Li[j] ← min{κ : κ ∈ Occaj ∧ κ > κ′
+//		}
+//		Linki[j] = j
+//		′
+//		endif
+//		if Li−1[j] 6= ∞ then
+//		(* Recall that DecreasePriority inserts aj if it is not already there *)
+//		DecreasePriority (H, aj , Li−1[j],(j, Li−1[j]))
+//		endif
+//		endfor
+//
+//
+//		(* Generate an LCIS in reverse order *)
+//		if Li[j] = ∞ for all j then i ← i − 1
+//		j ← an index such that Li[j] 6= ∞
+//		while i > 0 do
+//		output aj
+//		j ← Linki[j]
+//		i ← i − 1
+//		end while
+//		end
 	}
-	
-	/**
-	 * Auxiliar de longestCommonIncSubseq.
-	 * inserts an element a into L, makes a link Prev[i, j ] to the former number in L, and returns the insertion index.
-	 * @param l
-	 * @param lIndex
-	 * @param prev
-	 * @param a
-	 * @param p
-	 * @param i
-	 * @param j
-	 * @return
-	 */
-	private static final int lisInsert(int[] l,Pair<Integer, Integer>[] lIndex,Pair<Integer, Integer>[][] prev,int a,int p,int i,int j)
-	{
-		int x=p;
-		if (x<0)
-			x=0;
-		while (l[x] < a)
-			x++;
-		l[x]=a;
-		lIndex[x]=new ImmutablePair<Integer, Integer>(i, j) ;
-		if (x != 0) 
-			if (lIndex[x-1]==null)
-				prev[i][j] = new ImmutablePair<Integer, Integer>(-1, -1) ;
-			else
-				prev[i][j]=lIndex[x-1];
-		return x;
-	}
-	
-
 }

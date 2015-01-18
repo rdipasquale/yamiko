@@ -68,20 +68,6 @@ public class RouteHelper {
 				return rutasNoVacias.get(0).getRouteModel();
 			return rutasNoVacias.get(StaticHelper.randomInt(rutasNoVacias.size())).getRouteModel();
 	}
-
-	/**
-	 * Invierte una ruta
-	 * @param r
-	 * @return
-	 */
-	public static final List<Integer> invertRoute(List<Integer> r)
-	{
-		if (r==null) return null;
-		List<Integer> salida=new ArrayList<Integer>();
-		for (int i=r.size()-1;i>=0;i--)
-			salida.add(r.get(i));
-		return salida;
-	}	
 		
 	/**
 	 * Reemplaza una subruta por otra en un individuo

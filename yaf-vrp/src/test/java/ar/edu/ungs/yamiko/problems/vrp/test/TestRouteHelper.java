@@ -15,6 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -52,7 +54,7 @@ public class TestRouteHelper {
 		l.add(3);
 		l.add(4);
 		l.add(5);
-		List<Integer> linv=RouteHelper.invertRoute(l);
+		List<Integer> linv=Lists.reverse(l);
 		assertTrue(linv.get(0)==5);
 		assertTrue(linv.get(1)==4);
 		assertTrue(linv.get(2)==3);
