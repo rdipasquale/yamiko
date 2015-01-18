@@ -384,5 +384,28 @@ public class RouteHelper {
 				salida.add(0);
 		return salida;
 	}	
+
+	/**
+	 * Devuelve las rutas de un individuo (no vacías) en forma de lista de listas de enteros.
+	 * @param ind
+	 * @return
+	 * @throws IndividualNotDeveloped
+	 */
+	@SuppressWarnings("unchecked")
+	public static final List<List<Integer>> getRoutesFromInd(Individual<Integer[]> ind) throws IndividualNotDeveloped
+	{
+		List<Route> rutasNoVacias=new ArrayList<Route>();
+		List<Route> rutasCompletas=new ArrayList<Route>();
+		if (ind.getPhenotype()==null) throw new IndividualNotDeveloped();
+		Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
+		rutasCompletas.addAll(((List<Route>)rutas[0]));
+		for (Route r : rutasCompletas) 
+			if (r.getRouteModel().size()>0)
+				rutasNoVacias.add(r);		
+		List<List<Integer>> salida=new ArrayList<List<Integer>>();
+		for (Route r : rutasNoVacias)
+			salida.add(r.getRouteModel());
+		return salida;
+	}
 	
 }
