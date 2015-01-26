@@ -3,10 +3,27 @@ package ar.edu.ungs.yamiko.problems.vrp;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.problems.vrp.utils.Constants;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
-public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 
+/**
+ * Función de Fitness que contempla:
+ * - Distancia total
+ * - Tiempo máximo de viaje por ruta (penalidad)
+ * - Cantidad de rutas (vehículos utilizados)
+ * - Penalidades por violación de la TW. Se trata de una función que manejará un límite de inacptabilidad del desvio. Hasta el umbral, la función de penalidad
+ * será lineal. A partir de allí crecerá de manera cuadrática.
+ * @author ricardo
+ *
+ */
+public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
+	
+	public static final double PENAL_MAX_TIME_ROUTE=15000d;
+	public static final double PENAL_TW_LIMIT_MINUTES=90d;
+	public static final double PENAL_TW_LIMIT_METROS=5000d;
+
+	
 	@Override
 	public double execute(Individual<Integer[]> ind) {
 		if (ind==null) return 0d;
@@ -16,10 +33,13 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		double fitness=0d;
 		for (List<Integer> r: rutas) {
 			int ant=r.get(0);
+			double tiempo=0;
 			for (int i=1;i<r.size();i++)
 			{
 				double dist=getMatrix().getDistance(ant, r.get(i));
 				fitness+=dist;
+				tiempo+=(getMatrix().getDistance(r.get(i-1), r.get(i))/(Constants.AVERAGE_VELOCITY_KMH*1000))*60+Constants.DISPATCH_TIME_MINUTES;				
+				
 				ant=r.get(i);
 			}
 		}
