@@ -32,15 +32,20 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		int cantRutas=rutas.size();
 		double fitness=0d;
 		for (List<Integer> r: rutas) {
-			int ant=r.get(0);
 			double tiempo=0;
 			for (int i=1;i<r.size();i++)
 			{
-				double dist=getMatrix().getDistance(ant, r.get(i));
+				double dist=getMatrix().getDistance(r.get(i-1), r.get(i));
 				fitness+=dist;
-				tiempo+=(getMatrix().getDistance(r.get(i-1), r.get(i))/(Constants.AVERAGE_VELOCITY_KMH*1000))*60+Constants.DISPATCH_TIME_MINUTES;				
-				
-				ant=r.get(i);
+				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(Constants.AVERAGE_VELOCITY_KMH*1000))*60+Constants.DISPATCH_TIME_MINUTES;
+				tiempo+=deltaTiempo;
+				if (i>1)
+				{
+					Customer c1=getMatrix().getCustomers().get(i-1);
+					Customer c2=getMatrix().getCustomers().get(i);
+					if (c1.getTimeWindow()!=null || c2.getTimeWindow()!=null );
+				}
+			
 			}
 		}
 		return fitness*Math.pow(10,cantRutas);

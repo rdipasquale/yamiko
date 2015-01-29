@@ -54,6 +54,30 @@ public class TimeWindow {
 		return c2;
 	}	
 	
+	public int minGap(TimeWindow t2,int marginInMinutes,Double timeTravel, int timeServe)
+	{
+		if (t2==null) return 0; // Algo con restricción intersecta a algo sin restricción
+		Calendar travelF=Calendar.getInstance();
+		Calendar travelT=Calendar.getInstance();
+		travelF.setTime(c1.getTime());
+		travelT.setTime(c2.getTime());
+		travelF.add(Calendar.MINUTE, timeTravel.intValue()+timeServe-marginInMinutes);
+		travelT.add(Calendar.MINUTE, timeTravel.intValue()+timeServe+marginInMinutes);
+		
+		if ( 
+				(travelF.before(t2.from()) && travelT.after(t2.from())) ||
+				(travelF.before(t2.to()) && travelT.after(t2.to()) ||
+				travelF.equals(t2.from()) ||
+				travelT.equals(t2.to())  || 
+				travelF.equals(t2.to()) ||
+				travelT.equals(t2.from()) ) 
+			)
+			return 0;
+		long diff1 = Math.abs(travelT.getTimeInMillis() - t2.from().getTimeInMillis())/60000;
+		long diff2 = Math.abs(travelF.getTimeInMillis() - t2.to().getTimeInMillis())/60000;
+		return new Long(Math.min(diff1, diff2)).intValue();		
+	}
+	
 	public boolean intersects(TimeWindow t2,int marginInMinutes,Double timeTravel, int timeServe)
 	{
 		if (t2==null) return true; // Algo con restricción intersecta a algo sin restricción
@@ -66,10 +90,15 @@ public class TimeWindow {
 		
 		if ( 
 				(travelF.before(t2.from()) && travelT.after(t2.from())) ||
-				(travelF.before(t2.to()) && travelT.after(t2.to())) 
+				(travelF.before(t2.to()) && travelT.after(t2.to()) ||
+				travelF.equals(t2.from()) ||
+				travelT.equals(t2.to())  || 
+				travelF.equals(t2.to()) ||
+				travelT.equals(t2.from()) ) 
 			)
 			return true;
 		return false;
+
 	}
 
 }
