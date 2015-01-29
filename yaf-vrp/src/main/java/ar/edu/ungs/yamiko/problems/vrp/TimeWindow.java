@@ -101,4 +101,11 @@ public class TimeWindow {
 
 	}
 
+	@Override
+	public String toString() {
+		return "[" + c1.get(Calendar.HOUR_OF_DAY) + ":" + c1.get(Calendar.MINUTE) + "hs ;" + 
+				c2.get(Calendar.HOUR_OF_DAY) + ":" + c2.get(Calendar.MINUTE) + "hs ]";
+	}
+
+	
 }
