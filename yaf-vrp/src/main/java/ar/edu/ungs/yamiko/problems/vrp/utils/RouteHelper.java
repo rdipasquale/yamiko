@@ -82,8 +82,10 @@ public class RouteHelper {
 			if (ind.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation()[i]==ori.get(0))
 			{
 				ind.getGenotype().getChromosomes().iterator().next().getFullRawRepresentation()[i]=nue.get(0);
-				ori.remove(0);
-				nue.remove(0);
+				if (ori.size()>0)
+					ori.remove(0);
+				if (nue.size()>0)
+					nue.remove(0);
 				if (ori.size()==0)
 					break;
 			}
