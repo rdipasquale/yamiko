@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -23,7 +24,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
 	public static final double PENAL_TW_LIMIT_MINUTES=90d;
 	public static final double PENAL_TW_LIMIT_METROS=5000d;
-	public static final double MAX_FITNESS=Double.MAX_VALUE/10;
+	public static final double MAX_FITNESS=1000000000000d;
 	public static final double PENAL_PER_ROUTE_METROS=10000d;
 
 	
@@ -34,23 +35,22 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 		int cantRutas=rutas.size();
 		double fitness=0d;
-		for (List<Integer> r: rutas) {
+		for (List<Integer> rr: rutas) {
 			double tiempo=0;
-			for (int i=0;i<r.size();i++)
+			List<Integer> r=new ArrayList<Integer>();
+			r.add(0);
+			r.addAll(rr);
+			for (int i=1;i<r.size();i++)
 			{
 				double dist=getMatrix().getDistance(r.get(i-1), r.get(i));
 				fitness+=dist;
 				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;
 				tiempo+=deltaTiempo;
-				if (i>0)
-				{
-					Customer c1=getMatrix().getCustomers().get(i-1);
-					Customer c2=getMatrix().getCustomers().get(i);
-					if (c1.getTimeWindow()!=null && c2.getTimeWindow()!=null )
-						fitness+=calcTWPenalty(c1.getTimeWindow().minGap(c2.getTimeWindow(), 0, deltaTiempo,
-								Constants.DISPATCH_TIME_MINUTES));
-				}
-			
+				Customer c1=getMatrix().getCustomers().get(i-1);
+				Customer c2=getMatrix().getCustomers().get(i);
+				if (c1.getTimeWindow()!=null && c2.getTimeWindow()!=null )
+					fitness+=calcTWPenalty(c1.getTimeWindow().minGap(c2.getTimeWindow(), 0, deltaTiempo,
+							Constants.DISPATCH_TIME_MINUTES));
 			}
 			if (tiempo>MAX_TIME_ROUTE_MINUTES)
 				fitness+=PENAL_MAX_TIME_ROUTE_METROS;

@@ -1,6 +1,5 @@
 package ar.edu.ungs.yamiko.problems.vrp.test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -25,18 +24,15 @@ import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
-import ar.edu.ungs.yamiko.problems.vrp.CAXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
-import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPSimpleFitnessEvaluator;
 
 public class TestVRPSimpleFitness {
 
 	private static final int LOOPS=1000000;
-	private VRPCrossover cross; 
 	
 	@Before
 	public void setUp() throws Exception {
@@ -114,21 +110,22 @@ public class TestVRPSimpleFitness {
 		rma.develop(genome, d1);
 		rma.develop(genome, d2);
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());	
-		System.out.println("Parent 1 -> " + IntegerStaticHelper.toStringIntArray(d1.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-		System.out.println("Parent 2 -> " + IntegerStaticHelper.toStringIntArray(d2.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 
 		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator();
 		fit.setMatrix(matrix);
 		double fit1=fit.execute(d1);
 		double fit2=fit.execute(d2);
+
+		System.out.println("Ind 1 -> " + IntegerStaticHelper.toStringIntArray(d1.getGenotype().getChromosomes().get(0).getFullRawRepresentation()) + " -> Fitness: " + fit1);
+		System.out.println("Ind 2 -> " + IntegerStaticHelper.toStringIntArray(d2.getGenotype().getChromosomes().get(0).getFullRawRepresentation())+ " -> Fitness: " + fit2);
 		
-		assertEquals(fit1,10000d,1d);
-		assertEquals(fit2,10000d,1d);
+		assertEquals(fit1,9.999998870626244E11d,1d);
+		assertEquals(fit2,9.999999318564833E11d,1d);
 	}
 
 
 	@Test
-	public void testCAXCrossOverStress() {
+	public void testVRPSimpleFitnessStress() {
 		List<Integer> l =new ArrayList<Integer>();
 		l.add(0);
 		l.add(1);
@@ -193,18 +190,17 @@ public class TestVRPSimpleFitness {
 		Individual<Integer[]> d2=IntegerStaticHelper.create(i2.getGenotype().getChromosomes().get(0).name(), l2.toArray(new Integer[0]));
 		rma.develop(genome, d1);
 		rma.develop(genome, d2);
-		List<Individual<Integer[]>> inds=new ArrayList<Individual<Integer[]>>();
-		inds.add(d1);
-		inds.add(d2);
-		cross=new CAXCrossover();
-		cross.setMatrix(new DistanceMatrix(customers.values()));	
+		DistanceMatrix matrix=new DistanceMatrix(customers.values());	
+
+		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator();
+		fit.setMatrix(matrix);
 		System.out.println("---------------------");		
 
 		long t=System.currentTimeMillis();
 		for (int i=0;i<LOOPS;i++)
-			cross.execute(inds);
+			fit.execute(d1);
 		long t2=System.currentTimeMillis();
-		System.out.println(LOOPS + " CAX crossovers in " + (t2-t) + "ms"); 
+		System.out.println(LOOPS + " Fitness Evaluations in " + (t2-t) + "ms"); 
 	}
 		
 
