@@ -107,12 +107,7 @@
        <artifactId>hadoop-mapreduce-client-hs</artifactId>
        <scope>test</scope>
       <version>2.4.0</version>       
-     </dependency>
-   <dependency> <!-- Spark dependency -->
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.10</artifactId>
-      <version>1.2.1</version>
-    </dependency>     
+     </dependency> 
          
   </dependencies>
   

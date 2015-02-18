@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,13 +19,22 @@ import ar.edu.ungs.yamiko.ga.operators.ParallelOperator;
  *
  * @param <T>
  */
-public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOperator{
+public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOperator,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1722893820724398016L;
 	private List<Individual<T>> pop;
 	private Genome<T> genome;
 	private long size;
 	JavaRDD<Individual<T>> p;
 	
+	
+	public JavaRDD<Individual<T>> getRDD() {
+		return p;
+	}
+
 	public GlobalSingleSparkPopulation(Genome<T> g) {
 		genome=g;
 		pop=new ArrayList<Individual<T>>();

@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +15,12 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
  * @author ricardo
  *
  */
-public class DynamicLengthGenome<T> implements Genome<T>{
+public class DynamicLengthGenome<T> implements Genome<T>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1783177361079248243L;
 	private Map<String,List<Gene>> structure;
 	private int size;
 	private Map<Gene,Ribosome<T>> translators;
