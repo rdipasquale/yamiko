@@ -31,6 +31,10 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	JavaRDD<Individual<T>> p;
 	
 	
+	public void setJavaRDD(JavaRDD<Individual<T>> p) {
+		this.p = p;
+	}
+
 	public JavaRDD<Individual<T>> getRDD() {
 		return p;
 	}
@@ -64,11 +68,11 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	}
 	
 	public void addIndividual(Individual<T> i) {
-		pop.add(i);		
+		pop.add(i);	
 	}
 	
 	public void removeIndividual(Individual<T> i) {
-		pop.remove(i);		
+		pop.remove(i);
 	}
 	
 	public void replaceIndividual(Individual<T> i1, Individual<T> i2) {

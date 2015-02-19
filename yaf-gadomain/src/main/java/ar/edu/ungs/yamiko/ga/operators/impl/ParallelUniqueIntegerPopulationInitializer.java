@@ -13,6 +13,7 @@ import org.apache.spark.broadcast.Broadcast;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -35,14 +36,15 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 
 	public void execute(Population<Integer[]> population) {
 		if (population==null) return ;
-		
+		JavaRDD<Individual<Integer[]>> salida=ParallelUniqueIntegerPopulationInitializer.execute(this.isStartWithZero(),this.getMaxValue(),this.getMaxZeros(),sparkC,population);
+		//salida.count();
+		((GlobalSingleSparkPopulation<Integer[]>)population).setJavaRDD(salida);
+	}
+
+	public static JavaRDD<Individual<Integer[]>> execute(final boolean startWithZero,final int maxValue,final int maxZeros,final JavaSparkContext sparkC, final Population<Integer[]> population) {
+	
 		final Broadcast<Genome<Integer[]>> bc= sparkC.broadcast(population.getGenome());
-		final boolean startWithZero=this.isStartWithZero();
-		final int maxValue=this.getMaxValue();
-		final int maxZeros=this.getMaxZeros();
-		Integer[] vector=new Integer[(int)population.size()];
-//		((ParallelOperator)population).parallelize(sparkC);
-		JavaRDD<Integer> lista=sparkC.parallelize(Arrays.asList(vector));
+		JavaRDD<Integer> lista=sparkC.parallelize(Arrays.asList(new Integer[(int)population.size()]));
 		JavaRDD<Individual<Integer[]>> salida=lista.map(new Function<Integer, Individual<Integer[]>>() {
 
 			/**
@@ -85,6 +87,8 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 				return (IntegerStaticHelper.create(genome.getStructure().keySet().iterator().next(),numeros));
 			}
 		});
+		
+		return salida;
 	}
 	
 	public ParallelUniqueIntegerPopulationInitializer(JavaSparkContext sc) {
@@ -92,4 +96,6 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 		sparkC=sc;
 	}
 
+	
 }
+
