@@ -6,10 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 
+import scala.Tuple2;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
@@ -75,9 +77,10 @@ public class SparkParallelGA<T> implements Serializable{
 					bestInd=bestOfGeneration;					
 				}
 
-//				parameter.getSelector().setPopulation(p);
-//				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
-//				
+				parameter.getSelector().setPopulation(p);
+				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
+
+				JavaPairRDD<List<Individual<T>>, List<Individual<T>>> selected;
 //				Iterator ite=candidates.iterator();
 //				while (ite.hasNext()) {
 //					Individual<T> parentA=(Individual<T>)ite.next();
