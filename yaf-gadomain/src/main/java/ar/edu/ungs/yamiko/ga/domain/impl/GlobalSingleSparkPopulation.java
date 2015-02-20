@@ -33,7 +33,7 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	private boolean listModified=true;
 	
 	
-	public void setJavaRDD(JavaRDD<Individual<T>> p) {
+	public void setRDD(JavaRDD<Individual<T>> p) {
 		this.p = p;
 		newRdd=true;
 	}

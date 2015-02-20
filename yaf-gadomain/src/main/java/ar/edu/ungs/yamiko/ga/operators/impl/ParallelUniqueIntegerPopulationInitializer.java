@@ -38,7 +38,7 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 		if (population==null) return ;
 		JavaRDD<Individual<Integer[]>> salida=ParallelUniqueIntegerPopulationInitializer.execute(this.isStartWithZero(),this.getMaxValue(),this.getMaxZeros(),sparkC,population);
 		//salida.count();
-		((GlobalSingleSparkPopulation<Integer[]>)population).setJavaRDD(salida);
+		((GlobalSingleSparkPopulation<Integer[]>)population).setRDD(salida);
 	}
 
 	public static JavaRDD<Individual<Integer[]>> execute(final boolean startWithZero,final int maxValue,final int maxZeros,final JavaSparkContext sparkC, final Population<Integer[]> population) {

@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -12,13 +13,24 @@ import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 
-public class DevelopPopulation<T> implements Serializable {
+public class SparkHelper<T> implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1009957126466969597L;
 
+	protected Individual<T> findBestIndividual(final JavaRDD<Individual<T>> lista, final JavaSparkContext sc)
+	{
+		return lista.max(new Comparator<Individual<T>>() {
+			@Override
+			public int compare(Individual<T> o1, Individual<T> o2) {
+				// TODO Auto-generated method stub
+				return o1.getFitness()>o2.getFitness()?1:o1.getFitness()<o2.getFitness()?-1:0;
+			}
+		});
+	}
+	
 	protected JavaRDD<Individual<T>> developPopulation(final JavaRDD<Individual<T>> lista,final Broadcast<MorphogenesisAgent<T>> bcMA, final Broadcast<Genome<T>> bcG, final Broadcast<FitnessEvaluator<T>> bcFE, final JavaSparkContext sc)
 	{
 		

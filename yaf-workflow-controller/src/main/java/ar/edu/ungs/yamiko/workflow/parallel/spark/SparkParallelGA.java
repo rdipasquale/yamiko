@@ -60,21 +60,20 @@ public class SparkParallelGA<T> implements Serializable{
 			Broadcast<MorphogenesisAgent<T>> bcMA=sc.broadcast(parameter.getMorphogenesisAgent()); 
 			Broadcast<Genome<T>> bcG=sc.broadcast(parameter.getGenome());
 			Broadcast<FitnessEvaluator<T>> bcFE=sc.broadcast(parameter.getFitnessEvaluator());
-			DevelopPopulation<T> developPopulation=new DevelopPopulation<T>();
+			SparkHelper<T> developPopulation=new SparkHelper<T>();
 			
 			GlobalSingleSparkPopulation<T> p=(GlobalSingleSparkPopulation<T>)parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
 			
 			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
 			{
-				p.setJavaRDD(developPopulation.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
-				
-				for (Individual<T> individual : p)
-					if (individual.getFitness()>bestFitness)
-					{
-						bestFitness=individual.getFitness();
-						bestInd=individual;
-					}
+				p.setRDD(developPopulation.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
+				Individual bestOfGeneration=developPopulation.findBestIndividual(p.getRDD(), sc);
+				if (bestOfGeneration.getFitness()>bestFitness)
+				{
+					bestFitness=bestOfGeneration.getFitness();
+					bestInd=bestOfGeneration;					
+				}
 
 //				parameter.getSelector().setPopulation(p);
 //				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
