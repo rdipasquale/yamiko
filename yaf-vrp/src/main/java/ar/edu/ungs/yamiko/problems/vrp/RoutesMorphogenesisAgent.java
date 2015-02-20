@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +22,12 @@ import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
  *
  * @author ricardo
  */
-public class RoutesMorphogenesisAgent implements MorphogenesisAgent<Integer[]> {
+public class RoutesMorphogenesisAgent implements MorphogenesisAgent<Integer[]>,Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7428856797394286072L;
 	private Map<Integer,Customer> customers;
 	
 	

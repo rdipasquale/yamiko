@@ -1,10 +1,15 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TimeWindow {
+public class TimeWindow implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5916153376836885363L;
 	Calendar c1=Calendar.getInstance();
 	Calendar c2=Calendar.getInstance();
 	

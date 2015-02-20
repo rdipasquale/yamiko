@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,8 +20,12 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
  * @author ricardo
  *
  */
-public class DistanceMatrix {
+public class DistanceMatrix implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -505864774557800207L;
 	private double[][] matrix;
 	private int[] closer;
 	private List<Customer> customers;

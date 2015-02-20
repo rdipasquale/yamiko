@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
@@ -11,8 +13,13 @@ import ar.edu.ungs.yamiko.ga.operators.Mutator;
  * @author ricardo
  *
  */
-public abstract class GVRMutator implements Mutator<Integer[]>{ 
+public abstract class GVRMutator implements Mutator<Integer[]>,Serializable{ 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4864519770021393987L;
+
 	@Override
 	public void execute(Individual<Integer[]> i) throws YamikoException {
 		if (i==null) throw new NullIndividualException();

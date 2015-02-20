@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,12 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  * @author ricardo
  *
  */
-public class BasicGenome<T> implements Genome<T>{
+public class BasicGenome<T> implements Genome<T>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8422798873296370912L;
 	private Map<String,List<Gene>> structure;
 	private int size;
 	private Map<Gene,Ribosome<T>> translators;

@@ -26,6 +26,11 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  */
 public class RBXCrossover extends VRPCrossover{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4920058131827278850L;
+
 	public RBXCrossover() {
 
 	}

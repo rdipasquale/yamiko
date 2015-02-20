@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,12 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  * @author ricardo
  *
  */
-public class BitSetGenome implements Genome<BitSet>{
+public class BitSetGenome implements Genome<BitSet>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 393961534174520013L;
 	private Map<String,List<Gene>> structure;
 	private int size;
 	private Map<Gene,Ribosome<BitSet>> translators;

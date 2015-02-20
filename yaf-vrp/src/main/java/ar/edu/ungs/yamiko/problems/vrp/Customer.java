@@ -1,7 +1,13 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
-public class Customer {
+import java.io.Serializable;
 
+public class Customer implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2706361225191062789L;
 	private int id;
 	private String name;
 	private String address;

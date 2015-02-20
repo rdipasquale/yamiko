@@ -29,10 +29,13 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	private Genome<T> genome;
 	private long size;
 	JavaRDD<Individual<T>> p;
+	private boolean newRdd=false;
+	private boolean listModified=true;
 	
 	
 	public void setJavaRDD(JavaRDD<Individual<T>> p) {
 		this.p = p;
+		newRdd=true;
 	}
 
 	public JavaRDD<Individual<T>> getRDD() {
@@ -56,6 +59,7 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	}
 	
 	public Iterator<Individual<T>> iterator() {
+		updateList();
 		return pop.iterator();
 	}
 
@@ -68,30 +72,50 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	}
 	
 	public void addIndividual(Individual<T> i) {
+		updateList();
 		pop.add(i);	
+		listModified=true;
 	}
 	
 	public void removeIndividual(Individual<T> i) {
+		updateList();
 		pop.remove(i);
+		listModified=true;
 	}
 	
 	public void replaceIndividual(Individual<T> i1, Individual<T> i2) {
+		updateList();
 		if (!pop.contains(i2))
 			if (pop.contains(i1))
 			{
 				pop.remove(i1);
-				pop.add(i2);					
+				pop.add(i2);
+				listModified=true;
 			}
 	}
 	
 	@Override
 	public List<Individual<T>> getAll() {
+		updateList();
 		return pop;
 	}
 	
 	@Override
 	public void parallelize(JavaSparkContext sc) {
-		p=sc.parallelize(pop);		
+		if (listModified)
+		{
+			p=sc.parallelize(pop);				
+			listModified=false;			
+		}
+	}
+	
+	private void updateList()
+	{
+		if (newRdd)
+		{
+			newRdd=false;
+			pop=p.collect();
+		}
 	}
 
 }

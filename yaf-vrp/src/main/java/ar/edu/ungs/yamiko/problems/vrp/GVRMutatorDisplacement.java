@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,12 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class GVRMutatorDisplacement extends GVRMutator {
+public class GVRMutatorDisplacement extends GVRMutator implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5929717479111189981L;
 
 	public GVRMutatorDisplacement() {
 	}

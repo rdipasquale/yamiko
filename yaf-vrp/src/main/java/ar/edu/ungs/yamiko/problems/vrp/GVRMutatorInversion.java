@@ -16,6 +16,11 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  */
 public class GVRMutatorInversion extends GVRMutator {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3139684894817077103L;
+
 	public GVRMutatorInversion() {
 	}
 	

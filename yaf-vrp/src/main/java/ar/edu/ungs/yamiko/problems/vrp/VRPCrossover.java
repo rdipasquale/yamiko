@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -8,8 +9,12 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 
-public abstract class VRPCrossover implements Crossover<Integer[]>{
+public abstract class VRPCrossover implements Crossover<Integer[]>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4032378028840493070L;
 	private DistanceMatrix matrix;
 	
 	

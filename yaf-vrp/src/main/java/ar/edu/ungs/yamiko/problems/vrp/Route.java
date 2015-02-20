@@ -1,12 +1,17 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Route {
+public class Route implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7031376641111549703L;
 	private List<Integer> routeModel=new ArrayList<Integer>();
 	private List<Customer> routeRepresentation=new ArrayList<Customer>();
 	

@@ -15,6 +15,11 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  */
 public class GVRMutatorInsertion extends GVRMutator {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 169995317121068892L;
+
 	public GVRMutatorInsertion() {
 	}
 	

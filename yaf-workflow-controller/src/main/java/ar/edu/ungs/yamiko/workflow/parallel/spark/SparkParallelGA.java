@@ -1,12 +1,16 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.broadcast.Broadcast;
 
+import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
@@ -17,11 +21,17 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
-public class SparkParallelGA<T> {
+public class SparkParallelGA<T> implements Serializable{
 
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1363816706497868871L;
 		private long generationNumber=0;
 		private double bestFitness=0;
 		private Individual<T> bestInd;
@@ -47,24 +57,25 @@ public class SparkParallelGA<T> {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public Individual<T> run() throws YamikoException
 		{
+			Broadcast<MorphogenesisAgent<T>> bcMA=sc.broadcast(parameter.getMorphogenesisAgent()); 
+			Broadcast<Genome<T>> bcG=sc.broadcast(parameter.getGenome());
+			Broadcast<FitnessEvaluator<T>> bcFE=sc.broadcast(parameter.getFitnessEvaluator());
+			DevelopPopulation<T> developPopulation=new DevelopPopulation<T>();
+			
 			GlobalSingleSparkPopulation<T> p=(GlobalSingleSparkPopulation<T>)parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
 			
-			return null;
-//			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
-//			{
-//				for (Individual<T> individual : p)
-//					if (individual.getFitness()==null)
-//					{
-//						parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);
-//						individual.setFitness(parameter.getFitnessEvaluator().execute(individual));
-//						if (individual.getFitness()>bestFitness)
-//						{
-//							bestFitness=individual.getFitness();
-//							bestInd=individual;
-//						}
-//					}
-//
+			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
+			{
+				p.setJavaRDD(developPopulation.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
+				
+				for (Individual<T> individual : p)
+					if (individual.getFitness()>bestFitness)
+					{
+						bestFitness=individual.getFitness();
+						bestInd=individual;
+					}
+
 //				parameter.getSelector().setPopulation(p);
 //				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
 //				
@@ -93,12 +104,14 @@ public class SparkParallelGA<T> {
 //				if (Math.IEEEremainder(generationNumber,1000)==0) System.out.println("Generation " + generationNumber);
 //				
 //				
-//			}
-//			
+			}
+
 //			return bestInd;
+			return null;
 			
 		}
-		
+
+
 		
 	
 }

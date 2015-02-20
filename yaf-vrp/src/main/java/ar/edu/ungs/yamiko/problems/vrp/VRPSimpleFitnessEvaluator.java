@@ -20,6 +20,10 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  */
 public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2473729053134474976L;
 	public static final double MAX_TIME_ROUTE_MINUTES=720d;
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
 	public static final double PENAL_TW_LIMIT_MINUTES=90d;

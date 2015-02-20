@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,12 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class BCRCCrossover extends VRPCrossover{
+public class BCRCCrossover extends VRPCrossover implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3715097849555722120L;
 
 	public BCRCCrossover() {
 

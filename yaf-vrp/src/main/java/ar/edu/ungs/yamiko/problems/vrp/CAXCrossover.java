@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,12 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class CAXCrossover extends VRPCrossover{
+public class CAXCrossover extends VRPCrossover implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1125493192987763970L;
 
 	public CAXCrossover() {
 

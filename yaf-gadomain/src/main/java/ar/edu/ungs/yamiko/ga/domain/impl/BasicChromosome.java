@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
+import java.io.Serializable;
+
 import ar.edu.ungs.yamiko.ga.domain.Chromosome;
 
 /**
@@ -8,8 +10,12 @@ import ar.edu.ungs.yamiko.ga.domain.Chromosome;
  * @author ricardo
  * @param <T>
  */
-public class BasicChromosome<T> implements Chromosome<T>{
+public class BasicChromosome<T> implements Chromosome<T>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1347033969664943312L;
 	private T chromosomeRep;
 	private String _name;
 	
