@@ -3,7 +3,6 @@ package ar.edu.ungs.yamiko.problems.vrp.problems;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
@@ -13,13 +12,12 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
+import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
@@ -91,7 +89,7 @@ public class VRPTWParallel
         
         Individual<Integer[]> winner= ga.run();
         
-//		System.out.println("Winner -> " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+		System.out.println("Winner -> " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 
     }
 }

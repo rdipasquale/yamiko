@@ -117,5 +117,12 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 			pop=p.collect();
 		}
 	}
+	
+	public void setPopAndParallelize(List<Individual<T>> p2,JavaSparkContext sc)
+	{
+		pop=p2;
+		listModified=true;
+		parallelize(sc);
+	}
 
 }
