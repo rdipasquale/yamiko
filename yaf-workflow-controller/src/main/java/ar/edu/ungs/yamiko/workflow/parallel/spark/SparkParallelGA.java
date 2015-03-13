@@ -96,7 +96,7 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				// FIXME: Con la política de reemplazos que implementé tengo un problema: busca al padre para reemplazar... Por tanto si hay un padre
 				// que se reproduce mucho por su performance, lo va a reemplazar una vez y no va a incorporar toda su desdendencia...
-				// Corregir en la versión serial!!!!
+				// Corregir en la versión serial!!!! FIXED!
 				
 				List<List<Individual<T>>> descendants=descendantsRDD.collect();
 				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());

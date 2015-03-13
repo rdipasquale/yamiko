@@ -36,7 +36,12 @@
 		<artifactId>jgrapht-ext</artifactId>
 		<version>0.9.1-SNAPSHOT</version>
     </dependency>
-	
+   <dependency>
+	    <groupId>com.graphhopper</groupId>
+	    <artifactId>graphhopper</artifactId>
+	    <version>0.5-SNAPSHOT</version>
+    </dependency>
+ 	
   </dependencies>
   
   <build>
