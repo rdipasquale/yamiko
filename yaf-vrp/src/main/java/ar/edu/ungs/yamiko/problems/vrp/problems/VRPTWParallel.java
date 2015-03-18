@@ -50,17 +50,17 @@ public class VRPTWParallel
     	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
     	
 		customers=new HashMap<Integer,Customer>();
-		customers.put(0,new Customer(0, "Deposito", null, -34.625, -58.439));
-		customers.put(1,new Customer(1, "Cliente 1", null, -34.626754, -58.420035));
-		customers.put(2,new Customer(2, "Cliente 2", null, -34.551934, -58.487048));
-		customers.put(3,new Customer(3, "Cliente 3", null, -34.520542, -58.699564));		
-		customers.put(4,new Customer(4, "Cliente 4", null, -34.640675, -58.516573));		
-		customers.put(5,new Customer(5, "Cliente 5", null, -34.607338, -58.414263));		
-		customers.put(6,new Customer(6, "Cliente 6", null, -34.653103, -58.397097));		
-		customers.put(7,new Customer(7, "Cliente 7", null, -34.618075, -58.425593));		
-		customers.put(8,new Customer(8, "Cliente 8", null, -34.597730, -58.372378));		
-		customers.put(9,new Customer(9, "Cliente 9", null, -34.661575, -58.477091));		
-		customers.put(10,new Customer(10, "Cliente 10", null, -34.557589, -58.418383));		
+		customers.put(0,new Customer(0, "Deposito", null, -34.625, -58.439,null,0d,0));
+		customers.put(1,new Customer(1, "Cliente 1", null, -34.626754, -58.420035,null,0d,30));
+		customers.put(2,new Customer(2, "Cliente 2", null, -34.551934, -58.487048,null,0d,30));
+		customers.put(3,new Customer(3, "Cliente 3", null, -34.520542, -58.699564,null,0d,30));		
+		customers.put(4,new Customer(4, "Cliente 4", null, -34.640675, -58.516573,null,0d,30));		
+		customers.put(5,new Customer(5, "Cliente 5", null, -34.607338, -58.414263,null,0d,30));		
+		customers.put(6,new Customer(6, "Cliente 6", null, -34.653103, -58.397097,null,0d,30));		
+		customers.put(7,new Customer(7, "Cliente 7", null, -34.618075, -58.425593,null,0d,30));		
+		customers.put(8,new Customer(8, "Cliente 8", null, -34.597730, -58.372378,null,0d,30));		
+		customers.put(9,new Customer(9, "Cliente 9", null, -34.661575, -58.477091,null,0d,30));		
+		customers.put(10,new Customer(10, "Cliente 10", null, -34.557589, -58.418383,null,0d,30));	
 		rma=new RoutesMorphogenesisAgent(customers);
 		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 		translators.put(gene, ribosome);

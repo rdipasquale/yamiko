@@ -15,7 +15,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * - Cantidad de rutas (vehículos utilizados)
  * - Penalidades por violación de la TW. Se trata de una función que manejará un límite de inaceptabilidad del desvio. Hasta el umbral, la función de penalidad
  * será lineal. A partir de allí crecerá de manera cuadrática.
- *  -
+ *  -Penalidades por violación de la capacidad. En función del porcentaje de desvío usamos una cuadrática.
  * @author ricardo
  *
  */
@@ -31,6 +31,7 @@ public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_TW_LIMIT_METROS=5000d;
 	public static final double MAX_FITNESS=1000000000000d;
 	public static final double PENAL_PER_ROUTE_METROS=10000d;
+	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	
 	@Override
@@ -42,6 +43,7 @@ public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		double fitness=0d;
 		for (List<Integer> rr: rutas) {
 			double tiempo=0;
+			double capacityAux=0;
 			List<Integer> r=new ArrayList<Integer>();
 			r.add(0);
 			r.addAll(rr);
@@ -55,10 +57,12 @@ public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 				Customer c2=getMatrix().getCustomers().get(i);
 				if (c1.getTimeWindow()!=null && c2.getTimeWindow()!=null )
 					fitness+=calcTWPenalty(c1.getTimeWindow().minGap(c2.getTimeWindow(), 0, deltaTiempo,
-							Constants.DISPATCH_TIME_MINUTES));
+							c2.getServiceDuration()));
+				capacityAux+=c2.getDemand();
 			}
 			if (tiempo>MAX_TIME_ROUTE_MINUTES)
 				fitness+=PENAL_MAX_TIME_ROUTE_METROS;
+			fitness+=calcCapacityPenalty(capacityAux);
 		}
 		
 		fitness+=cantRutas*PENAL_PER_ROUTE_METROS;
@@ -77,6 +81,12 @@ public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		else	
 			return PENAL_TW_LIMIT_METROS+gap*gap;
 		
+	}
+
+	public double calcCapacityPenalty(double gap)
+	{
+		if (gap<=capacity) return 0d;
+		return ((gap-capacity)*100/capacity)*PENAL_PER_CAPACITY_X*PENAL_PER_CAPACITY_X;
 	}
 	
 }

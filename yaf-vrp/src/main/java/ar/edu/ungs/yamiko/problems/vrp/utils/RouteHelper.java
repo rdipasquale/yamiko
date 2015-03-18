@@ -99,7 +99,7 @@ public class RouteHelper {
 	 * @param matrix
 	 * @return
 	 */
-	public static final boolean insertClientBCTW(Integer client,List<Integer> dest, DistanceMatrix matrix)
+	public static final boolean insertClientBCTW(Integer client,int serviceDuration,List<Integer> dest, DistanceMatrix matrix)
 	{
 		List<Integer> mostC=matrix.getMostCloserCustomerList(client);
 		for (Integer c : mostC) {
@@ -117,7 +117,7 @@ public class RouteHelper {
 				else
 				{
 					double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
-					if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, Constants.DISPATCH_TIME_MINUTES))
+					if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, serviceDuration))
 					{
 						dest.add(dest.indexOf(c)+1, client);
 						return true;

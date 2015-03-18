@@ -15,6 +15,7 @@ public class Customer implements Serializable{
 	private double longitude;
 	private TimeWindow timeWindow;
 	private Double demand;
+	private int serviceDuration;
 	
 	public int getId() {
 		return id;
@@ -106,8 +107,15 @@ public class Customer implements Serializable{
 	public void setDemand(Double demand) {
 		this.demand = demand;
 	}
+	public int getServiceDuration() {
+		return serviceDuration;
+	}
+	public void setServiceDuration(int serviceDuration) {
+		this.serviceDuration = serviceDuration;
+	}
 	public Customer(int id, String name, String address, double latitude,
-			double longitude, TimeWindow timeWindow, Double demand) {
+			double longitude, TimeWindow timeWindow, Double demand,
+			int serviceDuration) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -116,7 +124,9 @@ public class Customer implements Serializable{
 		this.longitude = longitude;
 		this.timeWindow = timeWindow;
 		this.demand = demand;
+		this.serviceDuration = serviceDuration;
 	}
+
 	
 	
 	

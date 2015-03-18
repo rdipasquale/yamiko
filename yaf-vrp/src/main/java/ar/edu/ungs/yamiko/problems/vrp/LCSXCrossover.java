@@ -53,7 +53,7 @@ public class LCSXCrossover extends VRPCrossover{
 	
 		for (Integer c :getMatrix().getCustomerMap().keySet()) 
 			if (!lcis.contains(c))
-				if (!RouteHelper.insertClientBCTW(c, lcis, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(c, getMatrix().getCustomerMap().get(c).getServiceDuration(), lcis, getMatrix()))
 					RouteHelper.createNewRouteAndInsertClient(c, lcis);
 		
 		if (lcis.size()>0)

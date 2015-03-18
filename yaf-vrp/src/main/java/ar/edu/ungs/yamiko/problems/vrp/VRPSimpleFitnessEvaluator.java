@@ -54,7 +54,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 				Customer c2=getMatrix().getCustomers().get(i);
 				if (c1.getTimeWindow()!=null && c2.getTimeWindow()!=null )
 					fitness+=calcTWPenalty(c1.getTimeWindow().minGap(c2.getTimeWindow(), 0, deltaTiempo,
-							Constants.DISPATCH_TIME_MINUTES));
+							c2.getServiceDuration()));
 			}
 			if (tiempo>MAX_TIME_ROUTE_MINUTES)
 				fitness+=PENAL_MAX_TIME_ROUTE_METROS;

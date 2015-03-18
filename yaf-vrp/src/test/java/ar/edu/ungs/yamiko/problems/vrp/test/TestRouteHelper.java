@@ -246,7 +246,7 @@ public class TestRouteHelper {
 		l.add(2);
 		l.add(3);
 		
-		RouteHelper.insertClientBCTW(1, l, dm);
+		RouteHelper.insertClientBCTW(1,30, l, dm);
 		
 		assertTrue(l.size()==4);
 		assertTrue(l.get(0)==0);
@@ -279,7 +279,7 @@ public class TestRouteHelper {
 		l.add(2);
 		l.add(3);
 		
-		boolean salida=RouteHelper.insertClientBCTW(1, l, dm);
+		boolean salida=RouteHelper.insertClientBCTW(1, 30,l, dm);
 		
 		assertFalse(salida);
 		assertTrue(l.get(0)==0);

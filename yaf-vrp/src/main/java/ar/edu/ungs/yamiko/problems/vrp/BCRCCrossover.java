@@ -50,7 +50,7 @@ public class BCRCCrossover extends VRPCrossover implements Serializable{
 		
 		// 4) Se crea el descendiente D1 a partir de P1', insertándole los clientes de R por el criterio de mínimo costo en alguna ruta existente. Si es imposible, se crea una nueva ruta.
 		for (Integer c : routeI2)
-			if (!RouteHelper.insertClientBCTW(c, p1prima,getMatrix()))
+			if (!RouteHelper.insertClientBCTW(c,getMatrix().getCustomerMap().get(c).getServiceDuration(), p1prima,getMatrix()))
 				RouteHelper.createNewRouteAndInsertClient(c, p1prima);
 	
 		// 5) Se crea el descendiente D2 de manera recíproca analogando los puntos 1-4.
@@ -58,7 +58,7 @@ public class BCRCCrossover extends VRPCrossover implements Serializable{
 		List<Integer> p2prima=IntegerStaticHelper.deepCopyIndasList(p2);
 		p2prima.removeAll(routeI1);
 		for (Integer c : routeI1)
-			if (!RouteHelper.insertClientBCTW(c, p2prima,getMatrix()))
+			if (!RouteHelper.insertClientBCTW(c, getMatrix().getCustomerMap().get(c).getServiceDuration(),p2prima,getMatrix()))
 				RouteHelper.createNewRouteAndInsertClient(c, p2prima);
 				
 		Integer[] desc1=p1prima.toArray(new Integer[0]);

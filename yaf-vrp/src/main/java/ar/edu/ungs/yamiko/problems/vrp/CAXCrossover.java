@@ -47,7 +47,7 @@ public class CAXCrossover extends VRPCrossover implements Serializable{
 		// 3) Se agregan los clientes no intersectados según criterio de mejor costo.
 		for (Integer i : getMatrix().getCustomerMap().keySet()) 
 			if (!intersection.contains(i))
-				if (!RouteHelper.insertClientBCTW(i, intersection, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(i,getMatrix().getCustomerMap().get(i).getServiceDuration(), intersection, getMatrix()))
 						RouteHelper.createNewRouteAndInsertClient(i, intersection);
 				
 		Integer[] desc1=intersection.toArray(new Integer[0]);

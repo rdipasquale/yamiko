@@ -58,7 +58,7 @@ public class LRXCrossover extends VRPCrossover{
 			for (List<Integer> r: rutasOrd)
 				for (Integer i : r)
 					if (!d.contains(i))
-						if (!RouteHelper.insertClientBCTW(i, d, getMatrix()))
+						if (!RouteHelper.insertClientBCTW(i, getMatrix().getCustomerMap().get(i).getServiceDuration(),d, getMatrix()))
 							RouteHelper.createNewRouteAndInsertClient(i, d);
 
 		Integer[] desc1=d.toArray(new Integer[0]);
