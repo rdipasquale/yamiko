@@ -1,15 +1,27 @@
 package ar.edu.ungs.yamiko.problems.vrp.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
 
+
+/**
+ * 
+ * @author ricardo
+ *
+ */
+public class CordeauParser {
 
 /**
  * Description for files of Cordeau’s Instances
@@ -57,11 +69,11 @@ Each visit combination is coded with the decimal equivalent of the corresponding
 
 Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t entries correspond to the t depots. In the case of the VRP, PVRP and MDVRP, the lines go from 0 to n and the first entry corresponds to the unique depot.
 
- * @author ricardo
- *
+ * @param fileName
+ * @param holder
+ * @return
+ * @throws Exception
  */
-public class CordeauParser {
-
 	public static Map<Integer,Customer> parse(String fileName,int[] holder) throws Exception
 	{
 		double lat0=-34.739587;
@@ -114,7 +126,63 @@ public class CordeauParser {
 		holder[0]=m;
 		holder[1]=n;
 		holder[2]=c;
+		
 		return salida;
+	}
+	
+	/**
+	 * 	
+		The first line contains the cost of the solution (total duration excluding service time).
+
+		The next lines contain, for each route, the following information:
+
+		l k d q list
+
+		l: number of the day (or depot or vehicle type)
+		k: number of the vehicle
+		d: duration of the route
+		q: load of the vehicle
+		list: ordered sequence of customers (with start-of-service times, if applicable)
+	 * @param fileName
+	 * @return
+	 */
+	public static Individual<Integer[]> parseSolution(String fileName)  throws Exception
+	{
+		if (!new File(fileName).exists()) return null;
+		List<Integer> cust=new ArrayList<Integer>();
+		FileInputStream fstream = new FileInputStream(fileName);
+		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+		String l = br.readLine();
+		while ((l = br.readLine()) != null)   {
+			if (l.trim().length()>0)
+			{
+				StringTokenizer st=new StringTokenizer(l, " ");
+				st.nextToken(); // Debe ser 1
+				st.nextToken(); // Debe ser Nro de Vehiculo
+				st.nextToken(); // Debe ser Duracion
+				st.nextToken(); // Debe ser Carga
+				while (st.hasMoreTokens())
+				{
+					int i=Integer.parseInt(st.nextToken());
+					st.nextToken(); // Debe ser TW
+					if (i==0)
+					{
+						if (cust.size()>0)
+						{
+							if (cust.get(cust.size()-1)>0)
+								cust.add(i);
+						}
+						else
+							cust.add(i);
+					}	
+					else
+						cust.add(i);
+				}
+			}
+		}
+		if (cust.get(cust.size()-1)==0) cust.remove(cust.size()-1);
+		br.close();
+		return IntegerStaticHelper.create("X", cust.toArray(new Integer[0]));
 	}
 	
 }
