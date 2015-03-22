@@ -75,8 +75,8 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 					{
 						rand=StaticHelper.randomInt(maxNum+1);
 						count++;
-						if (Math.IEEEremainder(count, 1000)==0)
-							System.out.println("Se ha llegado a 1000 intentos sin poder incluir un elemento más a la lista");
+						if (Math.IEEEremainder(count, maxNum*100)==0)
+							System.out.println("Se ha llegado a " +maxNum*100 + " intentos sin poder incluir un elemento más a la lista");
 						
 					}
 					if (rand!=0)

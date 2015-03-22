@@ -19,7 +19,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
+public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	
 	/**
 	 * 
@@ -69,7 +69,7 @@ public class CVRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return MAX_FITNESS-fitness;
 	}
 	
-	public CVRPSimpleFitnessEvaluator(Double _capacity) {
+	public CVRPTWSimpleFitnessEvaluator(Double _capacity) {
 		capacity=_capacity;
 	}
 
