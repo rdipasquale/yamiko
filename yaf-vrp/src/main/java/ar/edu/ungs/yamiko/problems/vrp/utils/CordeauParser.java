@@ -12,8 +12,8 @@ import java.util.StringTokenizer;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
-import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
 
 
 /**
@@ -76,10 +76,6 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
  */
 	public static Map<Integer,Customer> parse(String fileName,int[] holder) throws Exception
 	{
-		double lat0=-34.739587;
-		double long0= -58.523812;
-		double lat100=-34.542004;
-		double long100=-58.434377;
 		
 		FileInputStream fstream = new FileInputStream(fileName);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -103,21 +99,19 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
 			int i=Integer.parseInt(st.nextToken());
 			double x=Double.parseDouble(st.nextToken());
 			double y=Double.parseDouble(st.nextToken());
-			x=lat0+(lat100-lat0)*x/100;
-			y=long0+(long100-long0)*y/100;
 			int d=new Double(Double.parseDouble(st.nextToken())).intValue();
 			double q=Double.parseDouble(st.nextToken());
 			st.nextToken(); // Debe ser 0
 			st.nextToken(); // Debe ser 0
 			st.nextToken(); // Debe ser 0
-			TimeWindow tw=null;
+			int from=0;
+			int to=0;
 			if (st.hasMoreTokens() && i>0)
 			{
-				int from=Integer.parseInt(st.nextToken());
-				int to=Integer.parseInt(st.nextToken());
-				tw=new TimeWindow(from/60, new Double(Math.IEEEremainder(from, 60)).intValue(), to/60, new Double(Math.IEEEremainder(to, 60)).intValue());				
+				from=Integer.parseInt(st.nextToken());
+				to=Integer.parseInt(st.nextToken());
 			}
-			Customer c1=new Customer(i, String.valueOf(i),null, x, y,tw,q,d);
+			Customer c1=new CartesianCustomer(i, String.valueOf(i),null, q,d,x, y,from,to);
 			salida.put(i, c1);
 		}
 

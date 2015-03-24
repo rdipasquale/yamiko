@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
-import ar.edu.ungs.yamiko.problems.vrp.utils.Constants;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 
@@ -27,13 +26,14 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	private static final long serialVersionUID = -2473729053134474976L;
 	public static final double MAX_TIME_ROUTE_MINUTES=720d;
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
-	public static final double PENAL_TW_LIMIT_MINUTES=90d;
-	public static final double PENAL_TW_LIMIT_METROS=5000d;
-	public static final double MAX_FITNESS=1000000000000d;
+	public static final double PENAL_TW_LIMIT_MINUTES=60d;
+	public static final double PENAL_TW_LIMIT_METROS=10000d;
+	public static final double MAX_FITNESS=1000000000d;
 	public static final double PENAL_PER_ROUTE_METROS=10000d;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
-	
+	private double avgVelocity;
+
 	@Override
 	public double execute(Individual<Integer[]> ind) {
 		if (ind==null) return 0d;
@@ -51,13 +51,12 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			{
 				double dist=getMatrix().getDistance(r.get(i-1), r.get(i));
 				fitness+=dist;
-				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;
+				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
 				tiempo+=deltaTiempo;
 				Customer c1=getMatrix().getCustomers().get(i-1);
 				Customer c2=getMatrix().getCustomers().get(i);
-				if (c1.getTimeWindow()!=null && c2.getTimeWindow()!=null )
-					fitness+=calcTWPenalty(c1.getTimeWindow().minGap(c2.getTimeWindow(), 0, deltaTiempo,
-							c2.getServiceDuration()));
+				if (c1.isValidTimeWindow() && c2.isValidTimeWindow())
+					fitness+=calcTWPenalty(c1,c2,deltaTiempo);
 				capacityAux+=c2.getDemand();
 			}
 			if (tiempo>MAX_TIME_ROUTE_MINUTES)
@@ -69,12 +68,18 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return MAX_FITNESS-fitness;
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity) {
+	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity) {
 		capacity=_capacity;
+		avgVelocity=_velocity;
 	}
 
-	public double calcTWPenalty(int gap)
+	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)
 	{
+		int gap=0;
+		if (c1 instanceof GeodesicalCustomer)		
+			gap=((GeodesicalCustomer)c1).getTimeWindow().minGap(((GeodesicalCustomer)c2).getTimeWindow(), 0, deltaTiempo,c2.getServiceDuration());
+		else
+			gap=((CartesianCustomer)c1).minGap((CartesianCustomer)c2, 0, deltaTiempo);			
 		if (gap==0) return 0d;
 		if (gap<=PENAL_TW_LIMIT_MINUTES) 
 			return gap*PENAL_TW_LIMIT_METROS/PENAL_TW_LIMIT_MINUTES;

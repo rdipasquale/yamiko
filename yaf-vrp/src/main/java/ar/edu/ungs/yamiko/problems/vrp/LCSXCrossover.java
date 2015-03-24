@@ -24,10 +24,11 @@ public class LCSXCrossover extends VRPCrossover{
 	 * 
 	 */
 	private static final long serialVersionUID = 8881156772077436887L;
-
-	public LCSXCrossover() {
-
+	private double avgVelocity;
+	public LCSXCrossover(double vel) {
+		avgVelocity=vel;
 	}
+
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
 		
@@ -53,7 +54,7 @@ public class LCSXCrossover extends VRPCrossover{
 	
 		for (Integer c :getMatrix().getCustomerMap().keySet()) 
 			if (!lcis.contains(c))
-				if (!RouteHelper.insertClientBCTW(c, getMatrix().getCustomerMap().get(c).getServiceDuration(), lcis, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(c, lcis, getMatrix(),avgVelocity))
 					RouteHelper.createNewRouteAndInsertClient(c, lcis);
 		
 		if (lcis.size()>0)

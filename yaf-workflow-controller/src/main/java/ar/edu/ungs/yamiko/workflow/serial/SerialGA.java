@@ -47,7 +47,7 @@ public class SerialGA<T> {
 			parameter.getPopulationInitializer().execute(p);
 			
 			
-			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
+			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 				for (Individual<T> individual : p)
 					if (individual.getFitness()==null)

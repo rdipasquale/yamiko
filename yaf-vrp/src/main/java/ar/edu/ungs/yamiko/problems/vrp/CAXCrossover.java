@@ -25,10 +25,11 @@ public class CAXCrossover extends VRPCrossover implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1125493192987763970L;
-
-	public CAXCrossover() {
-
+	private double avgVelocity;
+	public CAXCrossover(double vel) {
+		avgVelocity=vel;
 	}
+
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
 		
@@ -47,7 +48,7 @@ public class CAXCrossover extends VRPCrossover implements Serializable{
 		// 3) Se agregan los clientes no intersectados según criterio de mejor costo.
 		for (Integer i : getMatrix().getCustomerMap().keySet()) 
 			if (!intersection.contains(i))
-				if (!RouteHelper.insertClientBCTW(i,getMatrix().getCustomerMap().get(i).getServiceDuration(), intersection, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(i, intersection, getMatrix(),avgVelocity))
 						RouteHelper.createNewRouteAndInsertClient(i, intersection);
 				
 		Integer[] desc1=intersection.toArray(new Integer[0]);

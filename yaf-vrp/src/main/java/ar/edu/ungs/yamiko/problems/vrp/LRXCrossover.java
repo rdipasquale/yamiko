@@ -27,10 +27,11 @@ public class LRXCrossover extends VRPCrossover{
 	 * 
 	 */
 	private static final long serialVersionUID = -6774197408956249772L;
-
-	public LRXCrossover() {
-
+	private double avgVelocity;
+	public LRXCrossover(double vel) {
+		avgVelocity=vel;
 	}
+
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
 		validaciones(individuals);
@@ -58,7 +59,7 @@ public class LRXCrossover extends VRPCrossover{
 			for (List<Integer> r: rutasOrd)
 				for (Integer i : r)
 					if (!d.contains(i))
-						if (!RouteHelper.insertClientBCTW(i, getMatrix().getCustomerMap().get(i).getServiceDuration(),d, getMatrix()))
+						if (!RouteHelper.insertClientBCTW(i, d, getMatrix(),avgVelocity))
 							RouteHelper.createNewRouteAndInsertClient(i, d);
 
 		Integer[] desc1=d.toArray(new Integer[0]);

@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,8 +14,6 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
-
 /**
  * Representa la matriz de distancia y abstrae algunas operaciones básicas relacionadas con las distancias entre clientes.
  * @author ricardo
@@ -25,6 +24,8 @@ public class DistanceMatrix implements Serializable {
 	/**
 	 * 
 	 */
+
+	private DecimalFormat df = new DecimalFormat("###,###,###.###");
 	private static final long serialVersionUID = -505864774557800207L;
 	private double[][] matrix;
 	private int[] closer;
@@ -67,7 +68,7 @@ public class DistanceMatrix implements Serializable {
 					matrix[i.getId()][j.getId()]=0d;
 				else
 				{
-					matrix[i.getId()][j.getId()]=GPSHelper.TwoDimensionalCalculation(i.getLatitude(), i.getLongitude(), j.getLatitude(), j.getLongitude());
+					matrix[i.getId()][j.getId()]=i.calcDistance(j);
 					if (custCercDist==0d || matrix[i.getId()][j.getId()]<custCercDist)
 					{
 						custCercDist=matrix[i.getId()][j.getId()];
@@ -82,7 +83,7 @@ public class DistanceMatrix implements Serializable {
 	public Map<Integer, Customer> getCustomerMap() {
 		return customerMap;
 	}
-
+	
 	public double[][] getMatrix() {
 		return matrix;
 	}
@@ -154,7 +155,7 @@ public class DistanceMatrix implements Serializable {
 		{
 			salida+= i + "\t";
 			for (int j=0;j<matrix[0].length;j++)
-				salida+=new Double(matrix[i][j]).intValue()+"\t";
+				salida+=df.format(matrix[i][j]) +"\t";
 			salida+="\n";
 		}
 		return salida;

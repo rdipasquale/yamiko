@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
+import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Route;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 
@@ -22,10 +23,10 @@ public class TestIntArrayToRouteRibosome {
 	@Before
 	public void setUp() throws Exception {
 		customers=new HashMap<Integer,Customer>();
-		customers.put(1,new Customer(1, "Cliente 1", null, 0, 0));
-		customers.put(2,new Customer(2, "Cliente 2", null, 0, 0));
-		customers.put(3,new Customer(3, "Cliente 3", null, 0, 0));		
-		customers.put(3,new Customer(4, "Cliente 4", null, 0, 0));		
+		customers.put(1,new GeodesicalCustomer(1, "Cliente 1", null, 0, 0));
+		customers.put(2,new GeodesicalCustomer(2, "Cliente 2", null, 0, 0));
+		customers.put(3,new GeodesicalCustomer(3, "Cliente 3", null, 0, 0));		
+		customers.put(3,new GeodesicalCustomer(4, "Cliente 4", null, 0, 0));		
 		rma=new RoutesMorphogenesisAgent(customers);
 	}
 

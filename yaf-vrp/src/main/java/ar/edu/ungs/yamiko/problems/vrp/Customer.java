@@ -2,7 +2,7 @@ package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.io.Serializable;
 
-public class Customer implements Serializable{
+public abstract class Customer implements Serializable{
 
 	/**
 	 * 
@@ -11,9 +11,6 @@ public class Customer implements Serializable{
 	private int id;
 	private String name;
 	private String address;
-	private double latitude;
-	private double longitude;
-	private TimeWindow timeWindow;
 	private Double demand;
 	private int serviceDuration;
 	
@@ -34,18 +31,6 @@ public class Customer implements Serializable{
 	}
 	public void setAddress(String address) {
 		this.address = address;
-	}
-	public double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	public double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
 	}
 	@Override
 	public String toString() {
@@ -73,34 +58,8 @@ public class Customer implements Serializable{
 	}
 	
 	public Customer() {
-		// TODO Auto-generated constructor stub
-	}
-	public Customer(int id, String name, String address, double latitude,
-			double longitude, TimeWindow timeWindow) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.timeWindow = timeWindow;
-	}
-	public Customer(int id, String name, String address, double latitude,
-			double longitude) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.latitude = latitude;
-		this.longitude = longitude;
 	}
 
-	public TimeWindow getTimeWindow() {
-		return timeWindow;
-	}
-	public void setTimeWindow(TimeWindow timeWindow) {
-		this.timeWindow = timeWindow;
-	}
 	public Double getDemand() {
 		return demand;
 	}
@@ -113,22 +72,19 @@ public class Customer implements Serializable{
 	public void setServiceDuration(int serviceDuration) {
 		this.serviceDuration = serviceDuration;
 	}
-	public Customer(int id, String name, String address, double latitude,
-			double longitude, TimeWindow timeWindow, Double demand,
+
+	public abstract double calcDistance(Customer j);
+	public abstract boolean isValidTimeWindow();
+	
+	public Customer(int id, String name, String address, Double demand,
 			int serviceDuration) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.address = address;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.timeWindow = timeWindow;
 		this.demand = demand;
 		this.serviceDuration = serviceDuration;
 	}
-
-	
-	
 	
 	
 }

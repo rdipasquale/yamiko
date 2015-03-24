@@ -30,10 +30,11 @@ public class RBXCrossover extends VRPCrossover{
 	 * 
 	 */
 	private static final long serialVersionUID = -4920058131827278850L;
-
-	public RBXCrossover() {
-
+	private double avgVelocity;
+	public RBXCrossover(double vel) {
+		avgVelocity=vel;
 	}
+
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
 		validaciones(individuals);
@@ -59,7 +60,7 @@ public class RBXCrossover extends VRPCrossover{
 		// 5) Se agrega cada visita de R1 a D1 según criterio de mejor costo.
 		for (Integer i : r1) 
 			if (!p1prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i,getMatrix().getCustomerMap().get(i).getServiceDuration(), p1prima, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(i, p1prima, getMatrix(),avgVelocity))
 						RouteHelper.createNewRouteAndInsertClient(i, p1prima);
 		
 		// 6) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-5.
@@ -70,7 +71,7 @@ public class RBXCrossover extends VRPCrossover{
 		RouteHelper.createNewRouteAndInsertRoute(r1, p2prima);
 		for (Integer i : r2) 
 			if (!p2prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i,getMatrix().getCustomerMap().get(i).getServiceDuration(), p2prima, getMatrix()))
+				if (!RouteHelper.insertClientBCTW(i, p2prima, getMatrix(),avgVelocity))
 						RouteHelper.createNewRouteAndInsertClient(i, p2prima);
 				
 		Integer[] desc1=p1prima.toArray(new Integer[0]);

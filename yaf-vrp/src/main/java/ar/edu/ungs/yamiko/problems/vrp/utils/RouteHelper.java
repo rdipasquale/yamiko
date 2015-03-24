@@ -16,8 +16,10 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
+import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Route;
 
 /**
@@ -99,7 +101,7 @@ public class RouteHelper {
 	 * @param matrix
 	 * @return
 	 */
-	public static final boolean insertClientBCTW(Integer client,int serviceDuration,List<Integer> dest, DistanceMatrix matrix)
+	public static final boolean insertClientBCTW(Integer client,List<Integer> dest, DistanceMatrix matrix,double avgVelocity)
 	{
 		List<Integer> mostC=matrix.getMostCloserCustomerList(client);
 		for (Integer c : mostC) {
@@ -109,19 +111,26 @@ public class RouteHelper {
 				
 				// Vemos después de c....
 				Customer cust=matrix.getCustomerMap().get(c);
-				if (cust.getTimeWindow()==null)
+				if (!cust.isValidTimeWindow())
 				{
 					dest.add(dest.indexOf(c)+1, client);
 					return true;
 				}
 				else
 				{
-					double timem=(matrix.getDistance(c, client)/(Constants.AVERAGE_VELOCITY_KMH*1000))*60;				
-					if (cust.getTimeWindow().intersects(matrix.getCustomerMap().get(client).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, serviceDuration))
-					{
-						dest.add(dest.indexOf(c)+1, client);
-						return true;
-					}						
+					double timem=(matrix.getDistance(c, client)/(avgVelocity*1000))*60;	
+					if (cust instanceof GeodesicalCustomer)
+						if (((GeodesicalCustomer)cust).getTimeWindow().intersects(((GeodesicalCustomer)matrix.getCustomerMap().get(client)).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, cust.getServiceDuration()))
+						{
+							dest.add(dest.indexOf(c)+1, client);
+							return true;
+						}
+					else
+						if (((CartesianCustomer)cust).minGap(((CartesianCustomer)matrix.getCustomerMap().get(client)), Constants.MARGIN_TIME_MINUTES, timem)==0)
+						{
+							dest.add(dest.indexOf(c)+1, client);
+							return true;
+						}
 				}
 			}
 

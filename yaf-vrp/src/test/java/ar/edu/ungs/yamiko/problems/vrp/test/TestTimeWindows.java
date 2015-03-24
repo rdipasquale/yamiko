@@ -2,11 +2,12 @@ package ar.edu.ungs.yamiko.problems.vrp.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
 
 public class TestTimeWindows {
@@ -57,4 +58,37 @@ public class TestTimeWindows {
 		assertTrue(t1.minGap(t2, 0, 0d, 0)==8*60);
 		assertTrue(t2.minGap(t1, 0, 0d, 0)==8*60);
 	}	
+	
+	
+	// Cartesian
+	@Test
+	public void testCartIntersectFalse() {
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		assertEquals(c1.minGap(830, 929, 0, 30d),61);
+	}
+
+	@Test
+	public void testCartIntersectSelf() {
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		assertEquals(c1.minGap(930, 1030,0, 0d),0);
+	}
+
+	@Test
+	public void testCartIntersectTruePuntoContacto() {
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		assertEquals(c1.minGap(830, 930,0, 0d),0);
+	}
+	
+
+	@Test
+	public void testCartMinGap1() {
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		assertEquals(c1.minGap(830, 929,0, 0d),1);
+	}
+	
+	@Test
+	public void testCartMinGap2() {
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		assertEquals(c1.minGap(1830, 1929,0, 0d),800);
+	}		
 }
