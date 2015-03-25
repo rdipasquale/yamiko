@@ -75,7 +75,7 @@ public class TestTimeWindows {
 
 	@Test
 	public void testCartIntersectTruePuntoContacto() {
-		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,0,0,0,930,1030);
 		assertEquals(c1.minGap(830, 930,0, 0d),0);
 	}
 	
@@ -83,12 +83,12 @@ public class TestTimeWindows {
 	@Test
 	public void testCartMinGap1() {
 		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
-		assertEquals(c1.minGap(830, 929,0, 0d),1);
+		assertEquals(c1.minGap(830, 929,0, 0d),31);
 	}
 	
 	@Test
 	public void testCartMinGap2() {
-		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,30,0,0,930,1030);
+		CartesianCustomer c1=new CartesianCustomer(1,"C1","A1",0d,0,0,0,930,1030);
 		assertEquals(c1.minGap(1830, 1929,0, 0d),800);
 	}		
 }

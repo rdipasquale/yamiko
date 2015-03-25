@@ -120,8 +120,8 @@ public class TestVRPSimpleFitness {
 		System.out.println("Ind 1 -> " + IntegerStaticHelper.toStringIntArray(d1.getGenotype().getChromosomes().get(0).getFullRawRepresentation()) + " -> Fitness: " + fit1);
 		System.out.println("Ind 2 -> " + IntegerStaticHelper.toStringIntArray(d2.getGenotype().getChromosomes().get(0).getFullRawRepresentation())+ " -> Fitness: " + fit2);
 		
-		assertEquals(fit1,9.999998870626244E11d,1d);
-		assertEquals(fit2,9.999999318564833E11d,1d);
+		assertEquals(fit1,9.999277836243764E8,1d);
+		assertEquals(fit2,9.99931856483261E8,1d);
 	}
 
 

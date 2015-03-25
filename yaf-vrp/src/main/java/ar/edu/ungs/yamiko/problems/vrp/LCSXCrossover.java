@@ -51,6 +51,8 @@ public class LCSXCrossover extends VRPCrossover{
 					lcis=cis;
 				}
 			}
+		
+		// TODO: Esto no puede ser así... Meter en el criterio de mejor costo el resto no me cierra
 	
 		for (Integer c :getMatrix().getCustomerMap().keySet()) 
 			if (!lcis.contains(c))

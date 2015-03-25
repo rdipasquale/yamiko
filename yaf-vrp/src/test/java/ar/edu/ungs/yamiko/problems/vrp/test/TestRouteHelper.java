@@ -657,9 +657,9 @@ public class TestRouteHelper {
 	public void testCartesianInsertBCTW() {
 		Map<Integer,Customer> customers=new HashMap<Integer,Customer>();
 		customers.put(0,new CartesianCustomer( 0, "Deposito", null, 0d,0,0d,0d,0,0));
-		customers.put(1,new CartesianCustomer(1, "Cliente 1", null,0d,1,2d,1d,800,1100));
-		customers.put(2,new CartesianCustomer(2, "Cliente 2", null, 0d,1,2d,2d,900,1200));
-		customers.put(3,new CartesianCustomer(3, "Cliente 3", null, 0d,1,2d,3d,1000,1500));		
+		customers.put(1,new CartesianCustomer(1, "Cliente 1", null,0d,0,2d,1d,800,1100));
+		customers.put(2,new CartesianCustomer(2, "Cliente 2", null, 0d,0,2d,2d,900,1200));
+		customers.put(3,new CartesianCustomer(3, "Cliente 3", null, 0d,0,2d,3d,1000,1500));		
 		DistanceMatrix dm=new DistanceMatrix(customers.values());
 		System.out.println(dm);
 		
@@ -672,8 +672,8 @@ public class TestRouteHelper {
 		
 		assertTrue(l.size()==4);
 		assertTrue(l.get(0)==0);
-		assertTrue(l.get(1)==1);
-		assertTrue(l.get(2)==2);
+		assertTrue(l.get(1)==2);
+		assertTrue(l.get(2)==1);
 		assertTrue(l.get(3)==3);
 		
 		
