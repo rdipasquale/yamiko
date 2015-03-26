@@ -17,7 +17,7 @@ import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
-import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
+import ar.edu.ungs.yamiko.problems.vrp.CVRPTWCartesianSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
@@ -66,7 +66,7 @@ public class CVRPTWCordeau101
 			cross=new GVRCrossover();
 			cross.setMatrix(matrix);
 			
-			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d);
+			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
 			fit.setMatrix(matrix);
 			
 			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
@@ -74,10 +74,10 @@ public class CVRPTWCordeau101
 			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
 			
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.95, 100, new DescendantAcceptEvaluator<Integer[]>(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.96, 250, new DescendantAcceptEvaluator<Integer[]>(), 
 									fit, cross, new GVRMutatorSwap(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), 50000, 980023515.0369271,rma,genome);
+									new GlobalSinglePopulation<Integer[]>(genome), 100000, 98643.81578650243,rma,genome);
 			
 			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
 			
@@ -91,9 +91,6 @@ public class CVRPTWCordeau101
 
 			System.out.println("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			System.out.println("Tiempo -> " + (t2-t1)/1000 + " seg");
-			// TODO: Ver por qué encuentro soluciones mejores que el óptimo... Es como llamar por tel: "Che, P=NP, no jodan más. A otra cosa".
-//			Optimal Ind -> Fitness=9.999804098483702E11 - {0 ; 20 ; 24 ; 25 ; 27 ; 29 ; 30 ; 28 ; 26 ; 23 ; 22 ; 21 ; 0 ; 67 ; 65 ; 63 ; 62 ; 74 ; 72 ; 61 ; 64 ; 68 ; 66 ; 69 ; 0 ; 43 ; 42 ; 41 ; 40 ; 44 ; 46 ; 45 ; 48 ; 51 ; 50 ; 52 ; 49 ; 47 ; 0 ; 13 ; 17 ; 18 ; 19 ; 15 ; 16 ; 14 ; 12 ; 0 ; 57 ; 55 ; 54 ; 53 ; 56 ; 58 ; 60 ; 59 ; 0 ; 90 ; 87 ; 86 ; 83 ; 82 ; 84 ; 85 ; 88 ; 89 ; 91 ; 0 ; 32 ; 33 ; 31 ; 35 ; 37 ; 38 ; 39 ; 36 ; 34 ; 0 ; 98 ; 96 ; 95 ; 94 ; 92 ; 93 ; 97 ; 100 ; 99 ; 0 ; 5 ; 3 ; 7 ; 8 ; 10 ; 11 ; 9 ; 6 ; 4 ; 2 ; 1 ; 75 ; 0 ; 81 ; 78 ; 76 ; 71 ; 70 ; 73 ; 77 ; 79 ; 80 }
-//			Winner 		-> Fitness=9.999876533118408E11 - {0 ; 0 ; 79 ; 29 ; 34 ; 100 ; 86 ; 52 ; 23 ; 99 ; 75 ; 73 ; 20 ; 48 ; 54 ; 22 ; 58 ; 42 ; 96 ; 76 ; 65 ; 97 ; 21 ; 6 ; 3 ; 49 ; 87 ; 88 ; 40 ; 71 ; 18 ; 63 ; 69 ; 81 ; 51 ; 16 ; 83 ; 37 ; 8 ; 39 ; 70 ; 9 ; 47 ; 44 ; 36 ; 53 ; 15 ; 26 ; 0 ; 64 ; 91 ; 12 ; 59 ; 7 ; 38 ; 2 ; 17 ; 85 ; 60 ; 95 ; 98 ; 78 ; 61 ; 28 ; 46 ; 45 ; 11 ; 43 ; 33 ; 80 ; 77 ; 74 ; 67 ; 5 ; 93 ; 19 ; 92 ; 94 ; 14 ; 35 ; 62 ; 72 ; 56 ; 82 ; 84 ; 31 ; 25 ; 13 ; 66 ; 57 ; 90 ; 24 ; 50 ; 10 ; 68 ; 1 ; 4 ; 89 ; 27 ; 30 ; 32 ; 0 ; 55 ; 0 ; 0 ; 0 ; 0 ; 41 ; 0 ; 0 }
 			
 		} catch (YamikoException e) {
 			// TODO Auto-generated catch block

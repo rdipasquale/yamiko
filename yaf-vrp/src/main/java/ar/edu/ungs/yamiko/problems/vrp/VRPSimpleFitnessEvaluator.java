@@ -28,8 +28,9 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_TW_LIMIT_MINUTES=90d;
 	public static final double PENAL_TW_LIMIT_METROS=5000d;
 	public static final double MAX_FITNESS=1000000000d;
-	public static final double PENAL_PER_ROUTE_METROS=10000d;
+	public static final double PENAL_PER_ROUTE_METROS=30000d;
 	private double avgVelocity;
+	private int maxVehiculos;
 	
 	@Override
 	public double execute(Individual<Integer[]> ind) {
@@ -57,12 +58,13 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 				fitness+=PENAL_MAX_TIME_ROUTE_METROS;
 		}
 		
-		fitness+=cantRutas*PENAL_PER_ROUTE_METROS;
+		fitness+=cantRutas*PENAL_PER_ROUTE_METROS*cantRutas>maxVehiculos?cantRutas*PENAL_PER_ROUTE_METROS:1;
 		return MAX_FITNESS-fitness;
 	}
 	
-	public VRPSimpleFitnessEvaluator(double vel) {
+	public VRPSimpleFitnessEvaluator(double vel,int maxVehicles) {
 		avgVelocity=vel;
+		maxVehiculos=maxVehicles;
 	}
 
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)

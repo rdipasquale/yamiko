@@ -18,18 +18,18 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
+public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2473729053134474976L;
-	public static final double MAX_TIME_ROUTE_MINUTES=720d;
-	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
+	public static final double MAX_TIME_ROUTE_MINUTES=1200d;
+	public static final double PENAL_MAX_TIME_ROUTE_METROS=500d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
-	public static final double PENAL_TW_LIMIT_METROS=10000d;
-	public static final double MAX_FITNESS=1000000000d;
-	public static final double PENAL_PER_ROUTE_METROS=30000d;
+	public static final double PENAL_TW_LIMIT_METROS=1000d;
+	public static final double MAX_FITNESS=100000d;
+	public static final double PENAL_PER_ROUTE_METROS=30d;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
@@ -72,12 +72,13 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		}
 		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*cantRutas>maxVehiculos?cantRutas*PENAL_PER_ROUTE_METROS:1;
 		
-		System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
+	//	System.out.println("Fitness= " + (MAX_FITNESS-fitness) + " Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
+
 		return MAX_FITNESS-fitness;
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
+	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;

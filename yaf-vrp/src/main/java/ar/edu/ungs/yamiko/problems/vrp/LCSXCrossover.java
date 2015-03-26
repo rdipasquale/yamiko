@@ -39,6 +39,9 @@ public class LCSXCrossover extends VRPCrossover{
 		int maxLong=0;
 		Individual<Integer[]> p1 = individuals.get(0);
 		Individual<Integer[]> p2 = individuals.get(1);		
+		
+		// TODO: En vez de evaluar todo convendría explorar las rutas con más elementos intersectados
+		
 		List<Integer> lcis=new ArrayList<Integer>();
 		for (List<Integer> r1 : RouteHelper.getRoutesFromInd(p1))
 			for (List<Integer> r2 : RouteHelper.getRoutesFromInd(p2))			
@@ -52,8 +55,11 @@ public class LCSXCrossover extends VRPCrossover{
 				}
 			}
 		
-		// TODO: Esto no puede ser así... Meter en el criterio de mejor costo el resto no me cierra
-	
+		/* TODO: Insertion. A random insertion heuristic is chosen for reconstruction to preserve the
+		stochastic approach of the genetic algorithm. A task is chosen from the list of unassigned
+		tasks randomly and inserted into the route by evaluating the feasibility and minimising
+		the insertion cost functions
+	*/
 		for (Integer c :getMatrix().getCustomerMap().keySet()) 
 			if (!lcis.contains(c))
 				if (!RouteHelper.insertClientBCTW(c, lcis, getMatrix(),avgVelocity))

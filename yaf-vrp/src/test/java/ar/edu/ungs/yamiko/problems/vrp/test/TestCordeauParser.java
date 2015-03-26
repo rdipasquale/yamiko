@@ -86,7 +86,7 @@ public class TestCordeauParser {
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d);
+		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
 		fit.setMatrix(matrix);
 		rma.develop(genome, ind);
 		Double fitnesOptInd=fit.execute(ind);

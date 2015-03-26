@@ -72,7 +72,7 @@ public class VRPTWParallel
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new VRPSimpleFitnessEvaluator(30d);
+		VRPFitnessEvaluator fit= new VRPSimpleFitnessEvaluator(30d,5);
 		fit.setMatrix(matrix);
 		
 		((ParallelUniqueIntegerPopulationInitializer)popI).setMaxZeros(5);
