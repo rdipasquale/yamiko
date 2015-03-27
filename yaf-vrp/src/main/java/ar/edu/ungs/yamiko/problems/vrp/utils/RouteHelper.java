@@ -6,6 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.spark.util.CollectionsUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -420,5 +424,34 @@ public class RouteHelper {
 			salida.add(r.getRouteModel());
 		return salida;
 	}
-	
+
+	/**
+	 * Devuelve pares ordenados con los índices de las rutas que mayor nivel de intersección tiene.
+	 * Devuelve n pares donde n es el mayor entre 3 y el 10% del promedio de las rutas entre los dos conjuntos
+	 * @param rutasDel1
+	 * @param rutasDel2
+	 * @return
+	 */
+	public static final List<Pair<Integer, Integer>> topIntersectionRoutes(final List<List<Integer>> rutasDel1,final List<List<Integer>> rutasDel2)
+	{
+		List<Pair<Integer, Integer>> salida=new ArrayList<Pair<Integer, Integer>>();
+		if (rutasDel1==null || rutasDel2==null) return salida;
+		int paresADevolver=Math.max((rutasDel1.size()+rutasDel2.size())/2, 3);
+		List<Pair<Pair<Integer, Integer>,Integer>> aux=new ArrayList<Pair<Pair<Integer,Integer>,Integer>>();
+		for (int i=0;i<rutasDel1.size();i++)
+			for (int j=0;j<rutasDel2.size();j++)
+				aux.add(new ImmutablePair<Pair<Integer,Integer>, Integer>(new ImmutablePair<Integer, Integer>(i, j), CollectionUtils.intersection(rutasDel1.get(i),rutasDel2.get(j)).size()));
+		Collections.sort(aux, new Comparator<Pair<Pair<Integer, Integer>,Integer>>() {
+			@Override
+			public int compare(Pair<Pair<Integer, Integer>, Integer> o1,Pair<Pair<Integer, Integer>, Integer> o2) {
+				return Integer.compare(o1.getRight(), o2.getRight())*-1;
+			}});
+		for (int i=0;i<paresADevolver;i++)
+			if (i>=aux.size()) 
+				break;
+			else
+				salida.add(aux.get(i).getLeft());
+		return salida;
+	}
+
 }

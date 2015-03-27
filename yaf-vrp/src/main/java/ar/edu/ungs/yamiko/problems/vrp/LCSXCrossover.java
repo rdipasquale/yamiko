@@ -3,6 +3,8 @@ package ar.edu.ungs.yamiko.problems.vrp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
@@ -40,20 +42,20 @@ public class LCSXCrossover extends VRPCrossover{
 		Individual<Integer[]> p1 = individuals.get(0);
 		Individual<Integer[]> p2 = individuals.get(1);		
 		
-		// TODO: En vez de evaluar todo convendría explorar las rutas con más elementos intersectados
-		
+		// Evalúa sólo las intersecciones de rutas con mayor índice
 		List<Integer> lcis=new ArrayList<Integer>();
-		for (List<Integer> r1 : RouteHelper.getRoutesFromInd(p1))
-			for (List<Integer> r2 : RouteHelper.getRoutesFromInd(p2))			
+		List<List<Integer>> rutasDel1=RouteHelper.getRoutesFromInd(p1);
+		List<List<Integer>> rutasDel2=RouteHelper.getRoutesFromInd(p2);
+		List<Pair<Integer, Integer>> tuplasIntersecciones=RouteHelper.topIntersectionRoutes(rutasDel1, rutasDel2);
+		for (Pair<Integer, Integer> pair : tuplasIntersecciones) {
+			List <Integer> cis=IntegerStaticHelper.longestCommonIncSubseq(rutasDel1.get(pair.getLeft()), rutasDel2.get(pair.getRight()));
+			int longcis=cis.size();
+			if (longcis>maxLong)
 			{
-				List <Integer> cis=IntegerStaticHelper.longestCommonIncSubseq(r1, r2);
-				int longcis=cis.size();
-				if (longcis>maxLong)
-				{
-					maxLong=longcis;
-					lcis=cis;
-				}
+				maxLong=longcis;
+				lcis=cis;
 			}
+		}
 		
 		/* TODO: Insertion. A random insertion heuristic is chosen for reconstruction to preserve the
 		stochastic approach of the genetic algorithm. A task is chosen from the list of unassigned

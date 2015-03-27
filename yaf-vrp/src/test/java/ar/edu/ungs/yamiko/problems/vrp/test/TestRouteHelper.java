@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -676,6 +677,34 @@ public class TestRouteHelper {
 		assertTrue(l.get(2)==1);
 		assertTrue(l.get(3)==3);
 		
-		
-	}	
+	}
+	
+	@Test
+	public void testIntersectionRoutes1()
+	{
+		List<Integer> l =new ArrayList<Integer>();
+		l.add(0);
+		l.add(1);
+		l.add(2);
+		List<Integer> l2 =new ArrayList<Integer>();
+		l2.add(3);
+		l2.add(4);
+		l2.add(5);
+		List<Integer> l3 =new ArrayList<Integer>();
+		l3.add(0);
+		l3.add(2);
+		l3.add(3);
+		List<Integer> l4 =new ArrayList<Integer>();
+		l4.add(3);
+		l4.add(4);
+		l4.add(5);
+		List<List<Integer>> r1 =new ArrayList<List<Integer>>();
+		r1.add(l);
+		r1.add(l2);
+		List<List<Integer>> r2 =new ArrayList<List<Integer>>();
+		r2.add(l3);
+		r2.add(l4);
+		List<Pair<Integer,Integer>> tuplas=RouteHelper.topIntersectionRoutes(r1, r2);
+		assertTrue(tuplas.size()==3);
+	}
 }
