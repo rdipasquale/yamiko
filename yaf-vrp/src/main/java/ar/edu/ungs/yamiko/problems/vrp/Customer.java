@@ -13,6 +13,7 @@ public abstract class Customer implements Serializable{
 	private String address;
 	private Double demand;
 	private int serviceDuration;
+	private int softTimeWindowMargin;
 	
 	public int getId() {
 		return id;
@@ -85,6 +86,13 @@ public abstract class Customer implements Serializable{
 		this.demand = demand;
 		this.serviceDuration = serviceDuration;
 	}
+	public int getSoftTimeWindowMargin() {
+		return softTimeWindowMargin;
+	}
+	public void setSoftTimeWindowMargin(int softTimeWindowMargin) {
+		this.softTimeWindowMargin = softTimeWindowMargin;
+	}
+
 	
 	
 }

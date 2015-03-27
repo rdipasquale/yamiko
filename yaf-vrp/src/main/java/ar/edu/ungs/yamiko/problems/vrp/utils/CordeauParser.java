@@ -111,7 +111,7 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
 				from=Integer.parseInt(st.nextToken());
 				to=Integer.parseInt(st.nextToken());
 			}
-			Customer c1=new CartesianCustomer(i, String.valueOf(i),null, q,d,x, y,from,to);
+			Customer c1=new CartesianCustomer(i, String.valueOf(i),null, q,d,x, y,from,to,0);
 			salida.put(i, c1);
 		}
 

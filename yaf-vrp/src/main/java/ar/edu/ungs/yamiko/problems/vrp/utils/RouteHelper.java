@@ -121,14 +121,14 @@ public class RouteHelper {
 					double timem=(matrix.getDistance(c, client)/(avgVelocity*1000))*60;	
 					if (cust instanceof GeodesicalCustomer)
 					{
-						if (((GeodesicalCustomer)cust).getTimeWindow().intersects(((GeodesicalCustomer)matrix.getCustomerMap().get(client)).getTimeWindow(), Constants.MARGIN_TIME_MINUTES, timem, cust.getServiceDuration()))
+						if (((GeodesicalCustomer)cust).getTimeWindow().intersects(((GeodesicalCustomer)matrix.getCustomerMap().get(client)).getTimeWindow(), cust.getSoftTimeWindowMargin(), timem, cust.getServiceDuration()))
 						{
 							dest.add(dest.indexOf(c)+1, client);
 							return true;
 						}
 					}
 					else
-						if (((CartesianCustomer)cust).minGap(((CartesianCustomer)matrix.getCustomerMap().get(client)), Constants.MARGIN_TIME_MINUTES, timem)==0)
+						if (((CartesianCustomer)cust).minGap(((CartesianCustomer)matrix.getCustomerMap().get(client)), cust.getSoftTimeWindowMargin(), timem)==0)
 						{
 							dest.add(dest.indexOf(c)+1, client);
 							return true;

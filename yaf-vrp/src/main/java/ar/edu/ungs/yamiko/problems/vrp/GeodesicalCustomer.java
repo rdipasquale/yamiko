@@ -45,7 +45,7 @@ public class GeodesicalCustomer extends Customer {
 		return this.timeWindow!=null;
 	}
 	
-	public GeodesicalCustomer(int id, String name, String address, double latitude, double longitude,TimeWindow timeWindow,Double demand,int serviceDuration) {
+	public GeodesicalCustomer(int id, String name, String address, double latitude, double longitude,TimeWindow timeWindow,Double demand,int serviceDuration,int softTimeWindow) {
 		super();
 		setId(id);
 		setName(name);
@@ -55,6 +55,7 @@ public class GeodesicalCustomer extends Customer {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.timeWindow = timeWindow;
+		setSoftTimeWindowMargin(softTimeWindow);
 	}
 
 	public GeodesicalCustomer(int id, String name, String address, double latitude, double longitude) {

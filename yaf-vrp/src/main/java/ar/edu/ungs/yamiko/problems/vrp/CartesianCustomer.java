@@ -82,7 +82,7 @@ public class CartesianCustomer extends Customer {
 	}
 	
 	public CartesianCustomer(int id, String name, String address, Double demand,
-			int serviceDuration,double x, double y, int timeWindowFrom,int timeWindowTo) {
+			int serviceDuration,double x, double y, int timeWindowFrom,int timeWindowTo,int softTimeWindow) {
 		super();
 		setId(id);
 		setName(name);
@@ -93,6 +93,7 @@ public class CartesianCustomer extends Customer {
 		this.y = y;
 		this.timeWindowFrom = timeWindowFrom;
 		this.timeWindowTo = timeWindowTo;
+		setSoftTimeWindowMargin(softTimeWindow);
 	}
 	
 	

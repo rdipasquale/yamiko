@@ -656,10 +656,10 @@ public class TestRouteHelper {
 	@Test
 	public void testCartesianInsertBCTW() {
 		Map<Integer,Customer> customers=new HashMap<Integer,Customer>();
-		customers.put(0,new CartesianCustomer( 0, "Deposito", null, 0d,0,0d,0d,0,0));
-		customers.put(1,new CartesianCustomer(1, "Cliente 1", null,0d,0,2d,1d,800,1100));
-		customers.put(2,new CartesianCustomer(2, "Cliente 2", null, 0d,0,2d,2d,900,1200));
-		customers.put(3,new CartesianCustomer(3, "Cliente 3", null, 0d,0,2d,3d,1000,1500));		
+		customers.put(0,new CartesianCustomer( 0, "Deposito", null, 0d,0,0d,0d,0,0,0));
+		customers.put(1,new CartesianCustomer(1, "Cliente 1", null,0d,0,2d,1d,800,1100,0));
+		customers.put(2,new CartesianCustomer(2, "Cliente 2", null, 0d,0,2d,2d,900,1200,0));
+		customers.put(3,new CartesianCustomer(3, "Cliente 3", null, 0d,0,2d,3d,1000,1500,0));		
 		DistanceMatrix dm=new DistanceMatrix(customers.values());
 		System.out.println(dm);
 		
