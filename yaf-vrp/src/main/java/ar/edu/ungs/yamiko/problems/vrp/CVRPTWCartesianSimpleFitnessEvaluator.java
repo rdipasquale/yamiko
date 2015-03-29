@@ -67,10 +67,10 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 					totalTWPenal+=calcTWPenalty(c1,c2,deltaTiempo);
 				capacityAux+=c2.getDemand();
 			}
-			if (tiempo>MAX_TIME_ROUTE_MINUTES) totalMaxTimePenal+=PENAL_MAX_TIME_ROUTE_METROS;
+			totalMaxTimePenal+=calcMaxTimeRoute(tiempo);
 			totalCapPenal+=calcCapacityPenalty(capacityAux);
 		}
-		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*cantRutas>maxVehiculos?cantRutas*PENAL_PER_ROUTE_METROS:1;
+		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
 		
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
 	//	System.out.println("Fitness= " + (MAX_FITNESS-fitness) + " Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
@@ -104,6 +104,18 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	{
 		if (gap<=capacity) return 0d;
 		return ((gap-capacity)*100/capacity)*PENAL_PER_CAPACITY_X*PENAL_PER_CAPACITY_X;
+	}
+
+	public double calcMaxVehiclePenalty(int cantRutas,int maxVehicles)
+	{
+		return cantRutas>maxVehicles?cantRutas*PENAL_PER_ROUTE_METROS:1;
+	}
+	
+	public double calcMaxTimeRoute(double tiempo)
+	{
+		if (tiempo>MAX_TIME_ROUTE_MINUTES)
+			return PENAL_MAX_TIME_ROUTE_METROS;
+		return 0d;
 	}
 	
 }

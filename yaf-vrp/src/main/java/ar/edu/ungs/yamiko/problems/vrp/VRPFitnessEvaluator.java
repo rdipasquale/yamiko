@@ -31,4 +31,10 @@ public abstract class VRPFitnessEvaluator implements FitnessEvaluator<Integer[]>
 	public VRPFitnessEvaluator() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	public abstract double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo);
+	public abstract double calcCapacityPenalty(double gap);
+	public abstract double calcMaxVehiclePenalty(int cantRutas,int maxVehicles);
+	public abstract double calcMaxTimeRoute(double tiempo);
+
 }

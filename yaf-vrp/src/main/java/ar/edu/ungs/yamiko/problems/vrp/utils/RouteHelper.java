@@ -3,17 +3,18 @@ package ar.edu.ungs.yamiko.problems.vrp.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.spark.util.CollectionsUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.alg.DijkstraShortestPath;
+import org.jgrapht.alg.cycle.JohnsonSimpleCycles;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -25,6 +26,7 @@ import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Route;
+import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 
 /**
  * Helper de Rutas para el VRP
@@ -100,6 +102,7 @@ public class RouteHelper {
 	/**
 	 * Inserta el Cliente "client" en la Lista "dest" con el criterio de Mejor Costo y Time Window.
 	 * Si no puede hacerlo devuelve false.
+	 * Esta función trabaja a nivel Ruta.
 	 * @param client
 	 * @param dest
 	 * @param matrix
@@ -338,6 +341,31 @@ public class RouteHelper {
 		}
 		return g;
 	}
+
+	/**
+	 * Crea un grafo representando la solución al VRP a partir de un individuo representado como una List<List<Integer>>
+	 * @param ind
+	 * @param m
+	 * @return
+	 */
+	public static final DirectedGraph<Integer, DefaultEdge> getGraphFromIndividual(List<List<Integer>> ind,DistanceMatrix m) 
+	{
+		if (ind==null) return null;
+		//Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
+		DirectedGraph<Integer, DefaultEdge> g=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		for (Integer i : m.getVertexSet())
+			g.addVertex(i);
+		for (List<Integer> r : ind) 
+		{
+			if (r.size()>0)
+			{
+				for (int i=1;i<r.size();i++)
+					g.addEdge(r.get(i-1), r.get(i));
+				g.addEdge(r.get(r.size()-1),0);
+			}
+		}
+		return g;
+	}
 	
 	/**
 	 * Devuelve un nuevo grafo con el mismo conjunto de nodos y los arcos que están en ambos grafos (la intersección de dichos conjuntos).
@@ -452,6 +480,42 @@ public class RouteHelper {
 			else
 				salida.add(aux.get(i).getLeft());
 		return salida;
+	}
+
+	public static final void insertClientsFullRestriction(List<Integer> clients,List<Integer> dest, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,VRPFitnessEvaluator vrp)
+	{
+		List<List<Integer>> dest2=new ArrayList<List<Integer>>();
+		dest2.add(dest);
+		insertClientsFullRestriction(clients, matrix,avgVelocity,capacity,vehicles,dest2,vrp);
+	}
+
+	/**
+	 * Inserta un cliente en una solución parcial representada como List<List<Integer>> teniendo en cuenta todas las restricciones del problema. 
+	 * Trabaja a nivel de individuo o de solución parcial.
+	 * El orden de los campos debió cambiarse porque Eclipse reconoce una List<Integer> igual que una List<List<Integer>>  por lo que no puede comprender la sobrecarga de la función.
+	 * Tomado de "Reconstruction" de "Genetic Algorithm and VRP. The behaviour of a crossover operator" (Vaira-Kurasova).  
+	 * @param clients
+	 * @param matrix
+	 * @param avgVelocity
+	 * @param dest
+	 */
+	public static final void insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
+	{
+		DirectedGraph<Integer, DefaultEdge> g=getGraphFromIndividual(dest, matrix);
+		List<List<Integer>> rutas=null;
+		boolean firstIteration=true;
+		
+		for (Integer client : clients) {
+			JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
+			if (firstIteration) rutas = dest; else {rutas =rutasAlg.findSimpleCycles();firstIteration=false;}
+			double penalties=0;
+			for (List<Integer> list : rutas) {
+				
+			}
+			Set<DefaultEdge> arcos=new HashSet<DefaultEdge>();
+			arcos.addAll(g.edgeSet());
+			
+		}
 	}
 
 }

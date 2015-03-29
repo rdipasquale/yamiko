@@ -54,11 +54,10 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 				Customer c2=getMatrix().getCustomers().get(i);
 				if (c1.isValidTimeWindow() && c2.isValidTimeWindow())
 					fitness+=calcTWPenalty(c1,c2,deltaTiempo);			}
-			if (tiempo>MAX_TIME_ROUTE_MINUTES)
-				fitness+=PENAL_MAX_TIME_ROUTE_METROS;
+			fitness+=calcMaxTimeRoute(tiempo);
 		}
-		
-		fitness+=cantRutas*PENAL_PER_ROUTE_METROS*cantRutas>maxVehiculos?cantRutas*PENAL_PER_ROUTE_METROS:1;
+
+		fitness+=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
 		return MAX_FITNESS-fitness;
 	}
 	
@@ -81,5 +80,26 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			return PENAL_TW_LIMIT_METROS+gap*gap;
 		
 	}
+
+	@Override
+	public double calcCapacityPenalty(double gap) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
+	public double calcMaxVehiclePenalty(int cantRutas,int maxVehicles)
+	{
+		return cantRutas>maxVehicles?cantRutas*PENAL_PER_ROUTE_METROS:1;
+	}
+
+	public double calcMaxTimeRoute(double tiempo)
+	{
+		if (tiempo>MAX_TIME_ROUTE_MINUTES)
+			return PENAL_MAX_TIME_ROUTE_METROS;
+		return 0d;
+	}
+	
+	
+
+
 }
