@@ -502,20 +502,114 @@ public class RouteHelper {
 	public static final void insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
 	{
 		DirectedGraph<Integer, DefaultEdge> g=getGraphFromIndividual(dest, matrix);
-		List<List<Integer>> rutas=null;
-		boolean firstIteration=true;
-		
+		List<List<Integer>> rutas=dest;
+		double penalties=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);
+
+		// Itero por cada cliente a insertar
 		for (Integer client : clients) {
-			JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
-			if (firstIteration) rutas = dest; else {rutas =rutasAlg.findSimpleCycles();firstIteration=false;}
-			double penalties=0;
-			for (List<Integer> list : rutas) {
-				
-			}
+			boolean insertado=false;
+			List<Pair<Double,DirectedGraph<Integer,DefaultEdge>>> grafosNoTanMalos=new ArrayList<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>();
+			
+			// Tomo backup
+			DirectedGraph<Integer, DefaultEdge> rollBack=copyGraph(g);
+
+			// Defino el conjunto de arcos a estudiar.
 			Set<DefaultEdge> arcos=new HashSet<DefaultEdge>();
 			arcos.addAll(g.edgeSet());
 			
+			// Para no explorar todo a lo bruto, elegimos los arcos del nodo más cercano
+			List<Integer> clientesMasCercanos=matrix.getMostCloserCustomerList(client);
+			for (Integer cms : clientesMasCercanos) {
+
+				// Verifico que esté en el grafo
+				Set<DefaultEdge> arcosDeCMS=g.edgesOf(cms);
+				
+				
+				if (!arcosDeCMS.isEmpty())
+				{
+					for (DefaultEdge arco : arcosDeCMS) {
+						arcos.remove(arco);
+						int origen=g.getEdgeSource(arco);
+						int destino=g.getEdgeTarget(arco);
+						g.removeEdge(arco);
+						g.addEdge(origen,client);
+						g.addEdge(client,destino);
+						double graphPenalty=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp);
+					}
+				}
+			}
+			
+
 		}
 	}
+
+
+	/**
+	 * Calcula las penalidades VRP a partir de un evaluador de Fitness VRP (que expone estas funcionalidades) y de un grafo dirigido DirectedGraph<Integer,DefaultEdge>
+	 * @param matrix
+	 * @param avgVelocity
+	 * @param capacity
+	 * @param vehicles
+	 * @param g
+	 * @param vrp
+	 * @return
+	 */
+	private static final double calcVRPPenalties(DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,DirectedGraph<Integer,DefaultEdge> g,VRPFitnessEvaluator vrp)
+	{
+		JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
+		List<List<Integer>> dest =rutasAlg.findSimpleCycles();
+		return calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);		
+	}
+	
+	/**
+	 * Calcula las penalidades VRP a partir de un evaluador de Fitness VRP (que expone estas funcionalidades) y de una List<List<Integer>> dest 
+	 * @param matrix
+	 * @param avgVelocity
+	 * @param capacity
+	 * @param vehicles
+	 * @param dest
+	 * @param vrp
+	 * @return
+	 */
+	private static final double calcVRPPenalties(DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
+	{
+		double penalties=0d;
+		for (List<Integer> list : dest) {
+			double tiempo=0;
+			double capacityAux=0;
+			List<Integer> r=new ArrayList<Integer>();
+			r.add(0);
+			r.addAll(list);
+			for (int i=1;i<r.size();i++)
+			{
+				double dist=matrix.getDistance(r.get(i-1), r.get(i));
+				double deltaTiempo=(matrix.getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
+				tiempo+=deltaTiempo;
+				Customer c1=matrix.getCustomers().get(i-1);
+				Customer c2=matrix.getCustomers().get(i);
+				if (c1.isValidTimeWindow() && c2.isValidTimeWindow())
+					penalties+=vrp.calcTWPenalty(c1,c2,deltaTiempo);
+				capacityAux+=c2.getDemand();
+			}
+			penalties+=vrp.calcMaxTimeRoute(tiempo);
+			penalties+=vrp.calcCapacityPenalty(capacityAux);
+		}
+		penalties+=vrp.calcMaxVehiclePenalty(dest.size(),vehicles);
+		return penalties;
+	}
+
+	/**
+	 * Deep Copy DirectedGraph.... No es Cloneable, por eso necesito implementar esto.
+	 * @param initialGraph
+	 * @return
+	 */
+	private static final DirectedGraph<Integer,DefaultEdge> copyGraph(DirectedGraph<Integer,DefaultEdge> initialGraph) {
+		DirectedGraph<Integer,DefaultEdge> newGraph = new SimpleDirectedGraph<Integer,DefaultEdge>(DefaultEdge.class);
+	    for (Integer v : initialGraph.vertexSet()) 
+	    	newGraph.addVertex(new Integer(v));
+		for (DefaultEdge arco : initialGraph.edgeSet()) 
+			newGraph.addEdge(initialGraph.getEdgeSource(arco), initialGraph.getEdgeTarget(arco));
+		return newGraph;
+	}	
 
 }
