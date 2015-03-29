@@ -18,6 +18,8 @@ import org.jgrapht.alg.cycle.JohnsonSimpleCycles;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
+import com.google.common.collect.Lists;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -482,15 +484,26 @@ public class RouteHelper {
 		return salida;
 	}
 
-	public static final void insertClientsFullRestriction(List<Integer> clients,List<Integer> dest, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,VRPFitnessEvaluator vrp)
+	/**
+	 * Inserta un conjunto de clientes en una solución parcial representada como una ruta List<Integer> teniendo en cuenta todas las restricciones del problema.
+	 * Trabaja a nivel de ruta
+	 * @param clients
+	 * @param dest
+	 * @param matrix
+	 * @param avgVelocity
+	 * @param capacity
+	 * @param vehicles
+	 * @param vrp
+	 */
+	public static final List<List<Integer>> insertClientsFullRestriction(List<Integer> clients,List<Integer> dest, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,VRPFitnessEvaluator vrp)
 	{
 		List<List<Integer>> dest2=new ArrayList<List<Integer>>();
 		dest2.add(dest);
-		insertClientsFullRestriction(clients, matrix,avgVelocity,capacity,vehicles,dest2,vrp);
+		return insertClientsFullRestriction(clients, matrix,avgVelocity,capacity,vehicles,dest2,vrp);
 	}
 
 	/**
-	 * Inserta un cliente en una solución parcial representada como List<List<Integer>> teniendo en cuenta todas las restricciones del problema. 
+	 * Inserta un conjunto de clientes en una solución parcial representada como List<List<Integer>> teniendo en cuenta todas las restricciones del problema. 
 	 * Trabaja a nivel de individuo o de solución parcial.
 	 * El orden de los campos debió cambiarse porque Eclipse reconoce una List<Integer> igual que una List<List<Integer>>  por lo que no puede comprender la sobrecarga de la función.
 	 * Tomado de "Reconstruction" de "Genetic Algorithm and VRP. The behaviour of a crossover operator" (Vaira-Kurasova).  
@@ -499,10 +512,9 @@ public class RouteHelper {
 	 * @param avgVelocity
 	 * @param dest
 	 */
-	public static final void insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
+	public static final List<List<Integer>> insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
 	{
 		DirectedGraph<Integer, DefaultEdge> g=getGraphFromIndividual(dest, matrix);
-		List<List<Integer>> rutas=dest;
 		double penalties=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);
 
 		// Itero por cada cliente a insertar
@@ -535,15 +547,64 @@ public class RouteHelper {
 						g.addEdge(origen,client);
 						g.addEdge(client,destino);
 						double graphPenalty=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp);
+						if (graphPenalty<=penalties)
+						{
+							// No se diga más, queda así.
+							insertado=true;
+							break;
+						}
+						else
+						{
+							grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(graphPenalty, copyGraph(g)));
+							g=copyGraph(rollBack);
+						}
 					}
+				}
+				
+				if (insertado) break;
+				
+				// Vemos si abrimos una nueva ruta
+				if (g.outDegreeOf(0)<=vehicles)
+					g.addEdge(0, client);
+				else
+				{
+					if (grafosNoTanMalos.size()>0)
+					{
+						// Agregamos en el lugar "menos" malo
+						Collections.sort(grafosNoTanMalos, new Comparator<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>() {
+							@Override
+							public int compare(
+									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o1,
+									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o2) {
+								return o1.getLeft().compareTo(o2.getLeft());
+							}});
+						g=copyGraph(grafosNoTanMalos.get(0).getRight());						
+					}
+					else
+						g.addEdge(0, client); // Si no queda otra
 				}
 			}
 			
-
 		}
+		return graphToListOfLists(g);
 	}
 
 
+	/**
+	 * Convierte un grafo dirigido representando una solución parcial en una lista de lista de enteros.
+	 * @param g
+	 * @return
+	 */
+	public static final List<List<Integer>> graphToListOfLists(DirectedGraph<Integer,DefaultEdge> g)
+	{
+		JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
+		List<List<Integer>> dest =rutasAlg.findSimpleCycles();
+		List<List<Integer>> salida=new ArrayList<List<Integer>>();
+		for (List<Integer> list : dest) 
+			salida.add(Lists.reverse(list));
+		return salida;
+	}
+	
 	/**
 	 * Calcula las penalidades VRP a partir de un evaluador de Fitness VRP (que expone estas funcionalidades) y de un grafo dirigido DirectedGraph<Integer,DefaultEdge>
 	 * @param matrix
@@ -556,8 +617,7 @@ public class RouteHelper {
 	 */
 	private static final double calcVRPPenalties(DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,DirectedGraph<Integer,DefaultEdge> g,VRPFitnessEvaluator vrp)
 	{
-		JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
-		List<List<Integer>> dest =rutasAlg.findSimpleCycles();
+		List<List<Integer>> dest =graphToListOfLists(g);
 		return calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);		
 	}
 	
@@ -582,7 +642,6 @@ public class RouteHelper {
 			r.addAll(list);
 			for (int i=1;i<r.size();i++)
 			{
-				double dist=matrix.getDistance(r.get(i-1), r.get(i));
 				double deltaTiempo=(matrix.getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
 				tiempo+=deltaTiempo;
 				Customer c1=matrix.getCustomers().get(i-1);

@@ -2,14 +2,16 @@ package ar.edu.ungs.yamiko.problems.vrp.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.alg.cycle.JohnsonSimpleCycles;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.junit.After;
@@ -706,5 +708,28 @@ public class TestRouteHelper {
 		r2.add(l4);
 		List<Pair<Integer,Integer>> tuplas=RouteHelper.topIntersectionRoutes(r1, r2);
 		assertTrue(tuplas.size()==3);
+	}
+	
+	@Test
+	public void testCycles()
+	{
+		DirectedGraph<Integer, DefaultEdge> g=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		g.addVertex(0);
+		g.addVertex(1);
+		g.addVertex(2);
+		g.addVertex(3);
+		g.addVertex(4);
+		g.addVertex(5);
+		g.addEdge(0, 1);
+		g.addEdge(1, 2);
+		g.addEdge(2, 3);
+		g.addEdge(3, 0);
+		g.addEdge(0, 4);
+		g.addEdge(4, 5);		
+		g.addEdge(5, 0);
+		JohnsonSimpleCycles<Integer, DefaultEdge> rutasAlg=new JohnsonSimpleCycles<Integer, DefaultEdge>(g);
+		List<List<Integer>> dest =rutasAlg.findSimpleCycles();
+		assertEquals(dest.size(), 2);		
+		
 	}
 }
