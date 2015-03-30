@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.io.Serializable;
+import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
@@ -36,5 +37,6 @@ public abstract class VRPFitnessEvaluator implements FitnessEvaluator<Integer[]>
 	public abstract double calcCapacityPenalty(double gap);
 	public abstract double calcMaxVehiclePenalty(int cantRutas,int maxVehicles);
 	public abstract double calcMaxTimeRoute(double tiempo);
+	public abstract double calcFullPenalties(List<List<Integer>> rutas);
 
 }

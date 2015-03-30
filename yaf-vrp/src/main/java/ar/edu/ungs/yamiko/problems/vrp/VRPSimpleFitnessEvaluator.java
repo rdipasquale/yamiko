@@ -33,10 +33,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	private int maxVehiculos;
 	
 	@Override
-	public double execute(Individual<Integer[]> ind) {
-		if (ind==null) return 0d;
-		if (ind.getPhenotype()==null) return 0d;
-		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
+	public double calcFullPenalties(List<List<Integer>> rutas) {
 		int cantRutas=rutas.size();
 		double fitness=0d;
 		for (List<Integer> rr: rutas) {
@@ -58,7 +55,15 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		}
 
 		fitness+=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
-		return MAX_FITNESS-fitness;
+		return fitness;
+	}
+	
+	@Override
+	public double execute(Individual<Integer[]> ind) {
+		if (ind==null) return 0d;
+		if (ind.getPhenotype()==null) return 0d;
+		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
+		return MAX_FITNESS-calcFullPenalties(rutas);
 	}
 	
 	public VRPSimpleFitnessEvaluator(double vel,int maxVehicles) {

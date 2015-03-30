@@ -515,7 +515,7 @@ public class RouteHelper {
 	public static final List<List<Integer>> insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
 	{
 		DirectedGraph<Integer, DefaultEdge> g=getGraphFromIndividual(dest, matrix);
-		double penalties=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);
+		double penalties=calcVRPPenalties(dest, vrp);
 
 		// Itero por cada cliente a insertar
 		for (Integer client : clients) {
@@ -534,8 +534,9 @@ public class RouteHelper {
 			for (Integer cms : clientesMasCercanos) {
 
 				// Verifico que esté en el grafo
-				Set<DefaultEdge> arcosDeCMS=g.edgesOf(cms);
-				
+				List<DefaultEdge> arcosDeCMS=new ArrayList<DefaultEdge>();
+				arcosDeCMS.addAll(g.outgoingEdgesOf(cms));
+				arcosDeCMS.addAll(g.incomingEdgesOf(cms));
 				
 				if (!arcosDeCMS.isEmpty())
 				{
@@ -560,31 +561,32 @@ public class RouteHelper {
 						}
 					}
 				}
-				
-				if (insertado) break;
-				
-				// Vemos si abrimos una nueva ruta
-				if (g.outDegreeOf(0)<=vehicles)
-					g.addEdge(0, client);
-				else
-				{
-					if (grafosNoTanMalos.size()>0)
-					{
-						// Agregamos en el lugar "menos" malo
-						Collections.sort(grafosNoTanMalos, new Comparator<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>() {
-							@Override
-							public int compare(
-									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o1,
-									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o2) {
-								return o1.getLeft().compareTo(o2.getLeft());
-							}});
-						g=copyGraph(grafosNoTanMalos.get(0).getRight());						
-					}
-					else
-						g.addEdge(0, client); // Si no queda otra
-				}
 			}
+			if (insertado) break;
 			
+			// Vemos si abrimos una nueva ruta
+			if (g.outDegreeOf(0)<=vehicles)
+			{
+				g.addEdge(0, client);
+				g.addEdge(client, 0);
+				grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp), copyGraph(g)));
+				g=copyGraph(rollBack);
+			}
+
+			if (grafosNoTanMalos.size()>0)
+			{
+				// Agregamos en el lugar "menos" malo
+				Collections.sort(grafosNoTanMalos, new Comparator<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>() {
+					@Override
+					public int compare(
+							Pair<Double, DirectedGraph<Integer, DefaultEdge>> o1,
+							Pair<Double, DirectedGraph<Integer, DefaultEdge>> o2) {
+						return o1.getLeft().compareTo(o2.getLeft());
+					}});
+				g=copyGraph(grafosNoTanMalos.get(0).getRight());						
+			}
+			else
+				g.addEdge(0, client); // Si no queda otra
 		}
 		return graphToListOfLists(g);
 	}
@@ -618,7 +620,7 @@ public class RouteHelper {
 	private static final double calcVRPPenalties(DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,DirectedGraph<Integer,DefaultEdge> g,VRPFitnessEvaluator vrp)
 	{
 		List<List<Integer>> dest =graphToListOfLists(g);
-		return calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, dest, vrp);		
+		return calcVRPPenalties(dest, vrp);		
 	}
 	
 	/**
@@ -631,30 +633,9 @@ public class RouteHelper {
 	 * @param vrp
 	 * @return
 	 */
-	private static final double calcVRPPenalties(DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
+	private static final double calcVRPPenalties(List<List<Integer>> dest,VRPFitnessEvaluator vrp)
 	{
-		double penalties=0d;
-		for (List<Integer> list : dest) {
-			double tiempo=0;
-			double capacityAux=0;
-			List<Integer> r=new ArrayList<Integer>();
-			r.add(0);
-			r.addAll(list);
-			for (int i=1;i<r.size();i++)
-			{
-				double deltaTiempo=(matrix.getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
-				tiempo+=deltaTiempo;
-				Customer c1=matrix.getCustomers().get(i-1);
-				Customer c2=matrix.getCustomers().get(i);
-				if (c1.isValidTimeWindow() && c2.isValidTimeWindow())
-					penalties+=vrp.calcTWPenalty(c1,c2,deltaTiempo);
-				capacityAux+=c2.getDemand();
-			}
-			penalties+=vrp.calcMaxTimeRoute(tiempo);
-			penalties+=vrp.calcCapacityPenalty(capacityAux);
-		}
-		penalties+=vrp.calcMaxVehiclePenalty(dest.size(),vehicles);
-		return penalties;
+		return vrp.calcFullPenalties(dest);
 	}
 
 	/**

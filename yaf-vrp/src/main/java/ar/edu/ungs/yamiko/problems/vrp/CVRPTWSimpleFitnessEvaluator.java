@@ -36,17 +36,14 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	private int maxVehiculos;
 
 	@Override
-	public double execute(Individual<Integer[]> ind) {
-		if (ind==null) return 0d;
-		if (ind.getPhenotype()==null) return 0d;
-		
+	public double calcFullPenalties(List<List<Integer>> rutas) {
 		double totalDist=0d;
 		double totalCapPenal=0d;
 		double totalMaxTimePenal=0d;
 		double totalTWPenal=0d;
 		double fitness=0d;
 
-		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
+		
 		int cantRutas=rutas.size();
 
 		for (List<Integer> rr: rutas) {
@@ -72,18 +69,34 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		}
 		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
 		
-		System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
+		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
-		return MAX_FITNESS-fitness;
+		return fitness;
+	}
+	
+	@Override
+	public double execute(Individual<Integer[]> ind) {
+		if (ind==null) return 0d;
+		if (ind.getPhenotype()==null) return 0d;
+		
+		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
+
+		return MAX_FITNESS-calcFullPenalties(rutas);
 	}
 	
 	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
-
 	}
-
+	
+	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
+		capacity=_capacity;
+		avgVelocity=_velocity;
+		maxVehiculos=maxVehicles;
+		setMatrix(dm);
+	}
+	
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)
 	{
 		int gap=0;

@@ -3,6 +3,8 @@ package ar.edu.ungs.yamiko.problems.vrp.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.CVRPTWCartesianSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
@@ -732,4 +735,55 @@ public class TestRouteHelper {
 		assertEquals(dest.size(), 2);		
 		
 	}
+	
+	@Test
+	public void testGraphToListOfLists()
+	{
+		DirectedGraph<Integer, DefaultEdge> g=new SimpleDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		g.addVertex(0);
+		g.addVertex(1);
+		g.addVertex(2);
+		g.addVertex(3);
+		g.addVertex(4);
+		g.addVertex(5);
+		g.addEdge(0, 1);
+		g.addEdge(1, 2);
+		g.addEdge(2, 3);
+		g.addEdge(3, 0);
+		g.addEdge(0, 4);
+		g.addEdge(4, 5);		
+		g.addEdge(5, 0);
+		List<List<Integer>> prueba=RouteHelper.graphToListOfLists(g);
+		assertNotNull(prueba);
+		assertEquals(prueba.size(), 2);
+		assertTrue(prueba.get(0).get(0)==0);
+		assertTrue(prueba.get(0).get(1)==1);
+		assertTrue(prueba.get(0).get(2)==2);
+		assertTrue(prueba.get(0).get(3)==3);
+		assertTrue(prueba.get(1).get(0)==0);
+		assertTrue(prueba.get(1).get(1)==4);
+		assertTrue(prueba.get(1).get(2)==5);
+	}
+
+	@Test
+	public void testInsertClientsFullRest1()
+	{
+		Map<Integer,Customer> customers=new HashMap<Integer,Customer>();
+		customers.put(0,new CartesianCustomer( 0, "Deposito", null, 0d,0,0d,0d,0,0,0));
+		customers.put(1,new CartesianCustomer(1, "Cliente 1", null,1d,0,2d,1d,800,1100,0));
+		customers.put(2,new CartesianCustomer(2, "Cliente 2", null, 1d,0,2d,2d,900,1200,0));
+		customers.put(3,new CartesianCustomer(3, "Cliente 3", null, 1d,0,2d,3d,1000,1500,0));		
+		DistanceMatrix dm=new DistanceMatrix(customers.values());
+		List<List<Integer>> prueba=new ArrayList<List<Integer>>();
+		List<Integer> ruta=new ArrayList<Integer>();
+		ruta.add(0);
+		ruta.add(2);
+		prueba.add(ruta);
+		List<Integer> clients=new ArrayList<Integer>();
+		clients.add(1);
+		clients.add(3);
+		prueba=RouteHelper.insertClientsFullRestriction(clients, dm, 1d, 3, 3, prueba, new CVRPTWCartesianSimpleFitnessEvaluator(3d, 1d, 3,dm));
+		assertNotNull(prueba);
+	}
+	
 }
