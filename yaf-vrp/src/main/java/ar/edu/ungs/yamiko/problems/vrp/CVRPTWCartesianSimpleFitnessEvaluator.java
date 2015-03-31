@@ -56,8 +56,8 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 				totalDist+=dist;
 				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
 				tiempo+=deltaTiempo;
-				Customer c1=getMatrix().getCustomers().get(i-1);
-				Customer c2=getMatrix().getCustomers().get(i);
+				Customer c1=getMatrix().getCustomers().get(r.get(i-1));
+				Customer c2=getMatrix().getCustomers().get(r.get(i));
 				if (c1.isValidTimeWindow() && c2.isValidTimeWindow())
 					totalTWPenal+=calcTWPenalty(c1,c2,deltaTiempo);
 				capacityAux+=c2.getDemand();

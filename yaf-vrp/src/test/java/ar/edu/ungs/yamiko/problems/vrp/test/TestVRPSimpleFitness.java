@@ -112,8 +112,7 @@ public class TestVRPSimpleFitness {
 		rma.develop(genome, d2);
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());	
 
-		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d,5);
-		fit.setMatrix(matrix);
+		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d,5,matrix);
 		double fit1=fit.execute(d1);
 		double fit2=fit.execute(d2);
 
@@ -193,8 +192,7 @@ public class TestVRPSimpleFitness {
 		rma.develop(genome, d2);
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());	
 
-		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d,5);
-		fit.setMatrix(matrix);
+		VRPSimpleFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d,5,matrix);
 		System.out.println("---------------------");		
 
 		long t=System.currentTimeMillis();

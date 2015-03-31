@@ -28,10 +28,12 @@ import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
+import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
+import ar.edu.ungs.yamiko.problems.vrp.VRPSimpleFitnessEvaluator;
 
 public class TestSBXCrossOver {
 
-	private static final int CROSSOVERS=1000000;
+	private static final int CROSSOVERS=10000;
 	private VRPCrossover cross; 
 	private Individual<Integer[]> i1;
 	private Individual<Integer[]> i2;
@@ -57,8 +59,10 @@ public class TestSBXCrossOver {
 		customers.put(7,new GeodesicalCustomer(7, "Cliente 7", null, -34.618075, -58.425593,new TimeWindow(8,0, 19, 0)));		
 		customers.put(8,new GeodesicalCustomer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 19, 0)));		
 		customers.put(9,new GeodesicalCustomer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 19, 0)));		
-		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));	
-		cross=new SBXCrossover(30d);
+		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));
+		DistanceMatrix dm=new DistanceMatrix(customers.values());
+		VRPFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d, 5, dm);
+		cross=new SBXCrossover(30d,0,5,fit);
 		i1=new BasicIndividual<Integer[]>();
 		i2=new BasicIndividual<Integer[]>();
 		popI=new UniqueIntegerPopulationInitializer();
@@ -77,7 +81,7 @@ public class TestSBXCrossOver {
 			rma.develop(genome, ind);		
 		i1=population.getAll().get(0);
 		i2=population.getAll().get(1);
-		cross.setMatrix(new DistanceMatrix(customers.values()));
+		cross.setMatrix(dm);
 		System.out.println("---------------------");		
 	}
 

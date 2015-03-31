@@ -31,11 +31,17 @@ public class RBXCrossover extends VRPCrossover{
 	 */
 	private static final long serialVersionUID = -4920058131827278850L;
 	private double avgVelocity;
-	public RBXCrossover(double vel) {
-		avgVelocity=vel;
-	}
-
+	private int capacity;
+	private int vehicles;
+	private VRPFitnessEvaluator vrp;
 	
+	public RBXCrossover(double vel,int _capacity, int _vehicles, VRPFitnessEvaluator _vrp) {
+		avgVelocity=vel;
+		capacity=_capacity;
+		vehicles=_vehicles;
+		vrp=_vrp;
+	}
+		
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
 		validaciones(individuals);
 		List<Individual<Integer[]>> descendants=new ArrayList<Individual<Integer[]>>();
@@ -58,10 +64,12 @@ public class RBXCrossover extends VRPCrossover{
 		RouteHelper.createNewRouteAndInsertRoute(r2, p1prima);
 		
 		// 5) Se agrega cada visita de R1 a D1 según criterio de mejor costo.
+		List<Integer> pendientes=new ArrayList<Integer>();
 		for (Integer i : r1) 
 			if (!p1prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i, p1prima, getMatrix(),avgVelocity))
-						RouteHelper.createNewRouteAndInsertClient(i, p1prima);
+				pendientes.add(i);
+		p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
+
 		
 		// 6) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-5.
 		r1=RouteHelper.selectRandomRouteFromInd(p1);
@@ -69,10 +77,11 @@ public class RBXCrossover extends VRPCrossover{
 		p2prima.removeAll(r2);
 		p2prima.removeAll(r1);
 		RouteHelper.createNewRouteAndInsertRoute(r1, p2prima);
+		pendientes=new ArrayList<Integer>();
 		for (Integer i : r2) 
 			if (!p2prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i, p2prima, getMatrix(),avgVelocity))
-						RouteHelper.createNewRouteAndInsertClient(i, p2prima);
+					pendientes.add(i);
+		p2prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p2prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 				
 		Integer[] desc1=p1prima.toArray(new Integer[0]);
 		Integer[] desc2=p2prima.toArray(new Integer[0]);

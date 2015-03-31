@@ -27,8 +27,15 @@ public class LCSXCrossover extends VRPCrossover{
 	 */
 	private static final long serialVersionUID = 8881156772077436887L;
 	private double avgVelocity;
-	public LCSXCrossover(double vel) {
+	private int capacity;
+	private int vehicles;
+	private VRPFitnessEvaluator vrp;
+	
+	public LCSXCrossover(double vel,int _capacity, int _vehicles, VRPFitnessEvaluator _vrp) {
 		avgVelocity=vel;
+		capacity=_capacity;
+		vehicles=_vehicles;
+		vrp=_vrp;
 	}
 
 	
@@ -56,17 +63,7 @@ public class LCSXCrossover extends VRPCrossover{
 				lcis=cis;
 			}
 		}
-		
-		/* TODO: Insertion. A random insertion heuristic is chosen for reconstruction to preserve the
-		stochastic approach of the genetic algorithm. A task is chosen from the list of unassigned
-		tasks randomly and inserted into the route by evaluating the feasibility and minimising
-		the insertion cost functions
-	*/
-		for (Integer c :getMatrix().getCustomerMap().keySet()) 
-			if (!lcis.contains(c))
-				if (!RouteHelper.insertClientBCTW(c, lcis, getMatrix(),avgVelocity))
-					RouteHelper.createNewRouteAndInsertClient(c, lcis);
-		
+
 		if (lcis.size()>0)
 		{
 			if (lcis.get(0)!=0)
@@ -74,6 +71,13 @@ public class LCSXCrossover extends VRPCrossover{
 			if (lcis.get(lcis.size()-1)!=0)
 				lcis.add(0);
 		}
+		
+		List<Integer> complemento=new ArrayList<Integer>();
+		for (Integer c :getMatrix().getCustomerMap().keySet()) 
+			if (!lcis.contains(c))
+				complemento.add(c);
+		
+		lcis=RouteHelper.insertClientsFullRestrictionAsSimpleList(complemento,lcis, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 		
 		Integer[] desc1=lcis.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(p1.getGenotype().getChromosomes().get(0).name(), desc1);

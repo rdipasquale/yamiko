@@ -33,9 +33,16 @@ public class SBXCrossover extends VRPCrossover{
 	 */
 	private static final long serialVersionUID = -6728302269500814694L;
 	private double avgVelocity;
-	public SBXCrossover(double vel) {
+	private int capacity;
+	private int vehicles;
+	private VRPFitnessEvaluator vrp;
+	
+	public SBXCrossover(double vel,int _capacity, int _vehicles, VRPFitnessEvaluator _vrp) {
 		avgVelocity=vel;
-	}
+		capacity=_capacity;
+		vehicles=_vehicles;
+		vrp=_vrp;
+	}	
 
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
@@ -76,10 +83,11 @@ public class SBXCrossover extends VRPCrossover{
 		RouteHelper.createNewRouteAndInsertRoute(sNew, p1prima);
 		
 		// 9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.
+		List<Integer> pendientes=new ArrayList<Integer>();
 		for (Integer i : tTemp) 
 			if (!p1prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i, p1prima, getMatrix(),avgVelocity))
-						RouteHelper.createNewRouteAndInsertClient(i, p1prima);
+				pendientes.add(i);
+		p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 		
 		// 10) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-9.
 		breakPoint=StaticHelper.randomInt(r2.size());
@@ -94,10 +102,11 @@ public class SBXCrossover extends VRPCrossover{
 		tTemp=new ArrayList<Integer>();
 		tTemp.addAll(r2);
 		RouteHelper.createNewRouteAndInsertRoute(sNew, p2prima);
+		pendientes=new ArrayList<Integer>();
 		for (Integer i : tTemp) 
 			if (!p2prima.contains(i))
-				if (!RouteHelper.insertClientBCTW(i, p2prima, getMatrix(),avgVelocity))
-						RouteHelper.createNewRouteAndInsertClient(i, p2prima);
+				pendientes.add(i);
+		p2prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p2prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 				
 		Integer[] desc1=p1prima.toArray(new Integer[0]);
 		Integer[] desc2=p2prima.toArray(new Integer[0]);

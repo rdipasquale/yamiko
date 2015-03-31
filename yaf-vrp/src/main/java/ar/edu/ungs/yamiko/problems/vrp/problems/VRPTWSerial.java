@@ -67,8 +67,7 @@ public class VRPTWSerial
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new VRPSimpleFitnessEvaluator(30d,5);
-		fit.setMatrix(matrix);
+		VRPFitnessEvaluator fit= new VRPSimpleFitnessEvaluator(30d,5,matrix);
 		
 		((UniqueIntegerPopulationInitializer)popI).setMaxZeros(5);
 		((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);

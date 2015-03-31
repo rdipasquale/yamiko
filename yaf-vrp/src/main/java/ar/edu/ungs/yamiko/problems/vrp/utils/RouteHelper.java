@@ -362,8 +362,10 @@ public class RouteHelper {
 			if (r.size()>0)
 			{
 				for (int i=1;i<r.size();i++)
+				if (r.get(i-1)!=r.get(i))
 					g.addEdge(r.get(i-1), r.get(i));
-				g.addEdge(r.get(r.size()-1),0);
+				if (r.get(r.size()-1)!=0)
+					g.addEdge(r.get(r.size()-1),0);
 			}
 		}
 		return g;
@@ -503,6 +505,27 @@ public class RouteHelper {
 	}
 
 	/**
+	 * Inserta un conjunto de clientes en una solución parcial representada como una ruta List<Integer> teniendo en cuenta todas las restricciones del problema.
+	 * Trabaja a nivel de ruta
+	 * @param clients
+	 * @param dest
+	 * @param matrix
+	 * @param avgVelocity
+	 * @param capacity
+	 * @param vehicles
+	 * @param vrp
+	 * @return
+	 */
+	public static final List<Integer> insertClientsFullRestrictionAsSimpleList(List<Integer> clients,List<Integer> dest, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,VRPFitnessEvaluator vrp)
+	{
+		List<Integer> salidaFinal=new ArrayList<Integer>();
+		List<List<Integer>> salida=insertClientsFullRestriction(clients,dest, matrix,avgVelocity,capacity,vehicles,vrp);
+		for (List<Integer> list : salida)
+			salidaFinal.addAll(list);
+		return salidaFinal;
+	}
+
+	/**
 	 * Inserta un conjunto de clientes en una solución parcial representada como List<List<Integer>> teniendo en cuenta todas las restricciones del problema. 
 	 * Trabaja a nivel de individuo o de solución parcial.
 	 * El orden de los campos debió cambiarse porque Eclipse reconoce una List<Integer> igual que una List<List<Integer>>  por lo que no puede comprender la sobrecarga de la función.
@@ -545,6 +568,8 @@ public class RouteHelper {
 						int origen=g.getEdgeSource(arco);
 						int destino=g.getEdgeTarget(arco);
 						g.removeEdge(arco);
+						if (origen==client)
+							break;
 						g.addEdge(origen,client);
 						g.addEdge(client,destino);
 						double graphPenalty=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp);

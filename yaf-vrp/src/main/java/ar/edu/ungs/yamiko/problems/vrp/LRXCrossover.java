@@ -28,8 +28,15 @@ public class LRXCrossover extends VRPCrossover{
 	 */
 	private static final long serialVersionUID = -6774197408956249772L;
 	private double avgVelocity;
-	public LRXCrossover(double vel) {
+	private int capacity;
+	private int vehicles;
+	private VRPFitnessEvaluator vrp;
+	
+	public LRXCrossover(double vel,int _capacity, int _vehicles, VRPFitnessEvaluator _vrp) {
 		avgVelocity=vel;
+		capacity=_capacity;
+		vehicles=_vehicles;
+		vrp=_vrp;
 	}
 
 	
@@ -45,7 +52,7 @@ public class LRXCrossover extends VRPCrossover{
 		while (rutasOrd.size()>0 && rutasOrd.get(0).size()>1)
 		{
 			List<Integer> l=rutasOrd.get(0);
-			d.add(0);
+			if (!l.isEmpty()) {if (l.get(0)!=0) d.add(0);} else d.add(0);;
 			d.addAll(l);
 			rutasOrd.remove(0);
 			// 3) Remueve de todas las rutas de L los clientes encontrados en la lista de mayor longitud seleccionada en el punto 2
@@ -55,12 +62,13 @@ public class LRXCrossover extends VRPCrossover{
 		}
 		
 		// 5) Si quedan rutas con 1 elemento, los agrega con el criterio de menor costo.
+		List<Integer> pendientes=new ArrayList<Integer>();
 		if (rutasOrd.size()>0)
 			for (List<Integer> r: rutasOrd)
 				for (Integer i : r)
 					if (!d.contains(i))
-						if (!RouteHelper.insertClientBCTW(i, d, getMatrix(),avgVelocity))
-							RouteHelper.createNewRouteAndInsertClient(i, d);
+						pendientes.add(i);
+		d=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,d, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 
 		Integer[] desc1=d.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), desc1);
