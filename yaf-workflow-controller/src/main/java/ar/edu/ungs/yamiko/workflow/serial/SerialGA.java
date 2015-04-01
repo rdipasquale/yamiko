@@ -71,6 +71,7 @@ public class SerialGA<T> {
 					{
 						Individual<T> parentB=(Individual<T>)ite.next();
 						List<Individual<T>> parents=new ArrayList<Individual<T>>();
+						
 						parents.add(parentA);
 						parents.add(parentB);
 						List<Individual<T>> children=parameter.getCrossover().execute(parents);
@@ -86,10 +87,11 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
-				if (Math.IEEEremainder(generationNumber,1000)==0) System.out.println("Generation " + generationNumber);
+				if (Math.IEEEremainder(generationNumber,1000)==0) System.out.print("Generation " + generationNumber + "...");
 				
 				
 			}
+			System.out.println("... Cumplidas " + generationNumber + " Generaciones.");
 			
 			return bestInd;
 			

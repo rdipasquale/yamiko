@@ -60,6 +60,7 @@ public class TestLRXCrossOver {
 		customers.put(8,new GeodesicalCustomer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 19, 0)));		
 		customers.put(9,new GeodesicalCustomer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 19, 0)));		
 		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));	
+		
 		DistanceMatrix dm=new DistanceMatrix(customers.values());
 		VRPFitnessEvaluator fit=new VRPSimpleFitnessEvaluator(30d, 5, dm);
 		cross=new LRXCrossover(30d,0,5,fit);

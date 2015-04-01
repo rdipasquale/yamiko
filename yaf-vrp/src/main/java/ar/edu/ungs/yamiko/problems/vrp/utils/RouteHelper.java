@@ -3,7 +3,6 @@ package ar.edu.ungs.yamiko.problems.vrp.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,8 +17,6 @@ import org.jgrapht.alg.cycle.JohnsonSimpleCycles;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.google.common.collect.Lists;
-
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
@@ -29,6 +26,8 @@ import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Route;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
+
+import com.google.common.collect.Lists;
 
 /**
  * Helper de Rutas para el VRP
@@ -447,6 +446,8 @@ public class RouteHelper {
 		List<Route> rutasCompletas=new ArrayList<Route>();
 		if (ind.getPhenotype()==null) throw new IndividualNotDeveloped();
 		Object[] rutas=ind.getPhenotype().getAlleleMap().get(ind.getPhenotype().getAlleleMap().keySet().iterator().next()).values().toArray(new Object[0]);
+		if (rutas[0]==null) 
+			return null;
 		rutasCompletas.addAll(((List<Route>)rutas[0]));
 		for (Route r : rutasCompletas) 
 			if (r.getRouteModel().size()>0)
@@ -542,76 +543,83 @@ public class RouteHelper {
 
 		// Itero por cada cliente a insertar
 		for (Integer client : clients) {
-			boolean insertado=false;
-			List<Pair<Double,DirectedGraph<Integer,DefaultEdge>>> grafosNoTanMalos=new ArrayList<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>();
-			
-			// Tomo backup
-			DirectedGraph<Integer, DefaultEdge> rollBack=copyGraph(g);
+			if (client!=0)
+			{
+				boolean insertado=false;
+				List<Pair<Double,DirectedGraph<Integer,DefaultEdge>>> grafosNoTanMalos=new ArrayList<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>();				
+				// Tomo backup
+				DirectedGraph<Integer, DefaultEdge> rollBack=copyGraph(g);
+	
+				// Para no explorar todo a lo bruto, elegimos los arcos del nodo más cercano
+				List<Integer> clientesMasCercanos=matrix.getMostCloserCustomerList(client);
+				for (Integer cms : clientesMasCercanos) {
+	
+					// Verifico que esté en el grafo
+					List<DefaultEdge> arcosDeCMS=new ArrayList<DefaultEdge>();
+					for (DefaultEdge d : g.outgoingEdgesOf(cms)) 
+						arcosDeCMS.add(d);	
+					for (DefaultEdge d : g.incomingEdgesOf(cms)) 
+						arcosDeCMS.add(d);	
+					
+					if (!arcosDeCMS.isEmpty())
+					{
+						for (DefaultEdge arco : arcosDeCMS) {
+							int origen=g.getEdgeSource(arco);
+							int destino=g.getEdgeTarget(arco);
 
-			// Defino el conjunto de arcos a estudiar.
-			Set<DefaultEdge> arcos=new HashSet<DefaultEdge>();
-			arcos.addAll(g.edgeSet());
-			
-			// Para no explorar todo a lo bruto, elegimos los arcos del nodo más cercano
-			List<Integer> clientesMasCercanos=matrix.getMostCloserCustomerList(client);
-			for (Integer cms : clientesMasCercanos) {
-
-				// Verifico que esté en el grafo
-				List<DefaultEdge> arcosDeCMS=new ArrayList<DefaultEdge>();
-				arcosDeCMS.addAll(g.outgoingEdgesOf(cms));
-				arcosDeCMS.addAll(g.incomingEdgesOf(cms));
-				
-				if (!arcosDeCMS.isEmpty())
-				{
-					for (DefaultEdge arco : arcosDeCMS) {
-						arcos.remove(arco);
-						int origen=g.getEdgeSource(arco);
-						int destino=g.getEdgeTarget(arco);
-						g.removeEdge(arco);
-						if (origen==client)
-							break;
-						g.addEdge(origen,client);
-						g.addEdge(client,destino);
-						double graphPenalty=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp);
-						if (graphPenalty<=penalties)
-						{
-							// No se diga más, queda así.
-							insertado=true;
-							break;
-						}
-						else
-						{
-							grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(graphPenalty, copyGraph(g)));
-							g=copyGraph(rollBack);
+							if (!g.removeEdge(arco))
+									g.removeAllEdges(origen, destino);
+							if (origen==client)
+								break;
+							g.addEdge(origen,client);
+							if (destino==client)
+								break;
+							g.addEdge(client,destino);
+							double graphPenalty=calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp);
+							if (graphPenalty<=penalties)
+							{
+								insertado=true;
+								break;
+							}
+							else
+							{
+								grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(graphPenalty, copyGraph(g)));
+								g=copyGraph(rollBack);
+							}
 						}
 					}
+					if (insertado)
+						break;
 				}
-			}
-			if (insertado) break;
-			
-			// Vemos si abrimos una nueva ruta
-			if (g.outDegreeOf(0)<=vehicles)
-			{
-				g.addEdge(0, client);
-				g.addEdge(client, 0);
-				grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp), copyGraph(g)));
-				g=copyGraph(rollBack);
-			}
 
-			if (grafosNoTanMalos.size()>0)
-			{
-				// Agregamos en el lugar "menos" malo
-				Collections.sort(grafosNoTanMalos, new Comparator<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>() {
-					@Override
-					public int compare(
-							Pair<Double, DirectedGraph<Integer, DefaultEdge>> o1,
-							Pair<Double, DirectedGraph<Integer, DefaultEdge>> o2) {
-						return o1.getLeft().compareTo(o2.getLeft());
-					}});
-				g=copyGraph(grafosNoTanMalos.get(0).getRight());						
+				if (!insertado)
+				{
+					// Vemos si abrimos una nueva ruta
+					if (g.outDegreeOf(0)<=vehicles)
+					{
+						g.addEdge(0, client);
+						g.addEdge(client, 0);
+						grafosNoTanMalos.add(new ImmutablePair<Double, DirectedGraph<Integer,DefaultEdge>>(calcVRPPenalties(matrix, avgVelocity, capacity, vehicles, g, vrp), copyGraph(g)));
+						g=copyGraph(rollBack);
+					}
+		
+					if (grafosNoTanMalos.size()>0)
+					{
+						// Agregamos en el lugar "menos" malo
+						Collections.sort(grafosNoTanMalos, new Comparator<Pair<Double,DirectedGraph<Integer,DefaultEdge>>>() {
+							@Override
+							public int compare(
+									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o1,
+									Pair<Double, DirectedGraph<Integer, DefaultEdge>> o2) {
+								return o1.getLeft().compareTo(o2.getLeft());
+							}});
+						g=copyGraph(grafosNoTanMalos.get(0).getRight());						
+					}
+					else
+						g.addEdge(0, client); // Si no queda otra
+					
+				}					
 			}
-			else
-				g.addEdge(0, client); // Si no queda otra
 		}
 		return graphToListOfLists(g);
 	}

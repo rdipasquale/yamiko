@@ -48,7 +48,7 @@ public class CartesianCustomer extends Customer {
 	
 	@Override
 	public boolean isValidTimeWindow() {
-		return timeWindowFrom==0 && timeWindowTo==0;
+		return !(timeWindowFrom==0 && timeWindowTo==0);
 	}
 
 	public int minGap(CartesianCustomer c2,int marginInMinutes,Double timeTravel)

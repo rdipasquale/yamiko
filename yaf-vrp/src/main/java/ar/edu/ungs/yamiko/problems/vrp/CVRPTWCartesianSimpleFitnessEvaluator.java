@@ -29,7 +29,8 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=1000d;
 	public static final double MAX_FITNESS=100000d;
-	public static final double PENAL_PER_ROUTE_METROS=30d;
+	//public static final double PENAL_PER_ROUTE_METROS=30d;
+	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
@@ -65,9 +66,9 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			totalMaxTimePenal+=calcMaxTimeRoute(tiempo);
 			totalCapPenal+=calcCapacityPenalty(capacityAux);
 		}
-		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
-		
+		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
+		fitness+=fitness*calcOmitPenalty(rutas);
 	//	System.out.println("Fitness= " + (MAX_FITNESS-fitness) + " Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 
 		return fitness;
@@ -81,6 +82,8 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		if (ind.getPhenotype()==null) return 0d;
 		
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
+		if (rutas==null)
+			return 0;
 		return MAX_FITNESS-calcFullPenalties(rutas);
 	}
 	
@@ -119,11 +122,6 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return ((gap-capacity)*100/capacity)*PENAL_PER_CAPACITY_X*PENAL_PER_CAPACITY_X;
 	}
 
-	public double calcMaxVehiclePenalty(int cantRutas,int maxVehicles)
-	{
-		return cantRutas>maxVehicles?cantRutas*PENAL_PER_ROUTE_METROS:1;
-	}
-	
 	public double calcMaxTimeRoute(double tiempo)
 	{
 		if (tiempo>MAX_TIME_ROUTE_MINUTES)

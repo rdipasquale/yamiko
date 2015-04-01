@@ -29,7 +29,7 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=10000d;
 	public static final double MAX_FITNESS=1000000000d;
-	public static final double PENAL_PER_ROUTE_METROS=30000d;
+	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
@@ -67,10 +67,11 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			totalMaxTimePenal+=calcMaxTimeRoute(tiempo);
 			totalCapPenal+=calcCapacityPenalty(capacityAux);
 		}
-		double maxVehPenal=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
+		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
 		
 		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
+		fitness+=fitness*calcOmitPenalty(rutas);
 		return fitness;
 	}
 	
@@ -118,11 +119,6 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return ((gap-capacity)*100/capacity)*PENAL_PER_CAPACITY_X*PENAL_PER_CAPACITY_X;
 	}
 	
-	public double calcMaxVehiclePenalty(int cantRutas,int maxVehicles)
-	{
-		return cantRutas>maxVehicles?cantRutas*PENAL_PER_ROUTE_METROS:1;
-	}
-
 	public double calcMaxTimeRoute(double tiempo)
 	{
 		if (tiempo>MAX_TIME_ROUTE_MINUTES)

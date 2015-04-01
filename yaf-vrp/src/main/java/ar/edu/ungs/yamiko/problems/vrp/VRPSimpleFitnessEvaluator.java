@@ -28,7 +28,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_TW_LIMIT_MINUTES=90d;
 	public static final double PENAL_TW_LIMIT_METROS=5000d;
 	public static final double MAX_FITNESS=1000000000d;
-	public static final double PENAL_PER_ROUTE_METROS=30000d;
+	public static final double PLUS_PER_ROUTE=0.1;
 	private double avgVelocity;
 	private int maxVehiculos;
 	
@@ -36,6 +36,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public double calcFullPenalties(List<List<Integer>> rutas) {
 		int cantRutas=rutas.size();
 		double fitness=0d;
+		double totalDist=0d;
 		for (List<Integer> rr: rutas) {
 			double tiempo=0;
 			List<Integer> r=new ArrayList<Integer>();
@@ -45,6 +46,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			{
 				double dist=getMatrix().getDistance(r.get(i-1), r.get(i));
 				fitness+=dist;
+				totalDist+=dist;
 				double deltaTiempo=(getMatrix().getDistance(r.get(i-1), r.get(i))/(avgVelocity*1000))*60;
 				tiempo+=deltaTiempo;
 				Customer c1=getMatrix().getCustomers().get(r.get(i-1));
@@ -53,8 +55,9 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 					fitness+=calcTWPenalty(c1,c2,deltaTiempo);			}
 			fitness+=calcMaxTimeRoute(tiempo);
 		}
-
-		fitness+=cantRutas*PENAL_PER_ROUTE_METROS*calcMaxVehiclePenalty(cantRutas,maxVehiculos);
+		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
+		fitness+=maxVehPenal;
+		fitness+=fitness*calcOmitPenalty(rutas);
 		return fitness;
 	}
 	
@@ -93,10 +96,6 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return 0;
 	}
 	
-	public double calcMaxVehiclePenalty(int cantRutas,int maxVehicles)
-	{
-		return cantRutas>maxVehicles?cantRutas*PENAL_PER_ROUTE_METROS:1;
-	}
 
 	public double calcMaxTimeRoute(double tiempo)
 	{

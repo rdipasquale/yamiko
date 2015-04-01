@@ -20,8 +20,8 @@ import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWCartesianSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
-import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
-import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom;
+import ar.edu.ungs.yamiko.problems.vrp.LCSXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
@@ -63,21 +63,24 @@ public class CVRPTWCordeau101
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
-			cross=new GVRCrossover();
-			cross.setMatrix(matrix);
+//			cross=new GVRCrossover();
+//			cross.setMatrix(matrix);
 			
 			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
 			fit.setMatrix(matrix);
+			cross=new LCSXCrossover(1d, c, m, fit);
+			cross.setMatrix(matrix);
+
 			
 			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
 			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
 			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
 			
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.96, 250, new DescendantAcceptEvaluator<Integer[]>(), 
-									fit, cross, new GVRMutatorSwap(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.96, 100, new DescendantAcceptEvaluator<Integer[]>(), 
+									fit, cross, new GVRMutatorRandom(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), 100000, 98643.81578650243,rma,genome);
+									new GlobalSinglePopulation<Integer[]>(genome), 50000, 98643.81578650243,rma,genome);
 			
 			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
 			

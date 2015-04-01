@@ -41,6 +41,7 @@ public class LRXCrossover extends VRPCrossover{
 
 	
 	public List<Individual<Integer[]>> execute(List<Individual<Integer[]>> individuals) throws YamikoException {
+	
 		validaciones(individuals);
 		List<Individual<Integer[]>> descendants=new ArrayList<Individual<Integer[]>>();
 
@@ -68,8 +69,11 @@ public class LRXCrossover extends VRPCrossover{
 				for (Integer i : r)
 					if (!d.contains(i))
 						pendientes.add(i);
-		d=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,d, getMatrix(), avgVelocity, capacity, vehicles, vrp);
+		if (!pendientes.isEmpty())
+			d=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,d, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 
+		if (d.isEmpty())
+			d.add(0);
 		Integer[] desc1=d.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), desc1);
 		descendants.add(d1);
