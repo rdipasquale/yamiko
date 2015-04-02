@@ -30,7 +30,6 @@ import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
 import ar.edu.ungs.yamiko.problems.vrp.LCSXCrossover;
-import ar.edu.ungs.yamiko.problems.vrp.LRXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.RBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
