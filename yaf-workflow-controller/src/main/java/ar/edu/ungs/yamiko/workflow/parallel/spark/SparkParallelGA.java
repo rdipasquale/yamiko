@@ -68,7 +68,7 @@ public class SparkParallelGA<T> implements Serializable{
 			GlobalSingleSparkPopulation<T> p=(GlobalSingleSparkPopulation<T>)parameter.getPopulationInstance();
 			parameter.getPopulationInitializer().execute(p);
 			
-			while (generationNumber<parameter.getMaxGenerations() || parameter.getOptimalFitness()<=bestFitness)
+			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 				p.setRDD(helper.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
 				Individual bestOfGeneration=helper.findBestIndividual(p.getRDD(), sc);

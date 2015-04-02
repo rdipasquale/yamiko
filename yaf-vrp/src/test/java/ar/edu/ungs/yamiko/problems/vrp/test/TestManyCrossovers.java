@@ -169,22 +169,22 @@ public class TestManyCrossovers {
 			System.out.println("Winner CAXCrossover -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			System.out.println("Tiempo -> " + (t2-t1)/1000 + " seg");
 			
-			t1=System.currentTimeMillis();
-			popI =new UniqueIntegerPopulationInitializer();			
-			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(vehicles);
-			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
-			((UniqueIntegerPopulationInitializer)popI).setMaxValue(customers.keySet().size()-1);	
-			cross=new LRXCrossover(1d, capacity, vehicles, fit);
-			cross.setMatrix(matrix);
-			 par=	new Parameter<Integer[]>(0.035, 0.96, 100, new DescendantAcceptEvaluator<Integer[]>(), 
-						fit, cross, new GVRMutatorSwap(), 
-						null, popI, null, new ProbabilisticRouletteSelector(), 
-						new GlobalSinglePopulation<Integer[]>(genome), 100, 99900.12089781271,rma,genome);
-			ga=new SerialGA<Integer[]>(par);
-			winner= ga.run();
-			t2=System.currentTimeMillis();
-			System.out.println("Winner LRXCrossover -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-			System.out.println("Tiempo -> " + (t2-t1)/1000 + " seg");	
+//			t1=System.currentTimeMillis();
+//			popI =new UniqueIntegerPopulationInitializer();			
+//			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(vehicles);
+//			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
+//			((UniqueIntegerPopulationInitializer)popI).setMaxValue(customers.keySet().size()-1);	
+//			cross=new LRXCrossover(1d, capacity, vehicles, fit);
+//			cross.setMatrix(matrix);
+//			 par=	new Parameter<Integer[]>(0.035, 0.96, 100, new DescendantAcceptEvaluator<Integer[]>(), 
+//						fit, cross, new GVRMutatorSwap(), 
+//						null, popI, null, new ProbabilisticRouletteSelector(), 
+//						new GlobalSinglePopulation<Integer[]>(genome), 100, 99900.12089781271,rma,genome);
+//			ga=new SerialGA<Integer[]>(par);
+//			winner= ga.run();
+//			t2=System.currentTimeMillis();
+//			System.out.println("Winner LRXCrossover -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+//			System.out.println("Tiempo -> " + (t2-t1)/1000 + " seg");	
 
 			t1=System.currentTimeMillis();
 			popI =new UniqueIntegerPopulationInitializer();			
