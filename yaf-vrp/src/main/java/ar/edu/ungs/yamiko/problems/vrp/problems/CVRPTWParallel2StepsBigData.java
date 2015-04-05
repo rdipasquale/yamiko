@@ -8,7 +8,6 @@ public class CVRPTWParallel2StepsBigData {
 	 * - Armar Crossover especial
 	 * - Armar mutation especial
 	 * - Ver como cachear en Spark
-	 * - Como implementar weights en Graphhopper
 	 * - Rescatar el LRXCrossOver
 	 * - Cómo hacer forecasting a partir de datos reales
 	 * - Armar función de fitness a partir del tiempo

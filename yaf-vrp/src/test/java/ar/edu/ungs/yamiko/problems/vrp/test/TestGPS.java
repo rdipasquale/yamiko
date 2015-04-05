@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.problems.vrp.test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Iterator;
 
 import org.junit.After;
@@ -10,6 +12,7 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
+import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FlagEncoder;
@@ -182,5 +185,43 @@ public class TestGPS {
         
     }
 
+	@Test
+	public void testRouteTestEdges() throws Exception{
+
+		//Long ts=System.currentTimeMillis();
+		GraphHopper hopper = new GraphHopper().forServer();
+		//hopper.setCHEnable(enable)disableCHShortcuts();
+		hopper.setInMemory();
+		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph");
+		hopper.setEncodingManager(new EncodingManager("car"));
+		hopper.importOrLoad();
+
+		//FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
+	    LocationIndex locationIndex = hopper.getLocationIndex();
+	    
+	    AllEdgesIterator ite= hopper.getGraph().getAllEdges();
+	    System.out.println(ite.getCount());
+	    ite.next();
+	    System.out.println("El arco nro " + ite.getEdge() + " llamado " + ite.getName() + " une los nodos [" + ite.getBaseNode() + ";" + ite.getAdjNode() + "] entre los puntos (" 
+	    		+ hopper.getGraph().getNodeAccess().getLatitude(ite.getBaseNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(ite.getBaseNode()) + ") y (" + 
+	    		hopper.getGraph().getNodeAccess().getLatitude(ite.getAdjNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(ite.getAdjNode()) +") cubriendo una distancia de " + ite.getDistance() + "m");
+	    
+	    // Verificamos si el punto medio pertenece al mismo arco
+	    double latInter=(hopper.getGraph().getNodeAccess().getLatitude(ite.getBaseNode())+hopper.getGraph().getNodeAccess().getLatitude(ite.getAdjNode()))/2;
+	    double lonInter=(hopper.getGraph().getNodeAccess().getLongitude(ite.getBaseNode())+hopper.getGraph().getNodeAccess().getLongitude(ite.getAdjNode()) )/2;
+
+	    QueryResult qr = locationIndex.findClosest(latInter, lonInter, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
+        if (!qr.isValid()) throw new Exception("No encontrado");        
+        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+
+        //edge.getFlags(carEncoder.setSpeed(edge.getFlags(), 3d));
+	    System.out.println("El arco nro " + edge.getEdge() + " llamado " + edge.getName() + " une los nodos [" + edge.getBaseNode() + ";" + edge.getAdjNode() + "] entre los puntos (" 
+	    		+ hopper.getGraph().getNodeAccess().getLatitude(edge.getBaseNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(edge.getBaseNode()) + ") y (" + 
+	    		hopper.getGraph().getNodeAccess().getLatitude(edge.getAdjNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(edge.getAdjNode()) +") cubriendo una distancia de " + edge.getDistance() + "m");
+        
+		assertTrue( edge.getEdge()==ite.getEdge());			
+	    
+	}
 
 }
