@@ -197,7 +197,7 @@ public class TestGPS {
 		hopper.setEncodingManager(new EncodingManager("car"));
 		hopper.importOrLoad();
 
-		//FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
+		FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
 	    LocationIndex locationIndex = hopper.getLocationIndex();
 	    
 	    AllEdgesIterator ite= hopper.getGraph().getAllEdges();
@@ -214,6 +214,9 @@ public class TestGPS {
 	    QueryResult qr = locationIndex.findClosest(latInter, lonInter, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
         if (!qr.isValid()) throw new Exception("No encontrado");        
         EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        System.out.println("speed=" +carEncoder.getSpeed(edge.getFlags()));
+        System.out.println("reverseSpeed=" +carEncoder.getReverseSpeed(edge.getFlags()));
+        System.out.println("maxSpeed=" +carEncoder.getMaxSpeed());
 
         //edge.getFlags(carEncoder.setSpeed(edge.getFlags(), 3d));
 	    System.out.println("El arco nro " + edge.getEdge() + " llamado " + edge.getName() + " une los nodos [" + edge.getBaseNode() + ";" + edge.getAdjNode() + "] entre los puntos (" 
@@ -224,4 +227,103 @@ public class TestGPS {
 	    
 	}
 
+	@Test
+	public void testRouteCambioDeWeightingVerificacionReverseSpeed() {
+
+		Long ts=System.currentTimeMillis();
+		GraphHopper hopper = new GraphHopper().forServer();
+		//hopper.setCHEnable(enable)disableCHShortcuts();
+		hopper.setInMemory();
+		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph");
+		hopper.setEncodingManager(new EncodingManager("car"));
+		hopper.importOrLoad();
+
+		FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
+	    LocationIndex locationIndex = hopper.getLocationIndex();
+	
+	    // TODO make thread safe and lock routing when we update!
+	    int errors = 0;
+
+	    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
+        if (!qr.isValid()) errors++;        
+        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        edge.setFlags(carEncoder.setReverseSpeed(edge.getFlags(), 3d));
+
+	    qr = locationIndex.findClosest(-34.603383, -58.449060, EdgeFilter.ALL_EDGES);
+        if (!qr.isValid()) errors++;        
+        EdgeIteratorState edge2= hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
+        edge2.setFlags(carEncoder.setReverseSpeed(edge2.getFlags(), 3d));
+
+	    qr = locationIndex.findClosest(-34.612505, -58.441775, EdgeFilter.ALL_EDGES);
+        if (!qr.isValid()) errors++;        
+        EdgeIteratorState edge3 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Mendez de Andes y Vallese
+        edge3.setFlags(carEncoder.setReverseSpeed(edge3.getFlags(), 3d));
+
+	    qr = locationIndex.findClosest(-34.613251, -58.439340, EdgeFilter.ALL_EDGES);
+        if (!qr.isValid()) errors++;        
+        EdgeIteratorState edge4 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Aranguren entre Acoyte e Hidalgo
+        edge4.setFlags(carEncoder.setReverseSpeed(edge4.getFlags(), 3d));
+
+	    qr = locationIndex.findClosest(-34.625031, -58.425548, EdgeFilter.ALL_EDGES);
+        if (!qr.isValid()) errors++;        
+        EdgeIteratorState edge5 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Carlos Calvo entre Marmol y Muñiz
+        edge5.setFlags(carEncoder.setReverseSpeed(edge5.getFlags(), 3d));
+
+        System.out.println("Errores: " + errors);
+        
+		GHRequest req = new GHRequest(-34.626754, -58.420035, -34.551934, -58.487048).setVehicle("car").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
+		GHResponse rsp = hopper.route(req);
+		
+		if(rsp.hasErrors()) return;
+
+		double distance = rsp.getDistance();
+		long millis = rsp.getMillis();
+		System.out.println(distance/1000 + "km");
+		System.out.println(millis/60000 + "min");
+
+		InstructionList il = rsp.getInstructions();
+		
+		Long ts2=System.currentTimeMillis();
+		Iterator<Instruction> i=il.iterator();
+		while (i.hasNext())
+		{
+			Instruction ins=i.next();
+			System.out.print(ins.getName() + " ; ");
+		}
+		System.out.println("");
+		
+		// Probamos si vuelve a la normalidad
+		hopper = new GraphHopper().forServer();
+		hopper.setInMemory();
+		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph");
+		hopper.setEncodingManager(new EncodingManager("car"));
+		hopper.importOrLoad();
+
+		req = new GHRequest(-34.626754, -58.420035, -34.551934, -58.487048).setVehicle("car").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
+		rsp = hopper.route(req);
+		
+		if(rsp.hasErrors()) return;
+
+		distance = rsp.getDistance();
+		millis = rsp.getMillis();
+		System.out.println(distance/1000 + "km");
+		System.out.println(millis/60000 + "min");
+
+		il = rsp.getInstructions();
+		
+		ts2=System.currentTimeMillis();
+		i=il.iterator();
+		while (i.hasNext())
+		{
+			Instruction ins=i.next();
+			System.out.print(ins.getName() + " ; ");
+		}
+		
+		System.out.println("Toma " +(ts2-ts)+ "miliseg");
+        
+        
+    }
+	
 }
