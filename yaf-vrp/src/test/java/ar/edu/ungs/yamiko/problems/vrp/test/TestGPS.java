@@ -8,6 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -40,8 +42,8 @@ public class TestGPS {
 		//hopper.setCHEnable(enable)disableCHShortcuts();
 		hopper.setInMemory();
 		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
-		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph");
-		hopper.setEncodingManager(new EncodingManager("car"));
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph/truck");
+		hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 
 		hopper.importOrLoad();
 
@@ -235,11 +237,12 @@ public class TestGPS {
 		//hopper.setCHEnable(enable)disableCHShortcuts();
 		hopper.setInMemory();
 		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
-		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph");
-		hopper.setEncodingManager(new EncodingManager("car"));
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph/truck");
+		hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 		hopper.importOrLoad();
 
-		FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
+
+		FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("truck");
 	    LocationIndex locationIndex = hopper.getLocationIndex();
 	
 	    // TODO make thread safe and lock routing when we update!
@@ -248,8 +251,10 @@ public class TestGPS {
 	    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
         if (!qr.isValid()) errors++;        
         EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
-        edge.setFlags(carEncoder.setReverseSpeed(edge.getFlags(), 3d));
-
+        edge.setFlags(carEncoder.setReverseSpeed(edge.getFlags(), 11d));
+        edge.setFlags(carEncoder.setSpeed(edge.getFlags(), 14d));
+        carEncoder.getReverseSpeed(edge.getFlags());
+        carEncoder.getSpeed(edge.getFlags());
 	    qr = locationIndex.findClosest(-34.603383, -58.449060, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
         EdgeIteratorState edge2= hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
@@ -272,10 +277,11 @@ public class TestGPS {
 
         System.out.println("Errores: " + errors);
         
-		GHRequest req = new GHRequest(-34.626754, -58.420035, -34.551934, -58.487048).setVehicle("car").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
+		GHRequest req = new GHRequest(-34.626754, -58.420035, -34.551934, -58.487048).setVehicle("truck").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
 		GHResponse rsp = hopper.route(req);
 		
-		if(rsp.hasErrors()) return;
+		if(rsp.hasErrors()) 
+			return;
 
 		double distance = rsp.getDistance();
 		long millis = rsp.getMillis();
