@@ -258,6 +258,7 @@ public class TestGPS {
 	    qr = locationIndex.findClosest(-34.603383, -58.449060, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
         EdgeIteratorState edge2= hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
+        
         edge2.setFlags(carEncoder.setReverseSpeed(edge2.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.612505, -58.441775, EdgeFilter.ALL_EDGES);

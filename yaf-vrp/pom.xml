@@ -14,6 +14,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+	<repositories>
+	    <repository>
+	        <id>codehaus</id>
+	        <url>http://repository.codehaus.org/org/codehaus</url>
+	    </repository>
+	</repositories>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -46,7 +53,13 @@
 <!-- 	    <artifactId>map-matching</artifactId> -->
 <!-- 	    <version>0.5-SNAPSHOT</version> -->
 <!-- 	</dependency>     -->
- 	
+
+    <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.9.13</version>
+    </dependency>
+	 	
   </dependencies>
   
   <build>
