@@ -11,20 +11,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ar.edu.ungs.yamiko.problems.vrp.entities.TrafficData;
+import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
+import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
-import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.util.EdgeExplorer;
-import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
-
-import ar.edu.ungs.yamiko.problems.vrp.entities.TrafficData;
-import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
-import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
 
 @SuppressWarnings("deprecation")
 public class TestJsonIO {
