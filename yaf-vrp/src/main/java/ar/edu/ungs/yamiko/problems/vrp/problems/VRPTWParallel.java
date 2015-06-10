@@ -3,6 +3,7 @@ package ar.edu.ungs.yamiko.problems.vrp.problems;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
@@ -38,6 +39,10 @@ public class VRPTWParallel
 {
     public static void main( String[] args )
     {
+    	String cluster="";
+    	if (args.length==0)
+    		cluster="local[8]"; //cluster="local";
+    	
     	Genome<Integer[]> genome;
     	Gene gene=new BasicGene("Gene X", 0, 15);
     	Map<Integer, Customer> customers;
@@ -45,8 +50,10 @@ public class VRPTWParallel
     	String chromosomeName="The Chromosome";
     	VRPCrossover cross; 
     	RoutesMorphogenesisAgent rma;
-    	
-        JavaSparkContext sc = new JavaSparkContext("local","VRPTWParallel",System.getenv("SPARK_HOME"), System.getenv("JARS"));
+
+    	//SparkConf conf = new SparkConf().setMaster(cluster).setAppName("VRPTWParallel");
+    	SparkConf conf = new SparkConf().setAppName("VRPTWParallel");
+        JavaSparkContext sc = new JavaSparkContext(conf);
 
     	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
     	
