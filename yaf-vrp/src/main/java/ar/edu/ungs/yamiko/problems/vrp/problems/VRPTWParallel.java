@@ -39,10 +39,7 @@ public class VRPTWParallel
 {
     public static void main( String[] args )
     {
-    	String cluster="";
-    	if (args.length==0)
-    		cluster="local[8]"; //cluster="local";
-    	
+   	
     	Genome<Integer[]> genome;
     	Gene gene=new BasicGene("Gene X", 0, 15);
     	Map<Integer, Customer> customers;
@@ -51,7 +48,7 @@ public class VRPTWParallel
     	VRPCrossover cross; 
     	RoutesMorphogenesisAgent rma;
 
-    	//SparkConf conf = new SparkConf().setMaster(cluster).setAppName("VRPTWParallel");
+    	//SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("VRPTWParallel");
     	SparkConf conf = new SparkConf().setAppName("VRPTWParallel");
         JavaSparkContext sc = new JavaSparkContext(conf);
 

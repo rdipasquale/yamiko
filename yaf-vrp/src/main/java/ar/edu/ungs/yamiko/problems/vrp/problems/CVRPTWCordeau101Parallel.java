@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
@@ -12,12 +14,12 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
+import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWCartesianSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
@@ -29,19 +31,22 @@ import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
 import ar.edu.ungs.yamiko.workflow.Parameter;
-import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
+import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
 
 /**
  * Hello world!
  *
  */
-public class CVRPTWCordeau101 
+public class CVRPTWCordeau101Parallel 
 {
 	private static Logger log=Logger.getLogger("file");
     public static void main( String[] args )
     {
     	try {
     		log.info("Init");
+        	//SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101");
+        	SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
+            JavaSparkContext sc = new JavaSparkContext(conf);
     		
 			int[] holder=new int[3];		
 			Map<Integer, Customer> customers=CordeauParser.parse("src/main/resources/c101", holder);
@@ -58,7 +63,7 @@ public class CVRPTWCordeau101
 			String chromosomeName="X";
 			VRPCrossover cross; 
 			RoutesMorphogenesisAgent rma;
-			PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
+	    	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
 			
 
 			rma=new RoutesMorphogenesisAgent(customers);
@@ -75,19 +80,18 @@ public class CVRPTWCordeau101
 			fit.setMatrix(matrix);
 			cross=new LCSXCrossover(1d, c, m, fit);
 			cross.setMatrix(matrix);
-
-			
-			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
-			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
-			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
+		
+			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
+			((ParallelUniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
+			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
 			
 			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 100, new DescendantAcceptEvaluator<Integer[]>(), 
 									fit, cross, new GVRMutatorRandom(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), 5000, 98643.81578650243,rma,genome);
+									new GlobalSingleSparkPopulation<Integer[]>(genome), 5000, 98643.81578650243,rma,genome);
 			
-			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
+	        SparkParallelGA<Integer[]> ga=new SparkParallelGA<Integer[]>(par,sc);
 			
 			rma.develop(genome, optInd);
 			Double fitnesOptInd=fit.execute(optInd);

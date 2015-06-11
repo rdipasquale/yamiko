@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability;
@@ -87,11 +89,11 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
-				if (Math.IEEEremainder(generationNumber,1000)==0) System.out.print("Generation " + generationNumber + "...");
+				if (Math.IEEEremainder(generationNumber,1000)==0) Logger.getLogger("root").info("Generation " + generationNumber + "...");
 				
 				
 			}
-			System.out.println("... Cumplidas " + generationNumber + " Generaciones.");
+			Logger.getLogger("root").info("... Cumplidas " + generationNumber + " Generaciones.");
 			
 			return bestInd;
 			

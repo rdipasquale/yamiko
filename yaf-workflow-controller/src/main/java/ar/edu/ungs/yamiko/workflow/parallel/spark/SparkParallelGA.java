@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -119,10 +120,10 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				generationNumber++;
 				
-				if (Math.IEEEremainder(generationNumber,100)==0) 
-					System.out.println("Generation " + generationNumber);
+				if (Math.IEEEremainder(generationNumber,1000)==0) Logger.getLogger("root").info("Generation " + generationNumber);
 				
 			}
+			Logger.getLogger("root").info("... Cumplidas " + generationNumber + " Generaciones.");
 
 			return bestInd;
 			
