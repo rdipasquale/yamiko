@@ -94,7 +94,8 @@ public class WriteSampleTrafficData {
 						if (ins.toString().contains("AU")) speed=80d;
 						if (ins.toString().contains("Av.")) speed=50d;
 						if (ins.toString().contains("Avenida")) speed=50d;
-						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), true, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
+						boolean workable=feriado(cal);						
+						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
 					    fin.writeUTF(om.writeValueAsString(td)+"\n");
 					}
 					
@@ -105,5 +106,23 @@ public class WriteSampleTrafficData {
 		
 	}
 	
+	private static boolean feriado(Calendar cal)
+	{
+		if (cal.get(Calendar.DATE)==1 && cal.get(Calendar.MONTH)==0 ) return true;
+		if (cal.get(Calendar.DATE)==24 && cal.get(Calendar.MONTH)==2 ) return true;
+		if (cal.get(Calendar.DATE)==26 && cal.get(Calendar.MONTH)==2 ) return true;
+		if (cal.get(Calendar.DATE)==27 && cal.get(Calendar.MONTH)==2 ) return true;
+		if (cal.get(Calendar.DATE)==2 && cal.get(Calendar.MONTH)==3 ) return true;
+		if (cal.get(Calendar.DATE)==1 && cal.get(Calendar.MONTH)==4 ) return true;
+		if (cal.get(Calendar.DATE)==25 && cal.get(Calendar.MONTH)==4) return true;
+		if (cal.get(Calendar.DATE)==20 && cal.get(Calendar.MONTH)==5 ) return true;
+		if (cal.get(Calendar.DATE)==9 && cal.get(Calendar.MONTH)==6 ) return true;
+		if (cal.get(Calendar.DATE)==17 && cal.get(Calendar.MONTH)==7 ) return true;
+		if (cal.get(Calendar.DATE)==12 && cal.get(Calendar.MONTH)==9 ) return true;
+		if (cal.get(Calendar.DATE)==20 && cal.get(Calendar.MONTH)==10 ) return true;
+		if (cal.get(Calendar.DATE)==8 && cal.get(Calendar.MONTH)==11 ) return true;
+		if (cal.get(Calendar.DATE)==25 && cal.get(Calendar.MONTH)==11 ) return true;
+		return false;
+	}
 
 }
