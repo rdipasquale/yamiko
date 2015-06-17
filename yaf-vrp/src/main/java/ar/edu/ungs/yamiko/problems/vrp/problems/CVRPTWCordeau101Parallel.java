@@ -25,8 +25,8 @@ import ar.edu.ungs.yamiko.problems.vrp.CVRPTWCartesianSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom;
-import ar.edu.ungs.yamiko.problems.vrp.LCSXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
+import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
@@ -78,7 +78,7 @@ public class CVRPTWCordeau101Parallel
 			
 			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
 			fit.setMatrix(matrix);
-			cross=new LCSXCrossover(1d, c, m, fit);
+			cross=new SBXCrossover(1d, c, m, fit);
 			cross.setMatrix(matrix);
 		
 			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
