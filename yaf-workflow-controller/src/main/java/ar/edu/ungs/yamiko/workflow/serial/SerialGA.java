@@ -89,11 +89,12 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
-				if (Math.IEEEremainder(generationNumber,1000)==0) Logger.getLogger("root").info("Generation " + generationNumber + "...");
+				//if (Math.IEEEremainder(generationNumber,1000)==0) 
+				Logger.getLogger("root").warn("Generation " + generationNumber + "...");
 				
 				
 			}
-			Logger.getLogger("root").info("... Cumplidas " + generationNumber + " Generaciones.");
+			Logger.getLogger("root").warn("... Cumplidas " + generationNumber + " Generaciones.");
 			
 			return bestInd;
 			

@@ -43,7 +43,7 @@ public class CVRPTWCordeau101Parallel
     public static void main( String[] args )
     {
     	try {
-    		log.info("Init");
+    		log.warn("Init");
         	//SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101");
         	SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
             JavaSparkContext sc = new JavaSparkContext(conf);
@@ -85,26 +85,26 @@ public class CVRPTWCordeau101Parallel
 			((ParallelUniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
 			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
+			rma.develop(genome, optInd);
+			Double fitnesOptInd=fit.execute(optInd);
+			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 100, new DescendantAcceptEvaluator<Integer[]>(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 250, new DescendantAcceptEvaluator<Integer[]>(), 
 									fit, cross, new GVRMutatorRandom(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSingleSparkPopulation<Integer[]>(genome), 5000, 98643.81578650243,rma,genome);
+									new GlobalSingleSparkPopulation<Integer[]>(genome), 5000, fitnesOptInd,rma,genome);
 			
 	        SparkParallelGA<Integer[]> ga=new SparkParallelGA<Integer[]>(par,sc);
 			
-			rma.develop(genome, optInd);
-			Double fitnesOptInd=fit.execute(optInd);
-			log.info("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			
 			long t1=System.currentTimeMillis();
-			log.info("Iniciando ga.run() -> par.getMaxGenerations()=" + par.getMaxGenerations() + " par.getPopulationSize()=" + par.getPopulationSize() + " Crossover class=" + cross.getClass().getName());
+			log.warn("Iniciando ga.run() -> par.getMaxGenerations()=" + par.getMaxGenerations() + " par.getPopulationSize()=" + par.getPopulationSize() + " Crossover class=" + cross.getClass().getName());
 			Individual<Integer[]> winner= ga.run();
 			long t2=System.currentTimeMillis();
-			log.info("Fin ga.run()");
+			log.warn("Fin ga.run()");
 
-			log.info("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-			log.info("Tiempo -> " + (t2-t1)/1000 + " seg");
+			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
 			
 		} catch (YamikoException e) {
 			// TODO Auto-generated catch block

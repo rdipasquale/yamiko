@@ -38,6 +38,9 @@ public class GVRMutatorDisplacement extends GVRMutator implements Serializable {
 		
 		for (Integer i : subRoute) 
 			reemplazo.remove((Object)i);
+		
+		if (reemplazo.size()<=0)
+			return;
 
 		int point=StaticHelper.randomInt(reemplazo.size());
 		

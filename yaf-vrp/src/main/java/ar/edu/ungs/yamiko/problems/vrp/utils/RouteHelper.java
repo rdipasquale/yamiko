@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -360,11 +361,23 @@ public class RouteHelper {
 		{
 			if (r.size()>0)
 			{
+				
 				for (int i=1;i<r.size();i++)
-				if (r.get(i-1)!=r.get(i))
-					g.addEdge(r.get(i-1), r.get(i));
-				if (r.get(r.size()-1)!=0)
-					g.addEdge(r.get(r.size()-1),0);
+				{
+						if (r.get(i-1)!=r.get(i))
+							try {
+								g.addEdge(r.get(i-1), r.get(i));
+							} catch (Exception e) {
+								Logger.getLogger("root").error("Error en getGraphFromIndividual(List<List<Integer>> ind,DistanceMatrix m) : g.addEdge(r.get(i-1), r.get(i)); - Agregando Edge (" + r.get(i-1) + "," + r.get(i) + ") en " + g);
+							}
+						if (r.get(r.size()-1)!=0)
+							try {
+								g.addEdge(r.get(r.size()-1),0);
+							} catch (Exception e) {
+								Logger.getLogger("root").error("Error en getGraphFromIndividual(List<List<Integer>> ind,DistanceMatrix m) : Agregando Edge (" + r.get(r.size()-1) + ",0) en " + g);
+							}
+						
+				}
 			}
 		}
 		return g;

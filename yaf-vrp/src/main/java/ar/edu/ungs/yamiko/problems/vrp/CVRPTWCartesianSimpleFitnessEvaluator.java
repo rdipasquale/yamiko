@@ -28,7 +28,7 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=500d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=1000d;
-	public static final double MAX_FITNESS=100000d;
+	public static final double MAX_FITNESS=100000000d;
 	//public static final double PENAL_PER_ROUTE_METROS=30d;
 	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;

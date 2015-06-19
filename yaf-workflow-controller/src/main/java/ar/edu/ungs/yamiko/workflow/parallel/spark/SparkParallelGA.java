@@ -120,10 +120,11 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				generationNumber++;
 				
-				if (Math.IEEEremainder(generationNumber,1000)==0) Logger.getLogger("root").info("Generation " + generationNumber);
+				//if (Math.IEEEremainder(generationNumber,100)==0) 
+				Logger.getLogger("file").warn("Generation " + generationNumber);
 				
 			}
-			Logger.getLogger("root").info("... Cumplidas " + generationNumber + " Generaciones.");
+			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
 
 			return bestInd;
 			
