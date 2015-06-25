@@ -9,7 +9,7 @@ public class CVRPTWParallel2StepsBigData {
 	 * - Armar mutation especial
 	 * - Ver como cachear en Spark
 	 * - Rescatar el LRXCrossOver
-	 * - Cómo hacer forecasting a partir de datos reales
+	 * - Cómo hacer forecasting a partir de datos reales...Técnicas de estudio de flujo, son muy complejas, fuera de alcance. Usamos Forecasting Time Series Mean Method más algún recorte de samples por Xi cuadrado
 	 * - Armar función de fitness a partir del tiempo
 	 * - Analizar Path Relinking
 	 * 
