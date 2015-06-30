@@ -5,12 +5,12 @@ public class CVRPTWParallel2StepsBigData {
 	/**
 	 * TODO: 
 	 * - Cómo simular datos reales de subidas de GPS de flotas (relacionar con The Internet of Things).... OK....
-	 * - Armar Crossover especial
+	 * - Armar Crossover especial -> Ver si puedo mezclar con Path relinking
 	 * - Armar mutation especial
 	 * - Ver como cachear en Spark
 	 * - Rescatar el LRXCrossOver
 	 * - Cómo hacer forecasting a partir de datos reales...Técnicas de estudio de flujo, son muy complejas, fuera de alcance. Usamos Forecasting Time Series Mean Method más algún recorte de samples por Xi cuadrado
-	 * - Armar función de fitness a partir del tiempo
+	 * - Armar función de fitness a partir del tiempo -> Toma el individuo, empieza el recorrido y con intervalos de media hora o menos recalcula los pesos del mapa. Evalúa en función del tiempo.
 	 * - Analizar Path Relinking
 	 * 
 	 * FIXME: Pendiente:
