@@ -11,7 +11,7 @@ public class TrafficData implements Serializable,Cloneable{
 	private static final long serialVersionUID = -2083040378128218573L;
 
 	public TrafficData() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	private int truckId;
@@ -23,6 +23,9 @@ public class TrafficData implements Serializable,Cloneable{
 	private boolean workable;
 	private int week;
 	private int day;
+	private int hour;
+	private int minute;
+	private int second;
 	
 
 	public int getTruckId() {
@@ -80,8 +83,29 @@ public class TrafficData implements Serializable,Cloneable{
 		this.day = day;
 	}
 	
+	
+	public int getHour() {
+		return hour;
+	}
+	public void setHour(int hour) {
+		this.hour = hour;
+	}
+	public int getMinute() {
+		return minute;
+	}
+	public void setMinute(int minute) {
+		this.minute = minute;
+	}
+	public int getSecond() {
+		return second;
+	}
+	public void setSecond(int second) {
+		this.second = second;
+	}
+	
 	public TrafficData(int truckId, Timestamp moment, double lat, double lon,
-			double speed, String obs, boolean workable, int week, int day) {
+			double speed, String obs, boolean workable, int week, int day,
+			int hour, int minute, int second) {
 		super();
 		this.truckId = truckId;
 		this.moment = moment;
@@ -92,13 +116,19 @@ public class TrafficData implements Serializable,Cloneable{
 		this.workable = workable;
 		this.week = week;
 		this.day = day;
+		this.hour = hour;
+		this.minute = minute;
+		this.second = second;
 	}
+
+	
 	@Override
 	public String toString() {
 		return "TrafficData [truckId=" + truckId + ", moment=" + moment
 				+ ", lat=" + lat + ", lon=" + lon + ", speed=" + speed
 				+ ", obs=" + obs + ", workable=" + workable + ", week=" + week
-				+ ", day=" + day + "]";
+				+ ", day=" + day + ", hour=" + hour + ", minute=" + minute
+				+ ", second=" + second + "]";
 	}
 	@Override
 	public int hashCode() {

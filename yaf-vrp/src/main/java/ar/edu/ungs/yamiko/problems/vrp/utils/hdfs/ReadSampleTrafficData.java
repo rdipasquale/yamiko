@@ -11,9 +11,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import ar.edu.ungs.yamiko.problems.vrp.entities.TrafficData;
+import ar.edu.ungs.yamiko.problems.vrp.forecasting.HdfsJsonTrafficDataDao;
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
 import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
 
@@ -26,10 +31,10 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 
 
-public class WriteSampleTrafficData {
+public class ReadSampleTrafficData {
 
 	private static final String URI_TD="hdfs://localhost:9000/trafficdata.txt";
-	private static final int camiones=100;
+	private static final int camiones=50;
 	private static final int viajes=50;
 	private static final int days=365;
 	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
@@ -38,6 +43,18 @@ public class WriteSampleTrafficData {
 	public static void main(String[] args) throws IOException{
 
 		Long t1=System.currentTimeMillis();
+		
+    	SparkConf confSpark = new SparkConf().setMaster("local[8]").setAppName("ReadSampleTrafficData");
+    	//SparkConf confSpark = new SparkConf().setAppName("ReadSampleTrafficData");
+        JavaSparkContext sc = new JavaSparkContext(confSpark);
+		
+		DataFrame df= HdfsJsonTrafficDataDao.getTrafficProfile(URI_TD,1, false, 5, 8, 8, 0, 30, sc);
+		
+		for (Row r: df.collectAsList()) {
+			System.out.println(r);
+		} 
+		System.out.println(df.count());
+		
 		Random rand = new Random();
 		ObjectMapper om=new ObjectMapper();
 		GraphHopper hopper = new GraphHopper().forServer();
@@ -123,10 +140,9 @@ public class WriteSampleTrafficData {
 
 						boolean workable=feriado(cal);						
 						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND));
-					    //fin.writeUTF(om.writeValueAsString(td)+"\n");
-					    fin.writeBytes(om.writeValueAsString(td)+"\n");
+					    fin.writeUTF(om.writeValueAsString(td)+"\n");
 					}
-					cal.add(Calendar.MINUTE, 30); // Media hora de despacho
+					
 				}
 			}
 		}	    

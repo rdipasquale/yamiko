@@ -38,7 +38,7 @@ public class TestJsonIO {
 	@Test
 	public void testJSonIO() throws Exception {
 		ObjectMapper om=new ObjectMapper();
-		TrafficData td=new TrafficData(1, new Timestamp(System.currentTimeMillis()), -33.33, -33.33, 33.2, "", false, 5, 3);
+		TrafficData td=new TrafficData(1, new Timestamp(System.currentTimeMillis()), -33.33, -33.33, 33.2, "", false, 5, 3,8,33,66);
 		String json=om.writeValueAsString(td);
 		System.out.println(td);
 		TrafficData td2=  om.readValue(json, TrafficData.class);
@@ -146,7 +146,9 @@ public class TestJsonIO {
 							else
 								speed=30d;
 							
-					TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), true, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
+					//TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), true, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
+					TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), true, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND));
+					
 					String salida=om.writeValueAsString(td);
 					System.out.println(salida);
 				}
