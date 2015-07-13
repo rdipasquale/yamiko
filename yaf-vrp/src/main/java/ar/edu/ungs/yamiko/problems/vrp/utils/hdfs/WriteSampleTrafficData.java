@@ -5,6 +5,7 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -28,14 +29,16 @@ import com.graphhopper.util.InstructionList;
 public class WriteSampleTrafficData {
 
 	private static final String URI_TD="hdfs://localhost:9000/trafficdata.txt";
-	private static final int camiones=400;
-	private static final int viajes=100;
-	private static final int days=2;
+	private static final int camiones=50;
+	private static final int viajes=50;
+	private static final int days=365;
 	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
 	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
 	
 	public static void main(String[] args) throws IOException{
 
+		Long t1=System.currentTimeMillis();
+		Random rand = new Random();
 		ObjectMapper om=new ObjectMapper();
 		GraphHopper hopper = new GraphHopper().forServer();
 		//hopper.setCHEnable(enable)disableCHShortcuts();
@@ -56,6 +59,14 @@ public class WriteSampleTrafficData {
 		Double[] hasta;
 	    
 		Calendar calOrig=Calendar.getInstance();
+		calOrig.set(Calendar.YEAR, 2014);
+		calOrig.set(Calendar.MONTH, 0);
+		calOrig.set(Calendar.DATE, 1);
+		calOrig.set(Calendar.HOUR_OF_DAY, 0);
+		calOrig.set(Calendar.MINUTE, 0);
+		calOrig.set(Calendar.SECOND, 0);
+		calOrig.set(Calendar.MILLISECOND, 0);
+
 		for (int d=0;d<days;d++)
 		{
 			calOrig.add(Calendar.DATE, 1);
@@ -63,14 +74,12 @@ public class WriteSampleTrafficData {
 			{
 				Calendar cal=Calendar.getInstance();
 				cal.setTimeInMillis(calOrig.getTimeInMillis());
-				cal.set(Calendar.HOUR_OF_DAY, 8);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
 				hasta=GPSHelper.getRandomPointInMap(-34.621475, -58.460379, 8950);
 				
 				for (int v=1;v<viajes+1;v++)
 				{
+					if ((cal.getTimeInMillis()-calOrig.getTimeInMillis())>(24*60*60*1000))
+						break;
 					desde=hasta;
 					hasta=GPSHelper.getRandomPointInMap(-34.621475, -58.460379, 8950);
 					
@@ -91,9 +100,27 @@ public class WriteSampleTrafficData {
 						Instruction ins=i.next();
 						cal.add(Calendar.MILLISECOND, new Long(ins.getTime()).intValue());
 						Double speed=30d;
-						if (ins.toString().contains("AU")) speed=80d;
-						if (ins.toString().contains("Av.")) speed=50d;
-						if (ins.toString().contains("Avenida")) speed=50d;
+						if (ins.toString().contains("AU"))
+						{
+							if (rand.nextDouble()<0.001)
+								speed=0d;
+							else
+								speed=80d;
+						}
+						else				
+							if (ins.toString().contains("Av.") || ins.toString().contains("Avenida"))
+							{
+								if (rand.nextDouble()<0.05)
+									speed=0d;
+								else
+									speed=50d;
+							}
+							else
+								if (rand.nextDouble()<0.15)
+									speed=0d;
+								else
+									speed=30d;
+
 						boolean workable=feriado(cal);						
 						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
 					    fin.writeUTF(om.writeValueAsString(td)+"\n");
@@ -103,6 +130,7 @@ public class WriteSampleTrafficData {
 			}
 		}	    
 		fin.close();
+		System.out.println((System.currentTimeMillis()-t1)/1000 + " Seg.");
 		
 	}
 	

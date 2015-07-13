@@ -3,6 +3,7 @@ package ar.edu.ungs.yamiko.problems.vrp.test;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Random;
 
 import junit.framework.Assert;
 
@@ -46,6 +47,10 @@ public class TestJsonIO {
 		
 	}
 	
+	/**
+	 * Produce archivos fake con mediciones
+	 * @throws Exception
+	 */
 	@Test
 	public void testMakeFileImport() throws Exception
 	{
@@ -66,18 +71,34 @@ public class TestJsonIO {
 //			System.out.println(iter.getEdge() + " - " + iter.getDistance() + " - [" + iter.getBaseNode() + "," + iter.getAdjNode() + "]");
 //		}
 		
-		int camiones=40;
+		int camiones=1000;
 		int viajes=10;
+		
+		Calendar calStart=Calendar.getInstance();
+		calStart.set(Calendar.YEAR, 2014);
+		calStart.set(Calendar.MONTH, 0);
+		calStart.set(Calendar.DATE, 1);
+		calStart.set(Calendar.HOUR_OF_DAY, 0);
+		calStart.set(Calendar.MINUTE, 0);
+		calStart.set(Calendar.SECOND, 0);
+		calStart.set(Calendar.MILLISECOND, 0);
+
+		Calendar calEnd=Calendar.getInstance();
+		calStart.set(Calendar.YEAR, 2015);
+		calStart.set(Calendar.MONTH, 0);
+		calStart.set(Calendar.DATE, 1);
+		calStart.set(Calendar.HOUR_OF_DAY, 0);
+		calStart.set(Calendar.MINUTE, 0);
+		calStart.set(Calendar.SECOND, 0);
+		calStart.set(Calendar.MILLISECOND, 0);
+		
 		Double[] desde;
 		Double[] hasta;
 		
 		for (int c=1;c<camiones+1;c++)
 		{
 			Calendar cal=Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, 8);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
+			cal.setTimeInMillis(calStart.getTimeInMillis());
 			hasta=GPSHelper.getRandomPointInMap(-34.621475, -58.460379, 8950);
 			
 			for (int v=1;v<viajes+1;v++)
@@ -88,34 +109,50 @@ public class TestJsonIO {
 				GHRequest req = new GHRequest(desde[0],desde[1],hasta[0],hasta[1]).setVehicle("truck").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
 				GHResponse rsp = hopper.route(req);
 
-				// first check for errors
 				if(rsp.hasErrors()) {
 					desde=new Double[]{-34.644838, -58.360684};
 					hasta=new Double[]{-34.563170, -58.485310};
 					req = new GHRequest(desde[0],desde[1],hasta[0],hasta[1]).setVehicle("truck").setWeighting("fastest").setAlgorithm(AlgorithmOptions.ASTAR_BI);
 					rsp = hopper.route(req);
-					
-					// rsp.getErrors()
-				   //return;
 				}
-
 
 				InstructionList il = rsp.getInstructions();
 				Iterator<Instruction> i=il.iterator();
+				Random rand = new Random();
 				while (i.hasNext())
 				{
 					Instruction ins=i.next();
 					cal.add(Calendar.MILLISECOND, new Long(ins.getTime()).intValue());
 					Double speed=30d;
-					if (ins.toString().contains("AU")) speed=80d;
-					if (ins.toString().contains("Av.")) speed=50d;
-					if (ins.toString().contains("Avenida")) speed=50d;
+					
+					if (ins.toString().contains("AU"))
+					{
+						if (rand.nextDouble()<0.001)
+							speed=0d;
+						else
+							speed=80d;
+					}
+					else				
+						if (ins.toString().contains("Av.") || ins.toString().contains("Avenida"))
+						{
+							if (rand.nextDouble()<0.05)
+								speed=0d;
+							else
+								speed=50d;
+						}
+						else
+							if (rand.nextDouble()<0.15)
+								speed=0d;
+							else
+								speed=30d;
+							
 					TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), true, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK));
 					String salida=om.writeValueAsString(td);
 					System.out.println(salida);
 				}
 						
-				
+				if (cal.after(calEnd))
+					break;
 			}
 		}
 	}
