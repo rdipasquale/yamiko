@@ -21,7 +21,11 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
+import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.storage.index.LocationIndex;
+import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 
@@ -31,12 +35,13 @@ public class WriteSampleTrafficData {
 	private static final String URI_TD="hdfs://localhost:9000/trafficdata.txt";
 	private static final int camiones=100;
 	private static final int viajes=50;
-	private static final int days=365;
+	private static final int days=1;
 	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
 	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
 	
 	public static void main(String[] args) throws IOException{
 
+		int errors=0;
 		Long t1=System.currentTimeMillis();
 		Random rand = new Random();
 		ObjectMapper om=new ObjectMapper();
@@ -47,6 +52,8 @@ public class WriteSampleTrafficData {
 		hopper.setGraphHopperLocation(System.getProperty("user.home")+GRAPHOPPER_LOCATION);
 		hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 		hopper.importOrLoad();
+		//FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("truck");
+	    LocationIndex locationIndex = hopper.getLocationIndex();
 		
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(URI.create(URI_TD), conf);
@@ -67,6 +74,8 @@ public class WriteSampleTrafficData {
 		calOrig.set(Calendar.SECOND, 0);
 		calOrig.set(Calendar.MILLISECOND, 0);
 
+		
+		
 		for (int d=0;d<days;d++)
 		{
 			calOrig.add(Calendar.DATE, 1);
@@ -122,7 +131,12 @@ public class WriteSampleTrafficData {
 									speed=30d;
 
 						boolean workable=feriado(cal);						
-						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND));
+						
+					    QueryResult qr = locationIndex.findClosest(ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), EdgeFilter.ALL_EDGES);
+					    if (!qr.isValid()) errors++;        
+				        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+				        
+						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND),edge.getEdge());
 					    //fin.writeUTF(om.writeValueAsString(td)+"\n");
 					    fin.writeBytes(om.writeValueAsString(td)+"\n");
 					}
@@ -131,7 +145,7 @@ public class WriteSampleTrafficData {
 			}
 		}	    
 		fin.close();
-		System.out.println((System.currentTimeMillis()-t1)/1000 + " Seg.");
+		System.out.println((System.currentTimeMillis()-t1)/1000 + " Seg. Errores " + errors);
 		
 	}
 	

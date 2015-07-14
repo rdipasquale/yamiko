@@ -26,6 +26,7 @@ public class TrafficData implements Serializable,Cloneable{
 	private int hour;
 	private int minute;
 	private int second;
+	private int edge;
 	
 
 	public int getTruckId() {
@@ -103,6 +104,14 @@ public class TrafficData implements Serializable,Cloneable{
 		this.second = second;
 	}
 	
+	
+	
+	public int getEdge() {
+		return edge;
+	}
+	public void setEdge(int edge) {
+		this.edge = edge;
+	}
 	public TrafficData(int truckId, Timestamp moment, double lat, double lon,
 			double speed, String obs, boolean workable, int week, int day,
 			int hour, int minute, int second) {
@@ -120,7 +129,31 @@ public class TrafficData implements Serializable,Cloneable{
 		this.minute = minute;
 		this.second = second;
 	}
+	
+	
 
+	
+	public TrafficData(int truckId, Timestamp moment, double lat, double lon,
+			double speed, String obs, boolean workable, int week, int day,
+			int hour, int minute, int second, int edge) {
+		super();
+		this.truckId = truckId;
+		this.moment = moment;
+		this.lat = lat;
+		this.lon = lon;
+		this.speed = speed;
+		this.obs = obs;
+		this.workable = workable;
+		this.week = week;
+		this.day = day;
+		this.hour = hour;
+		this.minute = minute;
+		this.second = second;
+		this.edge = edge;
+	}
+	
+
+	
 	
 	@Override
 	public String toString() {
@@ -128,8 +161,9 @@ public class TrafficData implements Serializable,Cloneable{
 				+ ", lat=" + lat + ", lon=" + lon + ", speed=" + speed
 				+ ", obs=" + obs + ", workable=" + workable + ", week=" + week
 				+ ", day=" + day + ", hour=" + hour + ", minute=" + minute
-				+ ", second=" + second + "]";
+				+ ", second=" + second + ", edge=" + edge + "]";
 	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
