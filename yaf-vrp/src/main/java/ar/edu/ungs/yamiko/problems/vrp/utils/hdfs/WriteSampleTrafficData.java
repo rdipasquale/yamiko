@@ -35,7 +35,7 @@ public class WriteSampleTrafficData {
 	private static final String URI_TD="hdfs://localhost:9000/trafficdata.txt";
 	private static final int camiones=100;
 	private static final int viajes=50;
-	private static final int days=1;
+	private static final int days=365;
 	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
 	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
 	

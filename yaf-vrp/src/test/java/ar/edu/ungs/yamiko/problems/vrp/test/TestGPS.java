@@ -35,6 +35,7 @@ public class TestGPS {
 	public void tearDown() throws Exception {
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testRoute1() {
 		Long ts=System.currentTimeMillis();
@@ -83,6 +84,7 @@ public class TestGPS {
 			
 		System.out.println("Toma " +(ts2-ts)+ "miliseg");
 	}
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testRouteCambioDeWeighting() {
 
@@ -229,6 +231,7 @@ public class TestGPS {
 	    
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testRouteCambioDeWeightingVerificacionReverseSpeed() {
 
