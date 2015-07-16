@@ -14,13 +14,18 @@ public class ReadSampleTrafficData {
 
 	public static void main(String[] args) throws IOException{
 
+		String uri=URI_TD;
+		if (args!=null)
+			if (args.length>0)
+				uri=args[0];
+				
 		Long t1=System.currentTimeMillis();
 
 		//SparkConf confSpark = new SparkConf().setMaster("local[8]").setAppName("ReadSampleTrafficData");
     	SparkConf confSpark = new SparkConf().setAppName("ReadSampleTrafficData");
         JavaSparkContext sc = new JavaSparkContext(confSpark);
 
-		HdfsJsonTrafficDataDao.forecast(URI_TD,1, false, 5, 0, 0, 30, sc);
+		HdfsJsonTrafficDataDao.forecast(uri,1, false, 5, 0, 0, 30, sc);
 		
 		for (Integer clave : HdfsJsonTrafficDataDao.getOrderedKeySet()) 
 			System.out.println(HdfsJsonTrafficDataDao.getGraph(clave).hashCode());				

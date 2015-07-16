@@ -108,7 +108,7 @@ public class HdfsJsonTrafficDataDao {
 		if (trafficData==null) 
 		{
 			trafficData = sqlContext.jsonFile(trafficDataPath);
-			trafficData.printSchema();
+			//trafficData.printSchema();
 			trafficData.registerTempTable("trafficData");
 		}		
 		if (perfiles==null) perfiles=new HashMap<Integer, DataFrame>();
