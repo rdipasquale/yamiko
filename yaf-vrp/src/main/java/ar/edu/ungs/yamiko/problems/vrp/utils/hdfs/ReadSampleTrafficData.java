@@ -33,8 +33,10 @@ public class ReadSampleTrafficData {
 		HdfsJsonTrafficDataDao.forecast(uri,1, false, 5, 0, 0, 30, sc);
 		
 		for (Integer clave : HdfsJsonTrafficDataDao.getOrderedKeySet()) 
-			System.out.println(HdfsJsonTrafficDataDao.getGraph(clave).hashCode());				
-		
+		{
+			System.out.println(HdfsJsonTrafficDataDao.getGraph(clave).hashCode());
+			//HdfsJsonTrafficDataDao.getGraph(clave).
+		}
 		System.out.println((System.currentTimeMillis()-t1)/1000 + " Seg.");
 		
 	}

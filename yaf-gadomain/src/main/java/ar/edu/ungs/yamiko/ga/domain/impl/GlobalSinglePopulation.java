@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.ga.domain.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,6 +64,12 @@ public class GlobalSinglePopulation<T> implements Population<T>{
 				pop.remove(i1);
 				pop.add(i2);					
 			}
+	}
+	
+	@Override
+	public void replacePopulation(Collection<Individual<T>> i2) {
+		pop=new ArrayList<Individual<T>>();
+		pop.addAll(i2);		
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package ar.edu.ungs.yamiko.ga.domain.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -93,6 +94,14 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 				listModified=true;
 			}
 	}
+	
+	@Override
+	public void replacePopulation(Collection<Individual<T>> i2) {
+		pop=new ArrayList<Individual<T>>();
+		pop.addAll(i2);		
+		listModified=true;
+	}
+	
 	
 	@Override
 	public List<Individual<T>> getAll() {

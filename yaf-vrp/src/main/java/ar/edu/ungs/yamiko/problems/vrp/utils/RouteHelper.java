@@ -551,6 +551,10 @@ public class RouteHelper {
 	 */
 	public static final List<List<Integer>> insertClientsFullRestriction(List<Integer> clients, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,List<List<Integer>> dest,VRPFitnessEvaluator vrp)
 	{
+		long ts=System.currentTimeMillis();
+		//System.out.println("Inicio - Insert Full REstriction");
+
+		
 		DirectedGraph<Integer, DefaultEdge> g=getGraphFromIndividual(dest, matrix);
 		double penalties=calcVRPPenalties(dest, vrp);
 
@@ -634,6 +638,7 @@ public class RouteHelper {
 				}					
 			}
 		}
+		if ((System.currentTimeMillis()-ts)>2000) System.out.println("FIN - Insert Full REstriction " + (System.currentTimeMillis()-ts) + "ms");
 		return graphToListOfLists(g);
 	}
 

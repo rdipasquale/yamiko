@@ -1,8 +1,10 @@
 package ar.edu.ungs.yamiko.workflow.serial;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -51,22 +53,30 @@ public class SerialGA<T> {
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
+				Individual<T> bestIndGen=p.iterator().next();
 				for (Individual<T> individual : p)
+				{
 					if (individual.getFitness()==null)
 					{
 						parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);
 						individual.setFitness(parameter.getFitnessEvaluator().execute(individual));
-						if (individual.getFitness()>bestFitness)
-						{
-							bestFitness=individual.getFitness();
-							bestInd=individual;
-						}
 					}
+					if (individual.getFitness()>bestFitness)
+					{
+						bestFitness=individual.getFitness();
+						bestInd=individual;
+					}
+					if (individual.getFitness()>bestIndGen.getFitness())
+						bestIndGen=individual;
+				}
+				Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness());
 
 				parameter.getSelector().setPopulation(p);
 				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
 				
 				Iterator ite=candidates.iterator();
+				Set<Individual<T>> replacedChildren=new HashSet<Individual<T>>();
+				replacedChildren.add(bestIndGen);
 				while (ite.hasNext()) {
 					Individual<T> parentA=(Individual<T>)ite.next();
 					if (StaticHelper.randomDouble(1d)<=parameter.getCrossoverProbability() && ite.hasNext())
@@ -79,13 +89,15 @@ public class SerialGA<T> {
 						List<Individual<T>> children=parameter.getCrossover().execute(parents);
 						List<Individual<T>> acceptedChildren=parameter.getAcceptEvaluator().execute(children, parents);
 						for (int i=0;i<acceptedChildren.size();i++)
-							p.replaceIndividual(parents.get(i), acceptedChildren.get(i));						
+							replacedChildren.add(acceptedChildren.get(i));
 					}		
 				}
-				
+				p.replacePopulation(replacedChildren);
+						
 				for (Individual<T> ind : p) 
-					if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
-						parameter.getMutator().execute(ind);
+					if (ind.getId()!=bestIndGen.getId())
+						if (StaticHelper.randomDouble(1d)<=parameter.getMutationProbability())
+							parameter.getMutator().execute(ind);
 				
 				generationNumber++;
 				

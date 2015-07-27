@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -21,4 +22,6 @@ public interface Population<T> extends Iterable<Individual<T>>{
 	public void removeIndividual(Individual<T> i);
 	public void replaceIndividual(Individual<T> i1, Individual<T> i2);
 	public List<Individual<T>> getAll();
+	public void replacePopulation(Collection<Individual<T>> i2);
+
 }
