@@ -19,15 +19,10 @@ import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
-import ar.edu.ungs.yamiko.problems.vrp.BCRCCrossover;
-import ar.edu.ungs.yamiko.problems.vrp.CAXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
-import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom;
-import ar.edu.ungs.yamiko.problems.vrp.LCSXCrossover;
-import ar.edu.ungs.yamiko.problems.vrp.LRXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
@@ -46,11 +41,16 @@ public class CVRPTWCordeau101Geo
 	private static Logger log=Logger.getLogger("file");
     public static void main( String[] args )
     {
+		double lat01Ini=-34.581013;
+		double lat02Ini=-35.030460;
+		double lon01Ini=-58.375518;
+		double lon02Ini=-58.920122;
+    	
     	try {
     		log.warn("Init");
     		
 			int[] holder=new int[3];		
-			Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,-34.581013 , -58.539355,	-34.714564, -58.539355,8*60,18*60);
+			Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,8*60);
 
 			Individual<Integer[]> optInd=CordeauParser.parseSolution("src/main/resources/c101.res");
 
@@ -75,10 +75,9 @@ public class CVRPTWCordeau101Geo
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
-			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
-			fit.setMatrix(matrix);
+			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
-			cross=new SBXCrossover(1d, c, m, fit);
+			cross=new SBXCrossover(30d, c, m, fit);
 			cross.setMatrix(matrix);
 
 			
@@ -90,10 +89,10 @@ public class CVRPTWCordeau101Geo
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 				
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 50, new DescendantAcceptEvaluator<Integer[]>(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 300, new DescendantAcceptEvaluator<Integer[]>(), 
 									fit, cross, new GVRMutatorRandom(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), 1000, fitnesOptInd,rma,genome);
+									new GlobalSinglePopulation<Integer[]>(genome), 300, fitnesOptInd,rma,genome);
 			
 			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
 			

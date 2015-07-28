@@ -1,9 +1,14 @@
-package ar.edu.ungs.yamiko.problems.vrp;
+package ar.edu.ungs.yamiko.problems.vrp.test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
+import ar.edu.ungs.yamiko.problems.vrp.Customer;
+import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
+import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
+import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 
@@ -18,7 +23,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
  * @author ricardo
  *
  */
-public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
+public class CVRPTWSimpleFitnessEvaluatorNoDistance extends VRPFitnessEvaluator{
 	
 	/**
 	 * 
@@ -28,7 +33,7 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=10000d;
-	public static double MAX_FITNESS=10000000000d;
+	public static final double MAX_FITNESS=10000000000d;
 	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
@@ -67,11 +72,12 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 			totalMaxTimePenal+=calcMaxTimeRoute(tiempo);
 			totalCapPenal+=calcCapacityPenalty(capacityAux);
 		}
-		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
+//		double maxVehPenal=Math.pow(cantRutas*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
 		
 		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
-		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
-		fitness+=fitness*calcOmitPenalty(rutas);
+//		fitness+=totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
+//		fitness+=fitness*calcOmitPenalty(rutas);
+		fitness+=totalTWPenal;
 		return fitness;
 	}
 	
@@ -85,31 +91,24 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		return MAX_FITNESS-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
+	public CVRPTWSimpleFitnessEvaluatorNoDistance(Double _capacity,Double _velocity,int maxVehicles) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
+	public CVRPTWSimpleFitnessEvaluatorNoDistance(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
 		setMatrix(dm);
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS) {
-		capacity=_capacity;
-		avgVelocity=_velocity;
-		maxVehiculos=maxVehicles;
-		CVRPTWSimpleFitnessEvaluator.MAX_FITNESS=maxFITNESS;
-		setMatrix(dm);
-	}	
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)
 	{
 		int gap=0;
 		if (c1 instanceof GeodesicalCustomer)		
-			gap=((GeodesicalCustomer)c1).getTimeWindow().minGap(((GeodesicalCustomer)c2).getTimeWindow(), 0, deltaTiempo,c1.getServiceDuration());
+			gap=((GeodesicalCustomer)c1).getTimeWindow().minGap(((GeodesicalCustomer)c2).getTimeWindow(), 0, deltaTiempo,c2.getServiceDuration());
 		else
 			gap=((CartesianCustomer)c1).minGap((CartesianCustomer)c2, 0, deltaTiempo);			
 		if (gap==0) return 0d;

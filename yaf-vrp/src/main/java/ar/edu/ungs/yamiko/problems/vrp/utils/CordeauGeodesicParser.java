@@ -75,7 +75,7 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
  * @return
  * @throws Exception
  */
-	public static Map<Integer,Customer> parse(String fileName,int[] holder,double lat0, double lon0,double latMax,double lonMax,int mintw, int maxtw) throws Exception
+	public static Map<Integer,Customer> parse(String fileName,int[] holder,double lat0, double lon0,double latMax,double lonMax,int mintw) throws Exception
 	{
 		
 		FileInputStream fstream = new FileInputStream(fileName);
@@ -112,17 +112,18 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
 			{
 				from=Integer.parseInt(st.nextToken());
 				to=Integer.parseInt(st.nextToken());
+				if (from>to) System.out.println("En el cliente " + i + " El tw está mal: " + from + " - " + to);
 									
-				from=mintw+from*(maxtw-mintw)/maxt;
-				to=mintw+to*(maxtw-mintw)/maxt;
+				from=mintw+from;
+				to=mintw+to;
 			}
 			else
 				if (maxt==0) maxt=Integer.parseInt(st.nextToken());
 
 			
-			TimeWindow tw1=new TimeWindow(from/60, new Double(Math.IEEEremainder(from, 60d)).intValue(), to/60, new Double(Math.IEEEremainder(to, 60d)).intValue());
-			double lat=lat0+y*(latMax-lat0)/100;
-			double lon=lon0+x*(lonMax-lon0)/100;
+			TimeWindow tw1=new TimeWindow(from/60, from % 60, to/60, to % 60);
+			double lat=(-1)*(Math.abs(lat0)+Math.abs(y)*(Math.abs(latMax)-Math.abs(lat0))/100);
+			double lon=(-1)*(Math.abs(lon0)+Math.abs(x)*(Math.abs(lonMax)-Math.abs(lon0))/100);
 			Customer c1=new GeodesicalCustomer(i, String.valueOf(i),null,lat, lon, i==0?null:tw1,q,d,0);
 			salida.put(i, c1);
 		}

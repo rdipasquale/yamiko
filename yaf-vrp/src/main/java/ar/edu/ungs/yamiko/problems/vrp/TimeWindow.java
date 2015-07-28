@@ -66,12 +66,13 @@ public class TimeWindow implements Serializable{
 		Calendar travelT=Calendar.getInstance();
 		travelF.setTime(c1.getTime());
 		travelT.setTime(c2.getTime());
-		travelF.add(Calendar.MINUTE, timeTravel.intValue()+timeServe-marginInMinutes);
-		travelT.add(Calendar.MINUTE, timeTravel.intValue()+timeServe+marginInMinutes);
+		travelF.add(Calendar.MINUTE, new Long(Math.round(timeTravel) +timeServe-marginInMinutes).intValue());
+		travelT.add(Calendar.MINUTE, new Long(Math.round(timeTravel)+timeServe+marginInMinutes).intValue());
 		
 		if ( 
+				(travelF.after(t2.from()) && travelT.before(t2.to())) ||
 				(travelF.before(t2.from()) && travelT.after(t2.from())) ||
-				(travelF.before(t2.to()) && travelT.after(t2.to()) ||
+				(travelF.before(t2.to()) && travelT.after(t2.to()) ||				
 				travelF.equals(t2.from()) ||
 				travelT.equals(t2.to())  || 
 				travelF.equals(t2.to()) ||

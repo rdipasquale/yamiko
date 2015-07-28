@@ -83,6 +83,8 @@ public class TestCordeauParser {
 
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());
 		
+		System.out.println(matrix.toString());
+		
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		

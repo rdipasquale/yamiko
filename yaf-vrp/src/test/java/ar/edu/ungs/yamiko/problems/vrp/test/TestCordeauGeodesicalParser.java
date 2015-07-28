@@ -24,6 +24,7 @@ import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
+import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
@@ -43,7 +44,7 @@ public class TestCordeauGeodesicalParser {
 	@Test
 	public void testParseCordeauGeo() throws Exception{
 		int[] holder=new int[3];		
-		Map<Integer,Customer> prueba=CordeauGeodesicParser.parse("src/test/resources/c101", holder,-34.581013 , -58.539355,	-34.714564, -58.539355,8*60,18*60);
+		Map<Integer,Customer> prueba=CordeauGeodesicParser.parse("src/test/resources/c101", holder,-34.581013 , -58.539355,	-34.714564, -58.539355,8*60);
 		int m=holder[0];
 		int n=holder[1];
 		int c=holder[2];
@@ -56,9 +57,82 @@ public class TestCordeauGeodesicalParser {
 
 	@SuppressWarnings("unused")
 	@Test
-	public void testReviewFitnessCordeauGeo() throws Exception{
+	public void testSearchBestFitnessCordeauGeo() throws Exception{
+		double lat01Ini=-34.581013;
+		double lat02Ini=-35.030460;
+		double lon01Ini=-58.375518;
+		double lon02Ini=-58.920122;
+
+		double maxFit=0d;
+		double maxlat02Ini=-34.581014;
+		double maxlon02Ini=-58.375519;
+		long maxI=0;
+		
+		for (int i=0;i<2000;i++)
+		{
+			System.out.println("Probando con " + lat01Ini + "," + lon01Ini + "," + lat02Ini + "," + lon02Ini);
+			int[] holder=new int[3];		
+			Map<Integer,Customer> customers=CordeauGeodesicParser.parse("src/test/resources/c101", holder,lat01Ini , lon01Ini,	lat02Ini, lon02Ini,8*60);
+			int m=holder[0];
+			int n=holder[1];
+			int c=holder[2];
+			assertTrue(customers.keySet().size()==101);
+			Individual<Integer[]> ind=CordeauGeodesicParser.parseSolution("src/test/resources/c101.res");
+			assertNotNull(ind);
+			
+			Genome<Integer[]> genome;
+			Gene gene=new BasicGene("Gene X", 0, n+m);
+			
+			Ribosome<Integer[]> ribosome=new ByPassRibosome();
+			String chromosomeName="X";
+			VRPCrossover cross; 
+			RoutesMorphogenesisAgent rma;
+			PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
+			
+			rma=new RoutesMorphogenesisAgent(customers);
+			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
+			translators.put(gene, ribosome);
+			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
+	
+			DistanceMatrix matrix=new DistanceMatrix(customers.values());
+			
+			cross=new GVRCrossover();
+			cross.setMatrix(matrix);
+			
+			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluatorNoDistance(new Double(c),30d,m);
+			fit.setMatrix(matrix);
+			rma.develop(genome, ind);
+			Double fitnesOptInd=fit.execute(ind);
+			System.out.println("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+			System.out.println();
+			
+			if (maxFit<fitnesOptInd)
+			{
+				maxFit=fitnesOptInd;
+				maxlat02Ini=lat02Ini;
+				maxlon02Ini=lon02Ini;
+				maxI=i;
+				
+			}
+			
+			lat02Ini=lat02Ini-0.000085;
+			lon02Ini=lon02Ini-0.0001;
+			
+			// El máximo fitness se dio en la iteración 148 con [-34.581013,-58.375518] [-34.51456400000047,-58.33935500000047]
+		}
+		
+		System.out.println("El máximo fitness " + maxFit + " se dio en la iteración " + maxI + " con [" + lat01Ini + "," + lon01Ini +"] [" + maxlat02Ini + "," + maxlon02Ini + "]");
+	}
+
+	@Test
+	public void testValidateReviewFitnessCordeauGeo() throws Exception{
+		double lat01Ini=-34.581013;
+		double lat02Ini=-35.030460;
+		double lon01Ini=-58.375518;
+		double lon02Ini=-58.920122;
+
 		int[] holder=new int[3];		
-		Map<Integer,Customer> customers=CordeauGeodesicParser.parse("src/test/resources/c101", holder,-34.581013 , -58.375518,	-34.714564, -58.539355,8*60,18*60);
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,8*60);
 		int m=holder[0];
 		int n=holder[1];
 		int c=holder[2];
@@ -75,7 +149,6 @@ public class TestCordeauGeodesicalParser {
 		RoutesMorphogenesisAgent rma;
 		PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
 		
-
 		rma=new RoutesMorphogenesisAgent(customers);
 		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 		translators.put(gene, ribosome);
@@ -86,18 +159,19 @@ public class TestCordeauGeodesicalParser {
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
+		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluatorNoDistance(new Double(c),30d,m);
 		fit.setMatrix(matrix);
 		rma.develop(genome, ind);
 		Double fitnesOptInd=fit.execute(ind);
 		System.out.println("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+		System.out.println();
 		
-		Integer[] ga=new Integer[]{0 , 0 , 79 , 29 , 34 , 100 , 86 , 52 , 23 , 99 , 75 , 73 , 20 , 48 , 54 , 22 , 58 , 42 , 96 , 76 , 65 , 97 , 21 , 6 , 3 , 49 , 87 , 88 , 40 , 71 , 18 , 63 , 69 , 81 , 51 , 16 , 83 , 37 , 8 , 39 , 70 , 9 , 47 , 44 , 36 , 53 , 15 , 26 , 0 , 64 , 91 , 12 , 59 , 7 , 38 , 2 , 17 , 85 , 60 , 95 , 98 , 78 , 61 , 28 , 46 , 45 , 11 , 43 , 33 , 80 , 77 , 74 , 67 , 5 , 93 , 19 , 92 , 94 , 14 , 35 , 62 , 72 , 56 , 82 , 84 , 31 , 25 , 13 , 66 , 57 , 90 , 24 , 50 , 10 , 68 , 1 , 4 , 89 , 27 , 30 , 32 , 0 , 55 , 0 , 0 , 0 , 0 , 41 , 0 , 0 };
-		Individual<Integer[]> gaInd=IntegerStaticHelper.create("X", ga);
-		rma.develop(genome, gaInd);
-		Double fitnesGA=fit.execute(gaInd);
-		System.out.println("GA Ind -> Fitness=" + fitnesGA + " - " + IntegerStaticHelper.toStringIntArray(gaInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+		for (Integer cc : customers.keySet()) 
+			if (cc!=0)
+				System.out.println(((GeodesicalCustomer)customers.get(cc)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(cc)).getLongitude());
+		
+		System.out.println("Depósito:");
+		System.out.println(((GeodesicalCustomer)customers.get(0)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(0)).getLongitude());
 		
 	}
-
 }
