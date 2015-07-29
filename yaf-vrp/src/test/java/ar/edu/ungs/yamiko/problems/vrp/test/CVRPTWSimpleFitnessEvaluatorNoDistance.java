@@ -38,8 +38,10 @@ public class CVRPTWSimpleFitnessEvaluatorNoDistance extends VRPFitnessEvaluator{
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
+	@SuppressWarnings("unused")
 	private int maxVehiculos;
 
+	@SuppressWarnings("unused")
 	@Override
 	public double calcFullPenalties(List<List<Integer>> rutas) {
 		double totalDist=0d;

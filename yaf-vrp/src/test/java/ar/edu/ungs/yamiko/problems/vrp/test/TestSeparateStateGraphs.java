@@ -19,8 +19,8 @@ import com.graphhopper.util.EdgeIteratorState;
 
 public class TestSeparateStateGraphs {
 
-	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
-	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
+	private static final String OSM_PATH="/media/ricardo/hd/gps/buenos-aires_argentina.osm";
+	private static final String GRAPHOPPER_LOCATION="/media/ricardo/hd/gps/graph/truck";
 
 	@Test
 	public void testSeparateStateGraphs() {
@@ -31,8 +31,8 @@ public class TestSeparateStateGraphs {
 		{
 			GraphHopper hopper = new GraphHopper().forServer();
 			hopper.setInMemory();
-			hopper.setOSMFile(System.getProperty("user.home")+OSM_PATH);
-			hopper.setGraphHopperLocation(System.getProperty("user.home")+GRAPHOPPER_LOCATION);
+			hopper.setOSMFile(OSM_PATH);
+			hopper.setGraphHopperLocation(GRAPHOPPER_LOCATION + "/prueba");
 			hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 			hopper.importOrLoad();
 			FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("truck");

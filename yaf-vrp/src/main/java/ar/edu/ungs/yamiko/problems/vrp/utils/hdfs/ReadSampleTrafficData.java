@@ -11,10 +11,13 @@ import ar.edu.ungs.yamiko.problems.vrp.forecasting.HdfsJsonTrafficDataDao;
 
 public class ReadSampleTrafficData {
 
-	private static final String URI_TD="hdfs://192.168.1.40:9000/trafficdata.txt";
+	private static final String URI_TD="/home/ricardo/Descargas/trafficdata.txt";
+//	private static final String URI_TD="hdfs://192.168.1.40:9000/trafficdata.txt";
 	private static final String URI_SPARK="spark://192.168.1.40:7077";
-	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
-	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
+	private static final String OSM_PATH="/media/ricardo/hd/gps/buenos-aires_argentina.osm";
+	private static final String GRAPHOPPER_LOCATION="/media/ricardo/hd/gps/graph/truck";	
+//	private static final String OSM_PATH=System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm";
+//	private static final String GRAPHOPPER_LOCATION=System.getProperty("user.home")+"/gps/graph/truck";
 	
 	public static void main(String[] args) throws IOException{
 
@@ -53,17 +56,12 @@ public class ReadSampleTrafficData {
 		
 		Long t1=System.currentTimeMillis();
 
-		//SparkConf confSpark = new SparkConf().setMaster("local[8]").setAppName("ReadSampleTrafficData");
-    	SparkConf confSpark = new SparkConf().setAppName("ReadSampleTrafficData").setMaster(uriS);
+		SparkConf confSpark = new SparkConf().setMaster("local[8]").setAppName("ReadSampleTrafficData");
+//    	SparkConf confSpark = new SparkConf().setAppName("ReadSampleTrafficData").setMaster(uriS);
         JavaSparkContext sc = new JavaSparkContext(confSpark);
 
 		HdfsJsonTrafficDataDao.forecast(uri,1, false, 5, 0, 0, 30, osmPath,graphopperL, sc);
 		
-//		for (Integer clave : HdfsJsonTrafficDataDao.getOrderedKeySet()) 
-//		{
-//			System.out.println(HdfsJsonTrafficDataDao.getGraph(clave).hashCode());
-//		}
-				
 		System.out.println((System.currentTimeMillis()-t1)/1000 + " Seg.");
 		
 	}

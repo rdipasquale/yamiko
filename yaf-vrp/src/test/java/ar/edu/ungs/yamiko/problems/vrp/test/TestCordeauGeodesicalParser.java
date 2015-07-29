@@ -20,7 +20,6 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
-import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRCrossover;
@@ -124,6 +123,7 @@ public class TestCordeauGeodesicalParser {
 		System.out.println("El máximo fitness " + maxFit + " se dio en la iteración " + maxI + " con [" + lat01Ini + "," + lon01Ini +"] [" + maxlat02Ini + "," + maxlon02Ini + "]");
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testValidateReviewFitnessCordeauGeo() throws Exception{
 		double lat01Ini=-34.481013;
