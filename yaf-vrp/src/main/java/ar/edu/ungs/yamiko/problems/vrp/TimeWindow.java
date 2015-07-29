@@ -10,8 +10,8 @@ public class TimeWindow implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -5916153376836885363L;
-	Calendar c1=Calendar.getInstance();
-	Calendar c2=Calendar.getInstance();
+	private Calendar c1=Calendar.getInstance();
+	private Calendar c2=Calendar.getInstance();
 	
 	public TimeWindow(Date start,Date end) {
 		c1.setTime(start);
@@ -111,6 +111,22 @@ public class TimeWindow implements Serializable{
 	public String toString() {
 		return "[" + c1.get(Calendar.HOUR_OF_DAY) + ":" + c1.get(Calendar.MINUTE) + "hs ;" + 
 				c2.get(Calendar.HOUR_OF_DAY) + ":" + c2.get(Calendar.MINUTE) + "hs ]";
+	}
+
+	public Calendar getC1() {
+		return c1;
+	}
+
+	public void setC1(Calendar c1) {
+		this.c1 = c1;
+	}
+
+	public Calendar getC2() {
+		return c2;
+	}
+
+	public void setC2(Calendar c2) {
+		this.c2 = c2;
 	}
 
 	

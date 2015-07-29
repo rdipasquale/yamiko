@@ -36,8 +36,8 @@ public class WriteSampleTrafficData {
 	private static final int camiones=100;
 	private static final int viajes=50;
 	private static final int days=365;
-	private static final String OSM_PATH="/gps/buenos-aires_argentina.osm";
-	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
+	private static final String OSM_PATH=System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm";
+	private static final String GRAPHOPPER_LOCATION=System.getProperty("user.home")+"/gps/graph/truck";
 	
 	public static void main(String[] args) throws IOException{
 
@@ -48,8 +48,8 @@ public class WriteSampleTrafficData {
 		GraphHopper hopper = new GraphHopper().forServer();
 		//hopper.setCHEnable(enable)disableCHShortcuts();
 		hopper.setInMemory();
-		hopper.setOSMFile(System.getProperty("user.home")+OSM_PATH);
-		hopper.setGraphHopperLocation(System.getProperty("user.home")+GRAPHOPPER_LOCATION);
+		hopper.setOSMFile(OSM_PATH);
+		hopper.setGraphHopperLocation(GRAPHOPPER_LOCATION);
 		hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 		hopper.importOrLoad();
 		//FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("truck");
