@@ -30,7 +30,7 @@ public class HdfsJsonTrafficDataDao {
 	private static final String GRAPHOPPER_LOCATION="/gps/graph/truck";
 	private static List<Integer> orderedKeySet;
 	
-	public static final void forecast(final String trafficDataPath,final Integer week, final boolean workable, final Integer dayOfWeek,final Integer startH,final Integer startM, final Integer minutesInc,final JavaSparkContext sc)
+	public static final void forecast(final String trafficDataPath,final Integer week, final boolean workable, final Integer dayOfWeek,final Integer startH,final Integer startM, final Integer minutesInc,final String graphopperLocation,final String osmPath,final JavaSparkContext sc)
 	{
 		Logger.getLogger(HdfsJsonTrafficDataDao.class).warn("forecast => init");
 		
@@ -64,10 +64,19 @@ public class HdfsJsonTrafficDataDao {
 			horaDesde=horaHasta;
 			minutoDesde=minutoHasta;
 
-			GraphHopper hopper = new GraphHopper().forServer();
-			hopper.setInMemory();
-			hopper.setOSMFile(System.getProperty("user.home")+OSM_PATH);
-			hopper.setGraphHopperLocation(System.getProperty("user.home")+GRAPHOPPER_LOCATION);
+			GraphHopper hopper = new GraphHopper().forServer().setStoreOnFlush(true);
+			//hopper.setInMemory();
+			
+			if (osmPath==null)
+				hopper.setOSMFile(System.getProperty("user.home")+OSM_PATH);
+			else
+				hopper.setOSMFile(System.getProperty("user.home")+osmPath);
+			
+			if (graphopperLocation==null)
+				hopper.setGraphHopperLocation(System.getProperty("user.home")+GRAPHOPPER_LOCATION+"/"+clave);
+			else
+				hopper.setGraphHopperLocation(System.getProperty("user.home")+graphopperLocation);
+				
 			hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
 			hopper.importOrLoad();
 			FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("truck");
@@ -76,11 +85,13 @@ public class HdfsJsonTrafficDataDao {
 
 			for (Row row  : trafficData.filter("hour>=" + horaDesde + " and hour<=" + horaHasta + " and minute>=" + minutoDesde + " and minute<=" + minutoHasta ).collectAsList()) {
 				Long arco=new Long(row.getLong(2));
-		        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(arco.intValue(), Integer.MIN_VALUE);
+		        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(arco.intValue(), Integer.MIN_VALUE);
 		        edge.setFlags(carEncoder.setSpeed(edge.getFlags(), row.getDouble(3)));									
 			} 
 			
-			graphs.put(clave, hopper);
+			hopper.getGraphHopperStorage().flush();
+			
+			//graphs.put(clave, hopper);
 		}
 
 		Logger.getLogger(HdfsJsonTrafficDataDao.class).warn("forecast => fin");

@@ -105,32 +105,32 @@ public class TestGPS {
 
 	    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
         edge.setFlags(carEncoder.setSpeed(edge.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.603383, -58.449060, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge2= hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
+        EdgeIteratorState edge2= hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
         edge2.setFlags(carEncoder.setSpeed(edge2.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.612505, -58.441775, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge3 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Mendez de Andes y Vallese
+        EdgeIteratorState edge3 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Mendez de Andes y Vallese
         edge3.setFlags(carEncoder.setSpeed(edge3.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.613251, -58.439340, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge4 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Aranguren entre Acoyte e Hidalgo
+        EdgeIteratorState edge4 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Aranguren entre Acoyte e Hidalgo
         edge4.setFlags(carEncoder.setSpeed(edge4.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.625031, -58.425548, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge5 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Carlos Calvo entre Marmol y Muñiz
+        EdgeIteratorState edge5 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Carlos Calvo entre Marmol y Muñiz
         edge5.setFlags(carEncoder.setSpeed(edge5.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.625711, -58.420329, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge6 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Castro entre San Juan y Carlos Calvo 
+        EdgeIteratorState edge6 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Castro entre San Juan y Carlos Calvo 
         edge6.setFlags(carEncoder.setSpeed(edge6.getFlags(), 3d));
 
         System.out.println("Errores: " + errors);
@@ -204,28 +204,28 @@ public class TestGPS {
 		FlagEncoder carEncoder = hopper.getEncodingManager().getEncoder("car");
 	    LocationIndex locationIndex = hopper.getLocationIndex();
 	    
-	    AllEdgesIterator ite= hopper.getGraph().getAllEdges();
-	    System.out.println(ite.getCount());
+	    AllEdgesIterator ite= hopper.getGraphHopperStorage().getAllEdges();
+	    System.out.println(ite.getMaxId());
 	    ite.next();
 	    System.out.println("El arco nro " + ite.getEdge() + " llamado " + ite.getName() + " une los nodos [" + ite.getBaseNode() + ";" + ite.getAdjNode() + "] entre los puntos (" 
-	    		+ hopper.getGraph().getNodeAccess().getLatitude(ite.getBaseNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(ite.getBaseNode()) + ") y (" + 
-	    		hopper.getGraph().getNodeAccess().getLatitude(ite.getAdjNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(ite.getAdjNode()) +") cubriendo una distancia de " + ite.getDistance() + "m");
+	    		+ hopper.getGraphHopperStorage().getNodeAccess().getLatitude(ite.getBaseNode()) + "," + hopper.getGraphHopperStorage().getNodeAccess().getLongitude(ite.getBaseNode()) + ") y (" + 
+	    		hopper.getGraphHopperStorage().getNodeAccess().getLatitude(ite.getAdjNode()) + "," + hopper.getGraphHopperStorage().getNodeAccess().getLongitude(ite.getAdjNode()) +") cubriendo una distancia de " + ite.getDistance() + "m");
 	    
 	    // Verificamos si el punto medio pertenece al mismo arco
-	    double latInter=(hopper.getGraph().getNodeAccess().getLatitude(ite.getBaseNode())+hopper.getGraph().getNodeAccess().getLatitude(ite.getAdjNode()))/2;
-	    double lonInter=(hopper.getGraph().getNodeAccess().getLongitude(ite.getBaseNode())+hopper.getGraph().getNodeAccess().getLongitude(ite.getAdjNode()) )/2;
+	    double latInter=(hopper.getGraphHopperStorage().getNodeAccess().getLatitude(ite.getBaseNode())+hopper.getGraphHopperStorage().getNodeAccess().getLatitude(ite.getAdjNode()))/2;
+	    double lonInter=(hopper.getGraphHopperStorage().getNodeAccess().getLongitude(ite.getBaseNode())+hopper.getGraphHopperStorage().getNodeAccess().getLongitude(ite.getAdjNode()) )/2;
 
 	    QueryResult qr = locationIndex.findClosest(latInter, lonInter, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
         if (!qr.isValid()) throw new Exception("No encontrado");        
-        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
         System.out.println("speed=" +carEncoder.getSpeed(edge.getFlags()));
         System.out.println("reverseSpeed=" +carEncoder.getReverseSpeed(edge.getFlags()));
         System.out.println("maxSpeed=" +carEncoder.getMaxSpeed());
 
         //edge.getFlags(carEncoder.setSpeed(edge.getFlags(), 3d));
 	    System.out.println("El arco nro " + edge.getEdge() + " llamado " + edge.getName() + " une los nodos [" + edge.getBaseNode() + ";" + edge.getAdjNode() + "] entre los puntos (" 
-	    		+ hopper.getGraph().getNodeAccess().getLatitude(edge.getBaseNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(edge.getBaseNode()) + ") y (" + 
-	    		hopper.getGraph().getNodeAccess().getLatitude(edge.getAdjNode()) + "," + hopper.getGraph().getNodeAccess().getLongitude(edge.getAdjNode()) +") cubriendo una distancia de " + edge.getDistance() + "m");
+	    		+ hopper.getGraphHopperStorage().getNodeAccess().getLatitude(edge.getBaseNode()) + "," + hopper.getGraphHopperStorage().getNodeAccess().getLongitude(edge.getBaseNode()) + ") y (" + 
+	    		hopper.getGraphHopperStorage().getNodeAccess().getLatitude(edge.getAdjNode()) + "," + hopper.getGraphHopperStorage().getNodeAccess().getLongitude(edge.getAdjNode()) +") cubriendo una distancia de " + edge.getDistance() + "m");
         
 		assertTrue( edge.getEdge()==ite.getEdge());			
 	    
@@ -253,30 +253,30 @@ public class TestGPS {
 
 	    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
         edge.setFlags(carEncoder.setReverseSpeed(edge.getFlags(), 11d));
         edge.setFlags(carEncoder.setSpeed(edge.getFlags(), 14d));
         carEncoder.getReverseSpeed(edge.getFlags());
         carEncoder.getSpeed(edge.getFlags());
 	    qr = locationIndex.findClosest(-34.603383, -58.449060, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge2= hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
+        EdgeIteratorState edge2= hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Galicia y 3 Arroyos
         
         edge2.setFlags(carEncoder.setReverseSpeed(edge2.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.612505, -58.441775, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge3 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Mendez de Andes y Vallese
+        EdgeIteratorState edge3 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Honorio entre Mendez de Andes y Vallese
         edge3.setFlags(carEncoder.setReverseSpeed(edge3.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.613251, -58.439340, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge4 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Aranguren entre Acoyte e Hidalgo
+        EdgeIteratorState edge4 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Aranguren entre Acoyte e Hidalgo
         edge4.setFlags(carEncoder.setReverseSpeed(edge4.getFlags(), 3d));
 
 	    qr = locationIndex.findClosest(-34.625031, -58.425548, EdgeFilter.ALL_EDGES);
         if (!qr.isValid()) errors++;        
-        EdgeIteratorState edge5 = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Carlos Calvo entre Marmol y Muñiz
+        EdgeIteratorState edge5 = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE); // Carlos Calvo entre Marmol y Muñiz
         edge5.setFlags(carEncoder.setReverseSpeed(edge5.getFlags(), 3d));
 
         System.out.println("Errores: " + errors);

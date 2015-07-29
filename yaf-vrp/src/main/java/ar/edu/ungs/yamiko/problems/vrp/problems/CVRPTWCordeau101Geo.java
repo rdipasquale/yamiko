@@ -41,10 +41,10 @@ public class CVRPTWCordeau101Geo
 	private static Logger log=Logger.getLogger("file");
     public static void main( String[] args )
     {
-		double lat01Ini=-34.581013;
-		double lat02Ini=-35.030460;
-		double lon01Ini=-58.375518;
-		double lon02Ini=-58.920122;
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
     	
     	try {
     		log.warn("Init");
@@ -89,10 +89,10 @@ public class CVRPTWCordeau101Geo
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 				
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 300, new DescendantAcceptEvaluator<Integer[]>(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, 30, new DescendantAcceptEvaluator<Integer[]>(), 
 									fit, cross, new GVRMutatorRandom(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), 300, fitnesOptInd,rma,genome);
+									new GlobalSinglePopulation<Integer[]>(genome), 1000, fitnesOptInd,rma,genome);
 			
 			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
 			

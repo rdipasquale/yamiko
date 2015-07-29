@@ -134,7 +134,7 @@ public class WriteSampleTrafficData {
 						
 					    QueryResult qr = locationIndex.findClosest(ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), EdgeFilter.ALL_EDGES);
 					    if (!qr.isValid()) errors++;        
-				        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+				        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
 				        
 						TrafficData td=new TrafficData(c, new Timestamp(cal.getTimeInMillis()), ins.getPoints().getLatitude(0), ins.getPoints().getLongitude(0), speed, ins.toString(), workable, cal.get(Calendar.WEEK_OF_YEAR), cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND),edge.getEdge());
 					    //fin.writeUTF(om.writeValueAsString(td)+"\n");

@@ -39,7 +39,7 @@ public class TestSeparateStateGraphs {
 		    LocationIndex locationIndex = hopper.getLocationIndex();
 			
 		    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
-	        EdgeIteratorState edge = hopper.getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+	        EdgeIteratorState edge = hopper.getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
 	        edge.setFlags(carEncoder.setSpeed(edge.getFlags(), new Double((i+3)*10)));
 			
 	        lista.add(hopper);	        
@@ -47,12 +47,12 @@ public class TestSeparateStateGraphs {
 		
 	    LocationIndex locationIndex = lista.get(0).getLocationIndex();		
 	    QueryResult qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
-        EdgeIteratorState edge = lista.get(0).getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        EdgeIteratorState edge = lista.get(0).getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
         long l1=edge.getFlags();
 		
 	    locationIndex = lista.get(1).getLocationIndex();		
 	    qr = locationIndex.findClosest(-34.602270, -58.450069, EdgeFilter.ALL_EDGES); // Honorio entre 3 arroyos y Belaustegui
-        edge = lista.get(1).getGraph().getEdgeProps(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
+        edge = lista.get(1).getGraphHopperStorage().getEdgeIteratorState(qr.getClosestEdge().getEdge(), Integer.MIN_VALUE);
         long l2=edge.getFlags();
         
         assertFalse(l1==l2);

@@ -58,10 +58,10 @@ public class TestCordeauGeodesicalParser {
 	@SuppressWarnings("unused")
 	@Test
 	public void testSearchBestFitnessCordeauGeo() throws Exception{
-		double lat01Ini=-34.581013;
-		double lat02Ini=-35.030460;
-		double lon01Ini=-58.375518;
-		double lon02Ini=-58.920122;
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
 
 		double maxFit=0d;
 		double maxlat02Ini=-34.581014;
@@ -126,10 +126,10 @@ public class TestCordeauGeodesicalParser {
 
 	@Test
 	public void testValidateReviewFitnessCordeauGeo() throws Exception{
-		double lat01Ini=-34.581013;
-		double lat02Ini=-35.030460;
-		double lon01Ini=-58.375518;
-		double lon02Ini=-58.920122;
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
 
 		int[] holder=new int[3];		
 		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,8*60);
