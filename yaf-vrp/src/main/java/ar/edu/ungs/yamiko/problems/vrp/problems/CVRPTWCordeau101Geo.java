@@ -29,7 +29,7 @@ import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.WriteCustomers;
+import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 
@@ -51,9 +51,9 @@ public class CVRPTWCordeau101Geo
     		log.warn("Init");
     		
 			int[] holder=new int[3];		
-			Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,8*60);
+			Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
 
-			WriteCustomers.writeCustomers(customers.values(), "src/main/resources/customers101.txt");
+			CustomersPersistence.writeCustomers(customers.values(), "src/main/resources/customers101.txt");
 			
 			Individual<Integer[]> optInd=CordeauParser.parseSolution("src/main/resources/c101.res");
 

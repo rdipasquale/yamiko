@@ -1,5 +1,8 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
 
 public class GeodesicalCustomer extends Customer {
@@ -75,5 +78,9 @@ public class GeodesicalCustomer extends Customer {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.timeWindow = timeWindow;
+	}
+	
+	public GeodesicalCustomer() {
+		// TODO Auto-generated constructor stub
 	}
 }

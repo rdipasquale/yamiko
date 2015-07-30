@@ -43,7 +43,7 @@ public class TestCordeauGeodesicalParser {
 	@Test
 	public void testParseCordeauGeo() throws Exception{
 		int[] holder=new int[3];		
-		Map<Integer,Customer> prueba=CordeauGeodesicParser.parse("src/test/resources/c101", holder,-34.581013 , -58.539355,	-34.714564, -58.539355,8*60);
+		Map<Integer,Customer> prueba=CordeauGeodesicParser.parse("src/test/resources/c101", holder,-34.581013 , -58.539355,	-34.714564, -58.539355,5*60);
 		int m=holder[0];
 		int n=holder[1];
 		int c=holder[2];
@@ -71,7 +71,7 @@ public class TestCordeauGeodesicalParser {
 		{
 			System.out.println("Probando con " + lat01Ini + "," + lon01Ini + "," + lat02Ini + "," + lon02Ini);
 			int[] holder=new int[3];		
-			Map<Integer,Customer> customers=CordeauGeodesicParser.parse("src/test/resources/c101", holder,lat01Ini , lon01Ini,	lat02Ini, lon02Ini,8*60);
+			Map<Integer,Customer> customers=CordeauGeodesicParser.parse("src/test/resources/c101", holder,lat01Ini , lon01Ini,	lat02Ini, lon02Ini,5*60);
 			int m=holder[0];
 			int n=holder[1];
 			int c=holder[2];
@@ -132,7 +132,7 @@ public class TestCordeauGeodesicalParser {
 		double lon02Ini=-58.870122;
 
 		int[] holder=new int[3];		
-		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,8*60);
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
 		int m=holder[0];
 		int n=holder[1];
 		int c=holder[2];

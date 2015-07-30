@@ -54,4 +54,10 @@ public class TestGraphFromHDFS {
 		
 	}
 
+	@Test
+	public void testDistributedRoutesCalc() throws Exception{
+		
+	}
+		
+	
 }
