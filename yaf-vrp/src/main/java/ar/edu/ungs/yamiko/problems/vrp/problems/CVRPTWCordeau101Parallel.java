@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.problems.vrp.problems;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,11 @@ public class CVRPTWCordeau101Parallel
 	private static Logger log=Logger.getLogger("file");
     public static void main( String[] args )
     {
+    	
+		for (String classPathEntry : System.getProperty("java.class.path").split(File.pathSeparator)) 
+		    if (classPathEntry.endsWith(".jar")) 
+		        System.out.println(classPathEntry+":\\");
+	
     	try {
     		log.warn("Init");
         	//SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101");
