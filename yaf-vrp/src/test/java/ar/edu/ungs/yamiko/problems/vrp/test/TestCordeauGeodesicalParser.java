@@ -3,9 +3,11 @@ package ar.edu.ungs.yamiko.problems.vrp.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,14 @@ import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
+import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
+import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalc;
+
+import com.graphhopper.GHRequest;
+import com.graphhopper.GHResponse;
+import com.graphhopper.GraphHopper;
+import com.graphhopper.routing.AlgorithmOptions;
+import com.graphhopper.routing.util.EncodingManager;
 
 public class TestCordeauGeodesicalParser {
 
@@ -174,4 +184,39 @@ public class TestCordeauGeodesicalParser {
 		System.out.println(((GeodesicalCustomer)customers.get(0)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(0)).getLongitude());
 		
 	}
+
+	@Test
+	public void testGPSAllCombinations() throws Exception{
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
+
+		int[] holder=new int[3];		
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
+		assertTrue(customers.keySet().size()==101);
+		Individual<Integer[]> ind=CordeauGeodesicParser.parseSolution("src/test/resources/c101.res");
+		assertNotNull(ind);
+		
+		
+		GraphHopper hopper = new GraphHopper().forServer();
+		hopper.setInMemory();
+		hopper.setOSMFile(System.getProperty("user.home")+"/gps/buenos-aires_argentina.osm");
+		hopper.setGraphHopperLocation(System.getProperty("user.home")+"/gps/graph/truck");
+		hopper.setEncodingManager(new EncodingManager(new TruckFlagEncoder()));
+		hopper.importOrLoad();				
+	
+		for (Customer i : customers.values()) 
+			for (Customer j : customers.values())
+				if (!i.equals(j))
+				{
+					GHRequest req = new GHRequest(((GeodesicalCustomer)i).getLatitude(), ((GeodesicalCustomer)i).getLongitude(), ((GeodesicalCustomer)j).getLatitude(), ((GeodesicalCustomer)j).getLongitude()).setVehicle("truck").setAlgorithm(AlgorithmOptions.ASTAR_BI);
+					GHResponse rsp = hopper.route(req);
+					if(rsp.hasErrors()) 
+						Logger.getLogger(DistributedRouteCalc.class).error("La ruta entre " + i + " y " + j + " tiene errores. => [" + ((GeodesicalCustomer)i).getLatitude() + "," + ((GeodesicalCustomer)i).getLongitude() +"][" +((GeodesicalCustomer)j).getLatitude() +"," + ((GeodesicalCustomer)j).getLongitude() + "] En " + InetAddress.getLocalHost().getHostName() + " " + rsp.getErrors().get(0).getMessage()) ;
+				}
+		
+		
+	}
+	
 }

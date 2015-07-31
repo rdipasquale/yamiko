@@ -124,6 +124,14 @@ Note : In the case of the MDVRP, the lines go from 1 to n + t and the last t ent
 			TimeWindow tw1=new TimeWindow(from/60, from % 60, to/60, to % 60);
 			double lat=(-1)*(Math.abs(lat0)+Math.abs(y)*(Math.abs(latMax)-Math.abs(lat0))/100);
 			double lon=(-1)*(Math.abs(lon0)+Math.abs(x)*(Math.abs(lonMax)-Math.abs(lon0))/100);
+			
+			if (lat==-34.50348535 && lon==-58.532467520000004) // Salvar
+			{
+				lat=-34.502939;
+				lon=-58.531760;				
+			}
+				
+			
 			Customer c1=new GeodesicalCustomer(i, String.valueOf(i),null,lat, lon, i==0?null:tw1,q,d,0);
 			salida.put(i, c1);
 		}
