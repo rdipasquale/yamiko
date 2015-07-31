@@ -1,8 +1,5 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import ar.edu.ungs.yamiko.problems.vrp.utils.GPSHelper;
 
 public class GeodesicalCustomer extends Customer {

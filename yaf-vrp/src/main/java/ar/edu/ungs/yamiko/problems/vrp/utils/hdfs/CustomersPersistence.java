@@ -18,6 +18,7 @@ import org.apache.hadoop.fs.Path;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
+import ar.edu.ungs.yamiko.problems.vrp.entities.CustomerRoute;
 import ar.edu.ungs.yamiko.problems.vrp.entities.dto.CustomerAdapter;
 import ar.edu.ungs.yamiko.problems.vrp.entities.dto.CustomerDto;
 
@@ -41,7 +42,7 @@ public class CustomersPersistence {
 				fs.delete(path, true);
 		    FSDataOutputStream fin = fs.create(path);
 		    for (Customer c: customers) 
-			    fin.writeBytes(om.writeValueAsString(c)+"\n");
+			    fin.writeBytes(om.writeValueAsString(CustomerAdapter.adapt(c))+"\n");
 		    fin.close();
 		}
 		else
@@ -87,6 +88,74 @@ public class CustomersPersistence {
 	        line = reader.readLine(); 
 	        while (line != null){		    
 		    	Customer c=CustomerAdapter.adapt( om.readValue(line,CustomerDto.class ));
+		    	customers.add(c);
+		    	line=reader.readLine();		    	
+	        }
+	        reader.close();
+		}
+		return customers;
+	}
+
+	public static final void writeCustomerRoutes(Collection<CustomerRoute> customers,String dest) throws IOException
+	{
+		if (dest==null) return;
+		ObjectMapper om=new ObjectMapper();
+
+		if (dest.contains("hdfs:"))
+		{
+			Configuration conf = new Configuration();
+			FileSystem fs = FileSystem.get(URI.create(dest), conf);
+			Path path = new Path(dest);
+			if (fs.exists(path))
+				fs.delete(path, true);
+		    FSDataOutputStream fin = fs.create(path);
+		    for (CustomerRoute c: customers) 
+			    fin.writeBytes(om.writeValueAsString(c)+"\n");
+		    fin.close();
+		}
+		else
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
+		    for (CustomerRoute c: customers) 
+		    	writer.write(om.writeValueAsString(c)+"\n");
+		    writer.close();
+		}
+	}
+
+	public static final Collection<CustomerRoute> readCustomerRoutes(String dest) throws IOException
+	{
+		if (dest==null) return null;
+		ObjectMapper om=new ObjectMapper();
+		
+		Collection<CustomerRoute> customers=new ArrayList<CustomerRoute>();
+		
+		if (dest.contains("hdfs:"))
+		{
+			Configuration conf = new Configuration();
+			FileSystem fs = FileSystem.get(URI.create(dest), conf);
+			Path path = new Path(dest);
+			if (fs.exists(path))
+				fs.delete(path, true);
+		    FSDataInputStream fin = fs.open(path);		    
+		    BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+
+	        String line;
+	        line = reader.readLine(); 
+	        while (line != null){		    
+		    	CustomerRoute c=om.readValue(line,CustomerRoute.class );
+		    	customers.add(c);
+		    	line=reader.readLine();		    	
+	        }
+		    reader.close();
+		    fin.close();
+		}
+		else
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(dest));
+	        String line;
+	        line = reader.readLine(); 
+	        while (line != null){		    
+		    	CustomerRoute c=om.readValue(line,CustomerRoute.class );
 		    	customers.add(c);
 		    	line=reader.readLine();		    	
 	        }

@@ -1,7 +1,5 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 public class CartesianCustomer extends Customer {
