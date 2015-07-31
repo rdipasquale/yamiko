@@ -19,10 +19,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.Population;
-import ar.edu.ungs.yamiko.problems.vrp.Customer;
-import ar.edu.ungs.yamiko.problems.vrp.entities.CustomerRoute;
-import ar.edu.ungs.yamiko.problems.vrp.entities.dto.CustomerAdapter;
-import ar.edu.ungs.yamiko.problems.vrp.entities.dto.CustomerDto;
+import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.entities.dto.VRPIndividualDto;
 
 public class VRPPopulationPersistence {
@@ -56,7 +53,7 @@ public class VRPPopulationPersistence {
 		    writer.close();
 		}
 	}
-
+	
 	public static final void writePopulation(Individual<Integer[]> c,String dest) throws IOException
 	{
 		if (dest==null) return;
@@ -81,12 +78,12 @@ public class VRPPopulationPersistence {
 		}
 	}
 	
-	public static final Collection<Customer> readCustomers(String dest) throws IOException
+	public static final Collection<VRPIndividualDto> readPopulation(String dest) throws IOException
 	{
 		if (dest==null) return null;
 		ObjectMapper om=new ObjectMapper();
 		
-		Collection<Customer> customers=new ArrayList<Customer>();
+		Collection<VRPIndividualDto> inds=new ArrayList<VRPIndividualDto>();
 		
 		if (dest.contains("hdfs:"))
 		{
@@ -101,8 +98,7 @@ public class VRPPopulationPersistence {
 	        String line;
 	        line = reader.readLine(); 
 	        while (line != null){		    
-		    	Customer c=CustomerAdapter.adapt( om.readValue(line,CustomerDto.class ));
-		    	customers.add(c);
+		    	inds.add(om.readValue(line,VRPIndividualDto.class ));
 		    	line=reader.readLine();		    	
 	        }
 		    reader.close();
@@ -114,81 +110,24 @@ public class VRPPopulationPersistence {
 	        String line;
 	        line = reader.readLine(); 
 	        while (line != null){		    
-		    	Customer c=CustomerAdapter.adapt( om.readValue(line,CustomerDto.class ));
-		    	customers.add(c);
+		    	inds.add(om.readValue(line,VRPIndividualDto.class ));
 		    	line=reader.readLine();		    	
 	        }
 	        reader.close();
 		}
-		return customers;
+		return inds;
 	}
 
-	public static final void writeCustomerRoutes(Collection<CustomerRoute> customers,String dest) throws IOException
-	{
-		if (dest==null) return;
-		ObjectMapper om=new ObjectMapper();
-
-		if (dest.contains("hdfs:"))
-		{
-			Configuration conf = new Configuration();
-			FileSystem fs = FileSystem.get(URI.create(dest), conf);
-			Path path = new Path(dest);
-			if (fs.exists(path))
-				fs.delete(path, true);
-		    FSDataOutputStream fin = fs.create(path);
-		    for (CustomerRoute c: customers) 
-			    fin.writeBytes(om.writeValueAsString(c)+"\n");
-		    fin.close();
-		}
-		else
-		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
-		    for (CustomerRoute c: customers) 
-		    	writer.write(om.writeValueAsString(c)+"\n");
-		    writer.close();
-		}
-	}
-
-	public static final Collection<CustomerRoute> readCustomerRoutes(String dest) throws IOException
+	public static final Collection<Individual<Integer[]>> adaptReadPopulation(String dest) throws IOException
 	{
 		if (dest==null) return null;
-		ObjectMapper om=new ObjectMapper();
+		Collection<VRPIndividualDto> inds=readPopulation(dest);
+		Collection<Individual<Integer[]>> salida=new ArrayList<Individual<Integer[]>>();
 		
-		Collection<CustomerRoute> customers=new ArrayList<CustomerRoute>();
+		for (VRPIndividualDto dto : inds) 
+			salida.add(IntegerStaticHelper.create("X", dto.getInd()));
+		return salida;
 		
-		if (dest.contains("hdfs:"))
-		{
-			Configuration conf = new Configuration();
-			FileSystem fs = FileSystem.get(URI.create(dest), conf);
-			Path path = new Path(dest);
-			if (fs.exists(path))
-				fs.delete(path, true);
-		    FSDataInputStream fin = fs.open(path);		    
-		    BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
-
-	        String line;
-	        line = reader.readLine(); 
-	        while (line != null){		    
-		    	CustomerRoute c=om.readValue(line,CustomerRoute.class );
-		    	customers.add(c);
-		    	line=reader.readLine();		    	
-	        }
-		    reader.close();
-		    fin.close();
-		}
-		else
-		{
-			BufferedReader reader = new BufferedReader(new FileReader(dest));
-	        String line;
-	        line = reader.readLine(); 
-	        while (line != null){		    
-		    	CustomerRoute c=om.readValue(line,CustomerRoute.class );
-		    	customers.add(c);
-		    	line=reader.readLine();		    	
-	        }
-	        reader.close();
-		}
-		return customers;
 	}
 	
 }

@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -53,7 +55,20 @@ public class CustomersPersistence {
 		    writer.close();
 		}
 	}
-	
+
+	public static final Map<Integer,Customer> readCustomersMap(String dest) throws IOException
+	{
+		Collection<Customer> customers=readCustomers(dest);
+		
+		Map<Integer,Customer> salida=new HashMap<Integer, Customer>();
+		
+		for (Customer c : customers) 
+			salida.put(c.getId(), c);
+		
+		return salida;
+		
+	}
+
 	public static final Collection<Customer> readCustomers(String dest) throws IOException
 	{
 		if (dest==null) return null;

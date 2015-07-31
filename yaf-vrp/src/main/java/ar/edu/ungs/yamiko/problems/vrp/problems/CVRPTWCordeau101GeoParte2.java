@@ -6,9 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 
+import scala.Tuple2;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -16,13 +15,14 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
-import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
+import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.CVRPTWGeodesiacalGPSFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
@@ -30,22 +30,27 @@ import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
+import ar.edu.ungs.yamiko.problems.vrp.VRPFilePopulationInitializer;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence;
+import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalc;
+import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalcPersistence;
 import ar.edu.ungs.yamiko.workflow.Parameter;
-import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
+import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 
 
-public class CVRPTWCordeau101GeoParallel 
+public class CVRPTWCordeau101GeoParte2 
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
 	private static final int INDIVIDUALS=30;
 	private static final int MAX_GENERATIONS=100;
- 
+	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
+	private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
+
 	public static void main( String[] args )
     {
 		double lat01Ini=-34.481013;
@@ -60,6 +65,8 @@ public class CVRPTWCordeau101GeoParallel
 		String wPath=WORK_PATH;
 		int individuals=INDIVIDUALS;
 		int maxGenerations=MAX_GENERATIONS;
+		String popFile=POP_FILE;
+		String customerRouteFile=CUSTOMER_ROUTE_FILES;
 		if (args!=null)
 			if (args.length==1)
 				wPath=args[0];
@@ -70,27 +77,35 @@ public class CVRPTWCordeau101GeoParallel
 					individuals=Integer.parseInt(args[1]);
 				}
 				else
-					if (args.length>2)
+					if (args.length==3)
 					{
 						wPath=args[0];
 						individuals=Integer.parseInt(args[1]);
 						maxGenerations=Integer.parseInt(args[2]);
 					}
+					else
+						if (args.length==4)
+						{
+							wPath=args[0];
+							individuals=Integer.parseInt(args[1]);
+							maxGenerations=Integer.parseInt(args[2]);
+							popFile=args[3];
+						}
+						else
+							if (args.length>4)
+							{
+								wPath=args[0];
+								individuals=Integer.parseInt(args[1]);
+								maxGenerations=Integer.parseInt(args[2]);
+								popFile=args[3];
+								customerRouteFile=args[4];
+							}
     	
     	try {
-    		
     		log.warn("Init");
-    		
-        	SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101GeoParallel");
-        	//SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
-            JavaSparkContext sc = new JavaSparkContext(conf);
-    		
     		
 			int[] holder=new int[3];		
 			Map<Integer, Customer> customers=CordeauGeodesicParser.parse(wPath+"c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
-
-			CustomersPersistence.writeCustomers(customers.values(), wPath+"customers101.txt");
-			
 			Individual<Integer[]> optInd=CordeauParser.parseSolution(wPath+"c101.res");
 
 			int m=holder[0]; // Vehiculos
@@ -104,8 +119,8 @@ public class CVRPTWCordeau101GeoParallel
 			String chromosomeName="X";
 			VRPCrossover cross; 
 			RoutesMorphogenesisAgent rma;
-	    	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
-		
+			PopulationInitializer<Integer[]> popI =new VRPFilePopulationInitializer(popFile);
+			
 
 			rma=new RoutesMorphogenesisAgent(customers);
 			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
@@ -114,25 +129,27 @@ public class CVRPTWCordeau101GeoParallel
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
-			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
+			Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(customerRouteFile);
+			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,10000000d,matrix);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			cross=new SBXCrossover(30d, c, m, fit);
 			cross.setMatrix(matrix);
 
-			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
-			((ParallelUniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
-			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
+			
+			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
+			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
+			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
 			rma.develop(genome, optInd);
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-	
+				
 			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, new DescendantAcceptEvaluator<Integer[]>(), 
-					fit, cross, new GVRMutatorRandom(), 
-					null, popI, null, new ProbabilisticRouletteSelector(), 
-					new GlobalSingleSparkPopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
-
-			SparkParallelGA<Integer[]> ga=new SparkParallelGA<Integer[]>(par,sc);
+									fit, cross, new GVRMutatorRandom(), 
+									null, popI, null, new ProbabilisticRouletteSelector(), 
+									new GlobalSinglePopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
+			
+			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
 			
 		
 			long t1=System.currentTimeMillis();
@@ -147,8 +164,6 @@ public class CVRPTWCordeau101GeoParallel
 			Calendar cal=Calendar.getInstance();
 			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
-			
-			
 			
 		} catch (YamikoException e) {
 			e.printStackTrace();
