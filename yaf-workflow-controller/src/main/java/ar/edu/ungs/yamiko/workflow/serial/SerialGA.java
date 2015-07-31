@@ -26,6 +26,13 @@ public class SerialGA<T> {
 		private long generationNumber=0;
 		private double bestFitness=0;
 		private Individual<T> bestInd;
+		private Population<T> finalPopulation;
+
+		
+		
+		public Population<T> getFinalPopulation() {
+			return finalPopulation;
+		}
 
 		public SerialGA(Parameter<T> parameter) throws YamikoException{
 			super();
@@ -107,7 +114,15 @@ public class SerialGA<T> {
 				
 			}
 			Logger.getLogger("file").warn("... Cumplidas " + generationNumber + " Generaciones.");
-			
+
+			for (Individual<T> individual : p)
+				if (individual.getFitness()==null)
+				{
+					parameter.getMorphogenesisAgent().develop(parameter.getGenome(),individual);
+					individual.setFitness(parameter.getFitnessEvaluator().execute(individual));
+				}
+			finalPopulation=p;
+
 			return bestInd;
 			
 		}

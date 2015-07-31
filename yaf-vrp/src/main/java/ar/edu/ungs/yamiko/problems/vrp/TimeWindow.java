@@ -164,5 +164,14 @@ public class TimeWindow implements Serializable{
 		return true;
 	}
 
-	
+	public int minGap(final Calendar t,int marginInMinutes)
+	{
+		if (t==null) return 0; // Algo con restricción intersecta a algo sin restricción
+		if (c2.after(t) && c1.before(t)) return 0;
+		long diff1 = Math.abs(c1.getTimeInMillis() - t.getTimeInMillis())/60000;
+		long diff2 = Math.abs(c2.getTimeInMillis() - t.getTimeInMillis())/60000;
+		int diff=new Long(Math.min(diff1, diff2)).intValue();
+		if (diff<marginInMinutes) return 0;
+		return diff;		
+	}
 }

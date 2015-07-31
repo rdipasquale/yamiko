@@ -11,6 +11,7 @@ import org.apache.spark.broadcast.Broadcast;
 
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
+import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability;
 import ar.edu.ungs.yamiko.ga.exceptions.NullAcceptEvaluator;
@@ -36,7 +37,13 @@ public class SparkParallelGA<T> implements Serializable{
 		private Individual<T> bestInd;
 		private Parameter<T> parameter;
 		private JavaSparkContext sc;
+		private Population<T> finalPopulation;
 		
+		
+		
+		public Population<T> getFinalPopulation() {
+			return finalPopulation;
+		}
 		public SparkParallelGA(Parameter<T> _parameter,JavaSparkContext _sc) {
 			parameter=_parameter;
 			sc=_sc;
@@ -126,7 +133,9 @@ public class SparkParallelGA<T> implements Serializable{
 				
 			}
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
-
+			
+			p.setRDD(helper.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
+			finalPopulation=p;
 			return bestInd;
 			
 		}

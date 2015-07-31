@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
@@ -14,12 +16,12 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
+import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
@@ -34,10 +36,10 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence;
 import ar.edu.ungs.yamiko.workflow.Parameter;
-import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
+import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
 
 
-public class CVRPTWCordeau101Geo 
+public class CVRPTWCordeau101GeoParallel 
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
@@ -76,7 +78,13 @@ public class CVRPTWCordeau101Geo
 					}
     	
     	try {
+    		
     		log.warn("Init");
+    		
+        	SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101GeoParallel");
+        	//SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
+            JavaSparkContext sc = new JavaSparkContext(conf);
+    		
     		
 			int[] holder=new int[3];		
 			Map<Integer, Customer> customers=CordeauGeodesicParser.parse(wPath+"c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
@@ -96,8 +104,8 @@ public class CVRPTWCordeau101Geo
 			String chromosomeName="X";
 			VRPCrossover cross; 
 			RoutesMorphogenesisAgent rma;
-			PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
-			
+	    	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
+		
 
 			rma=new RoutesMorphogenesisAgent(customers);
 			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
@@ -111,21 +119,20 @@ public class CVRPTWCordeau101Geo
 			cross=new SBXCrossover(30d, c, m, fit);
 			cross.setMatrix(matrix);
 
-			
-			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
-			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
-			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
+			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
+			((ParallelUniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
+			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
 			rma.develop(genome, optInd);
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
-				
+	
 			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, new DescendantAcceptEvaluator<Integer[]>(), 
-									fit, cross, new GVRMutatorRandom(), 
-									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSinglePopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
-			
-			SerialGA<Integer[]> ga=new SerialGA<Integer[]>(par);
+					fit, cross, new GVRMutatorRandom(), 
+					null, popI, null, new ProbabilisticRouletteSelector(), 
+					new GlobalSingleSparkPopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
+
+			SparkParallelGA<Integer[]> ga=new SparkParallelGA<Integer[]>(par,sc);
 			
 		
 			long t1=System.currentTimeMillis();

@@ -3,8 +3,6 @@ package ar.edu.ungs.yamiko.problems.vrp.entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import ar.edu.ungs.yamiko.problems.vrp.Customer;
-
 public class CustomerRoute implements Serializable{
 
 	/**
