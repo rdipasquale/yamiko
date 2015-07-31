@@ -90,8 +90,6 @@ public class VRPPopulationPersistence {
 			Configuration conf = new Configuration();
 			FileSystem fs = FileSystem.get(URI.create(dest), conf);
 			Path path = new Path(dest);
-			if (fs.exists(path))
-				fs.delete(path, true);
 		    FSDataInputStream fin = fs.open(path);		    
 		    BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
 

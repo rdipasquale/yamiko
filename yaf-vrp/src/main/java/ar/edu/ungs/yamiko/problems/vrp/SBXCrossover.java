@@ -87,7 +87,8 @@ public class SBXCrossover extends VRPCrossover{
 		for (Integer i : tTemp) 
 			if (!p1prima.contains(i))
 				pendientes.add(i);
-		p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
+		if (pendientes.size()>0)
+			p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 		
 		// 10) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-9.
 		breakPoint=StaticHelper.randomInt(r2.size());
@@ -106,7 +107,8 @@ public class SBXCrossover extends VRPCrossover{
 		for (Integer i : tTemp) 
 			if (!p2prima.contains(i))
 				pendientes.add(i);
-		p2prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p2prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
+		if (pendientes.size()>0)
+			p2prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p2prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 				
 		Integer[] desc1=p1prima.toArray(new Integer[0]);
 		Integer[] desc2=p2prima.toArray(new Integer[0]);

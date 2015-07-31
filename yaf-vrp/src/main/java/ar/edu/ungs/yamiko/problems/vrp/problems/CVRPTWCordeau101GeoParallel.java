@@ -43,8 +43,8 @@ public class CVRPTWCordeau101GeoParallel
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=30;
-	private static final int MAX_GENERATIONS=100;
+	private static final int INDIVIDUALS=250;
+	private static final int MAX_GENERATIONS=6000;
  
 	public static void main( String[] args )
     {

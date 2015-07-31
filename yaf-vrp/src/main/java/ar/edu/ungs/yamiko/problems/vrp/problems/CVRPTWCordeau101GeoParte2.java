@@ -20,13 +20,12 @@ import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWGeodesiacalGPSFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
-import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom;
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
@@ -34,10 +33,8 @@ import ar.edu.ungs.yamiko.problems.vrp.VRPFilePopulationInitializer;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalc;
-import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalcPersistence;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 
@@ -46,8 +43,8 @@ public class CVRPTWCordeau101GeoParte2
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=30;
-	private static final int MAX_GENERATIONS=100;
+	private static final int INDIVIDUALS=250;
+	private static final int MAX_GENERATIONS=6000;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
 
@@ -130,22 +127,17 @@ public class CVRPTWCordeau101GeoParte2
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
 			Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(customerRouteFile);
-			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,10000000d,matrix);
+			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
-			cross=new SBXCrossover(30d, c, m, fit);
+			cross=new SBXCrossover(30d, c, m, new CVRPTWSimpleFitnessEvaluator(new Double(c), 30d, m,matrix));
 			cross.setMatrix(matrix);
-
-			
-			((UniqueIntegerPopulationInitializer)popI).setMaxZeros(m);
-			((UniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
-			((UniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
-
+	
 			rma.develop(genome, optInd);
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 				
 			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, new DescendantAcceptEvaluator<Integer[]>(), 
-									fit, cross, new GVRMutatorRandom(), 
+									fit, cross, new GVRMutatorSwap(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
 									new GlobalSinglePopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
 			
@@ -162,8 +154,8 @@ public class CVRPTWCordeau101GeoParte2
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
 			
 			Calendar cal=Calendar.getInstance();
-			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
-			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salidaFase2-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaFase2BestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
 		} catch (YamikoException e) {
 			e.printStackTrace();

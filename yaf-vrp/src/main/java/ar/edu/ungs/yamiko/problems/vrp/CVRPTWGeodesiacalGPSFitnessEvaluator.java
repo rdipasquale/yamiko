@@ -49,6 +49,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 
 		double totalDist=0d;
 		double totalTime=0d;
+		int totalGap=0;
 		int gap=0;
 		
 		for (List<Integer> rr: rutas) {
@@ -56,6 +57,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 			List<Integer> r=new ArrayList<Integer>();
 			r.addAll(rr);
 			if (r.get(0)==0) r.remove(0);
+			if (r.get(r.size()-1)!=0) r.add(0);
 			
 			
 			Calendar t0=calcT0(r.get(0));
@@ -67,15 +69,16 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 				t0=minG._1();
 				gap=minG._2();
 			}
-			
+					
 			Tuple2<Double, Double> distTime=calcDistTime(r,t0);
 			
 			totalDist+=distTime._1();
 			totalTime+=distTime._2();
+			totalGap+=gap;
 			
 		}
 
-		return totalDist+(totalTime*60)+(totalTime*60)+(gap*TIMEWINDOWS_VIOLATION_WEIGHT);
+		return totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT);
 	}
 	
 	@Override
@@ -160,7 +163,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		for (int i=0;i<r.length;i++)
 		{
 			GeodesicalCustomer custI=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[i]);
-			t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());				
+			t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());
 			dist+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._1();				
 			time+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2();				
 			t.add(Calendar.MINUTE, custI.getServiceDuration());				
@@ -183,7 +186,12 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		Integer[] r=rr.toArray(new Integer[0]);
 		int gap=initGap;
 		GeodesicalCustomer cust1=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[0]);		
-		long t1Size=cust1.getTimeWindow().getC2().getTimeInMillis()-cust1.getTimeWindow().getC1().getTimeInMillis();
+		
+		long t1Size=0;
+		if (cust1.getTimeWindow()==null)
+			t1Size=techo.getTimeInMillis()-piso.getTimeInMillis();
+		else
+			t1Size=cust1.getTimeWindow().getC2().getTimeInMillis()-cust1.getTimeWindow().getC1().getTimeInMillis();
 		
 		t0.add(Calendar.MINUTE, CALC_MIN_GAP_INCREMENT_MINUTES*(-1));
 		while (gap>0 && t0.after(piso) &&  origT0.getTimeInMillis()-t0.getTimeInMillis()<t1Size)
