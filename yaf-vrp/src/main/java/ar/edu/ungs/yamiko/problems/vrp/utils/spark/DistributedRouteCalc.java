@@ -51,7 +51,7 @@ public class DistributedRouteCalc implements Serializable{
 					if (osmURI!=null && graphURI!=null)
 					{
 						CopyGraphToLocal.copy(osmURI.getValue(), localOsmURI.getValue());
-						CopyGraphToLocal.copy(graphURI.getValue() + "/"+t, localGraphURI.getValue()+ "/"+t);
+						CopyGraphToLocal.copy(graphURI.getValue() + "/"+t, localGraphURI.getValue());
 					}
 					
 					GraphHopper hopper = new GraphHopper().forServer();

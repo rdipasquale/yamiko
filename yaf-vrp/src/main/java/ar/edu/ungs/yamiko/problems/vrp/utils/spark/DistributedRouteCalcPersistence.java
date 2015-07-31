@@ -19,7 +19,7 @@ public class DistributedRouteCalcPersistence {
 
 		private static final String URI_TD="hdfs://192.168.1.40:9000/gps/buenos-aires_argentina.osm";
 		private static final String URI_GRAPH="hdfs://192.168.1.40:9000/gps/graph/truck/truck";
-		private static final String URI_SPARK="local[1]";
+		private static final String URI_SPARK="local[8]";
 		//private static final String URI_SPARK="spark://192.168.1.40:7077";
 		private static final String OSM_PATH="/media/ricardo/hd/gps/tmp/buenos-aires_argentina.osm";
 		private static final String GRAPHOPPER_LOCATION="/media/ricardo/hd/gps/tmp";

@@ -214,6 +214,11 @@ public class TestCordeauGeodesicalParser {
 					GHResponse rsp = hopper.route(req);
 					if(rsp.hasErrors()) 
 						Logger.getLogger(DistributedRouteCalc.class).error("La ruta entre " + i + " y " + j + " tiene errores. => [" + ((GeodesicalCustomer)i).getLatitude() + "," + ((GeodesicalCustomer)i).getLongitude() +"][" +((GeodesicalCustomer)j).getLatitude() +"," + ((GeodesicalCustomer)j).getLongitude() + "] En " + InetAddress.getLocalHost().getHostName() + " " + rsp.getErrors().get(0).getMessage()) ;
+					else
+					{
+						rsp.getTime();
+						rsp.getDistance();
+					}
 				}
 		
 		
