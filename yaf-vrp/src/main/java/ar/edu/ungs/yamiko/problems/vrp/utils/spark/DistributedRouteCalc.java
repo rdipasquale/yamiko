@@ -1,10 +1,14 @@
 package ar.edu.ungs.yamiko.problems.vrp.utils.spark;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -14,11 +18,13 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.broadcast.Broadcast;
 
+import scala.Tuple2;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.entities.CustomerRoute;
 import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CopyGraphToLocal;
+import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -38,7 +44,7 @@ public class DistributedRouteCalc implements Serializable{
 	public DistributedRouteCalc() {
 	}
 	
-	public static final JavaPairRDD<Customer, Iterable<CustomerRoute>> calc(final List<Integer> orderedKeySet,final Broadcast<List<Customer>> customers,final Broadcast<String> osmURI,final Broadcast<String> graphURI,final Broadcast<String> localGraphURI,final Broadcast<String> localOsmURI , final JavaSparkContext sc)
+	public static final JavaPairRDD<Integer, Iterable<CustomerRoute>> calc(final List<Integer> orderedKeySet,final Broadcast<List<Customer>> customers,final Broadcast<String> osmURI,final Broadcast<String> graphURI,final Broadcast<String> localGraphURI,final Broadcast<String> localOsmURI , final JavaSparkContext sc)
 	{		
 		JavaRDD<Integer> pHoras= sc.parallelize(orderedKeySet);
 		JavaRDD<CustomerRoute> pCustomerRoutes=pHoras.flatMap(new FlatMapFunction<Integer, CustomerRoute>() {
@@ -78,19 +84,19 @@ public class DistributedRouteCalc implements Serializable{
 									Instruction ins=it.next();
 									inst.add(ins.getName());
 								}							
-								((ArrayList<CustomerRoute>)salida).add(new CustomerRoute(i, j,t,rsp.getDistance(),new Double(rsp.getTime())/60000,inst));
+								((ArrayList<CustomerRoute>)salida).add(new CustomerRoute(i.getId(), j.getId(),t,rsp.getDistance(),new Double(rsp.getTime())/60000,inst));
 							}
 					
 					return salida;
 				}
 		});
 				
-		JavaPairRDD<Customer, Iterable<CustomerRoute>> pCustomers=pCustomerRoutes.groupBy(new Function<CustomerRoute, Customer>() {
+		JavaPairRDD<Integer, Iterable<CustomerRoute>> pCustomers=pCustomerRoutes.groupBy(new Function<CustomerRoute, Integer>() {
 
 			private static final long serialVersionUID = -4245501011431840837L;
 
 			@Override
-			public Customer call(CustomerRoute v1) throws Exception {
+			public Integer call(CustomerRoute v1) throws Exception {
 				return v1.getFrom();
 			}
 		});
@@ -98,6 +104,21 @@ public class DistributedRouteCalc implements Serializable{
 		pCustomers.cache();	
 		return pCustomers;
 		
+	}
+	
+	public static Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> getMapFromFile(String dest) throws IOException
+	{
+		if (dest==null) return null;
+		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> salida=new HashMap<Short, Map<Short,Map<Integer,Tuple2<Double,Double>>>>();;
+
+		Collection<CustomerRoute> customers=CustomersPersistence.readCustomerRoutes(dest);
+		for (CustomerRoute c: customers) {
+			if (salida.get(((short)(c.getFrom())))==null) salida.put(((short)(c.getFrom())), new HashMap<Short,Map<Integer,Tuple2<Double, Double>>>());
+			if (salida.get(((short)(c.getFrom()))).get(((short)(c.getTo())))==null) salida.get(((short)(c.getFrom()))).put(((short)(c.getTo())), new HashMap<Integer,Tuple2<Double, Double>>());
+			if (salida.get(((short)(c.getFrom()))).get(((short)(c.getTo()))).get(c.getTimeRange())==null) salida.get(((short)(c.getFrom()))).get(((short)(c.getTo()))).put(c.getTimeRange(), new Tuple2<Double, Double>(c.getDistance(),c.getTime()));			
+		}
+		
+		return salida;
 	}
 
 }

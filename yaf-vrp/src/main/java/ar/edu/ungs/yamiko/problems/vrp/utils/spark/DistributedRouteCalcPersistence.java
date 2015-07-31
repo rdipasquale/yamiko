@@ -145,11 +145,11 @@ public class DistributedRouteCalcPersistence {
 			final Broadcast<String> bgraphopperL=sc.broadcast(graphopperL);
 			final Broadcast<String> bosmPath=sc.broadcast(osmPath);
   								
-			JavaPairRDD<Customer, Iterable<CustomerRoute>> rutas=DistributedRouteCalc.calc(orderedKeySet, bCustomers, bosmURI, bgraphURI, bgraphopperL, bosmPath, sc);
+			JavaPairRDD<Integer, Iterable<CustomerRoute>> rutas=DistributedRouteCalc.calc(orderedKeySet, bCustomers, bosmURI, bgraphURI, bgraphopperL, bosmPath, sc);
 			
 			List<CustomerRoute> aPersistir=new ArrayList<CustomerRoute>();
 			for (Customer c : customers) {
-				List<Iterable<CustomerRoute>> routes=rutas.lookup(c);
+				List<Iterable<CustomerRoute>> routes=rutas.lookup(c.getId());
 				for (Iterable<CustomerRoute> iterable : routes) 
 					for (CustomerRoute customerRoute : iterable) 
 						aPersistir.add(customerRoute);

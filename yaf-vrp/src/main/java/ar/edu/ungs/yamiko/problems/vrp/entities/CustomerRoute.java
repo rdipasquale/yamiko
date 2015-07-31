@@ -11,22 +11,22 @@ public class CustomerRoute implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -6054530731211154704L;
-	private Customer from;
-	private Customer to;
+	private int from;
+	private int to;
 	private Integer timeRange;
 	private Double distance;
 	private Double time;
 	private ArrayList<String> route;
-	public Customer getFrom() {
+	public int getFrom() {
 		return from;
 	}
-	public void setFrom(Customer from) {
+	public void setFrom(int from) {
 		this.from = from;
 	}
-	public Customer getTo() {
+	public int getTo() {
 		return to;
 	}
-	public void setTo(Customer to) {
+	public void setTo(int to) {
 		this.to = to;
 	}
 	public Double getDistance() {
@@ -52,7 +52,7 @@ public class CustomerRoute implements Serializable{
 	public CustomerRoute() {
 		// TODO Auto-generated constructor stub
 	}
-	public CustomerRoute(Customer from, Customer to) {
+	public CustomerRoute(int from, int to) {
 		super();
 		this.from = from;
 		this.to = to;
@@ -62,13 +62,30 @@ public class CustomerRoute implements Serializable{
 		return "CustomerRoute [from=" + from + ", to=" + to + ", distance="
 				+ distance + ", time=" + time + "]";
 	}
+	public Integer getTimeRange() {
+		return timeRange;
+	}
+	public void setTimeRange(Integer timeRange) {
+		this.timeRange = timeRange;
+	}
+	public CustomerRoute(int from, int to, Integer timeRange,
+			Double distance, Double time, ArrayList<String> route) {
+		super();
+		this.from = from;
+		this.to = to;
+		this.timeRange = timeRange;
+		this.distance = distance;
+		this.time = time;
+		this.route = route;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + from;
 		result = prime * result
-				+ ((distance == null) ? 0 : distance.hashCode());
-		result = prime * result + ((from == null) ? 0 : from.hashCode());
+				+ ((timeRange == null) ? 0 : timeRange.hashCode());
+		result = prime * result + to;
 		return result;
 	}
 	@Override
@@ -80,35 +97,19 @@ public class CustomerRoute implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		CustomerRoute other = (CustomerRoute) obj;
-		if (distance == null) {
-			if (other.distance != null)
-				return false;
-		} else if (!distance.equals(other.distance))
+		if (from != other.from)
 			return false;
-		if (from == null) {
-			if (other.from != null)
+		if (timeRange == null) {
+			if (other.timeRange != null)
 				return false;
-		} else if (!from.equals(other.from))
+		} else if (!timeRange.equals(other.timeRange))
+			return false;
+		if (to != other.to)
 			return false;
 		return true;
 	}
-	public Integer getTimeRange() {
-		return timeRange;
-	}
-	public void setTimeRange(Integer timeRange) {
-		this.timeRange = timeRange;
-	}
-	public CustomerRoute(Customer from, Customer to, Integer timeRange,
-			Double distance, Double time, ArrayList<String> route) {
-		super();
-		this.from = from;
-		this.to = to;
-		this.timeRange = timeRange;
-		this.distance = distance;
-		this.time = time;
-		this.route = route;
-	}
 
+	
 	
 	
 	
