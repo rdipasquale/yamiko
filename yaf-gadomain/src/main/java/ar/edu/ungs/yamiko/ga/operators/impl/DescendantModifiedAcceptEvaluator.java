@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.operators.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -20,7 +21,12 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  * @author ricardo
  * @param <T>
  */
-public class DescendantModifiedAcceptEvaluator<T> implements AcceptEvaluator<T>{
+public class DescendantModifiedAcceptEvaluator<T> implements AcceptEvaluator<T>,Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 824855310682963336L;
 
 	public static final Double PROB_ACEPT=0.5;
 	
@@ -60,14 +66,15 @@ public class DescendantModifiedAcceptEvaluator<T> implements AcceptEvaluator<T>{
 	public List<Individual<T>> execute(List<Individual<T>> children,
 			List<Individual<T>> parents) {
 
-		Collections.sort(parents, new FitnessComparator<T>());
-
 		for (Individual<T> i : parents) 
 			if (i.getFitness()==null)
 			{
 				getMorphogenesisAgent().develop(getGenome(),i);
 				i.setFitness(getFitnessEvaluator().execute(i));	
 			}
+		
+		Collections.sort(parents, new FitnessComparator<T>());
+		
 		for (Individual<T> i : children) 
 			if (i.getFitness()==null)
 			{

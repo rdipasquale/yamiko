@@ -19,7 +19,6 @@ import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
-import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
@@ -45,8 +44,8 @@ public class CVRPTWCordeau101GeoParte2
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=250;
-	private static final int MAX_GENERATIONS=6000;
+	private static final int INDIVIDUALS=200;
+	private static final int MAX_GENERATIONS=10000;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
 

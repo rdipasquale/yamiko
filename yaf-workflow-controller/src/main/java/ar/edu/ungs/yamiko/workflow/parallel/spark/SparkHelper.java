@@ -64,7 +64,7 @@ public class SparkHelper<T> implements Serializable {
 			@Override
 			public List<Individual<T>> call(List<Individual<T>> parents) throws Exception {
 				if (StaticHelper.randomDouble(1d)<=bcCrossProb.getValue())
-					return bcDesc.getValue().execute(parents, bcCross.getValue().execute(parents));
+					return bcDesc.getValue().execute(bcCross.getValue().execute(parents),parents);
 				else
 					return null;
 			}

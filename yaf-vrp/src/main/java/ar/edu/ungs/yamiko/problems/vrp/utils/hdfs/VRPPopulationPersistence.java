@@ -77,6 +77,32 @@ public class VRPPopulationPersistence {
 		    writer.close();
 		}
 	}
+
+	public static final void writePopulation(Collection<Individual<Integer[]>> pop,String dest) throws IOException
+	{
+		if (dest==null) return;
+		ObjectMapper om=new ObjectMapper();
+
+		if (dest.contains("hdfs:"))
+		{
+			Configuration conf = new Configuration();
+			FileSystem fs = FileSystem.get(URI.create(dest), conf);
+			Path path = new Path(dest);
+			if (fs.exists(path))
+				fs.delete(path, true);
+		    FSDataOutputStream fin = fs.create(path);
+		    for (Individual<Integer[]> c: pop) 
+		    	fin.writeBytes(om.writeValueAsString(new VRPIndividualDto(c.getFitness(),c.getGenotype().getChromosomes().get(0).getFullRawRepresentation(),c.getId()))+"\n");
+		    fin.close();
+		}
+		else
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
+		    for (Individual<Integer[]> c: pop) 
+		    	writer.write(om.writeValueAsString(new VRPIndividualDto(c.getFitness(),c.getGenotype().getChromosomes().get(0).getFullRawRepresentation(),c.getId()))+"\n");
+		    writer.close();
+		}
+	}
 	
 	public static final Collection<VRPIndividualDto> readPopulation(String dest) throws IOException
 	{

@@ -18,6 +18,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
+import ar.edu.ungs.yamiko.workflow.BestIndHolder;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
 public class SerialGA<T> {
@@ -61,6 +62,7 @@ public class SerialGA<T> {
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 				Individual<T> bestIndGen=p.iterator().next();
+				BestIndHolder.holdBestInd(bestIndGen);
 				for (Individual<T> individual : p)
 				{
 					if (individual.getFitness()==null)
@@ -72,11 +74,16 @@ public class SerialGA<T> {
 					{
 						bestFitness=individual.getFitness();
 						bestInd=individual;
+						BestIndHolder.holdBestInd(bestIndGen);						
 					}
 					if (individual.getFitness()>bestIndGen.getFitness())
+					{
 						bestIndGen=individual;
+						BestIndHolder.holdBestInd(bestIndGen);						
+					}
 				}
-				Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness());
+				if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness());
 
 				parameter.getSelector().setPopulation(p);
 				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
@@ -108,8 +115,8 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
-				if ((generationNumber % 100)==0) 
-					Logger.getLogger("file").warn("Generation " + generationNumber + "...");
+//				if ((generationNumber % 100)==0) 
+//					Logger.getLogger("file").warn("Generation " + generationNumber + "...");
 				
 				
 			}

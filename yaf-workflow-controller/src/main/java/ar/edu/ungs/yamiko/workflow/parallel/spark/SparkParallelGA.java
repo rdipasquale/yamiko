@@ -25,6 +25,7 @@ import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
 import ar.edu.ungs.yamiko.ga.operators.Mutator;
+import ar.edu.ungs.yamiko.workflow.BestIndHolder;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 
 public class SparkParallelGA<T> implements Serializable{
@@ -82,12 +83,15 @@ public class SparkParallelGA<T> implements Serializable{
 			{
 				p.setRDD(helper.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
 				Individual bestOfGeneration=helper.findBestIndividual(p.getRDD(), sc);
+				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
 				{
 					bestFitness=bestOfGeneration.getFitness();
 					bestInd=bestOfGeneration;					
 				}
-				Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+
+				//if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 
 				parameter.getSelector().setPopulation(p);
 				final List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
@@ -126,8 +130,8 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				generationNumber++;
 				
-				if ((generationNumber % 100)==0) 
-					Logger.getLogger("file").warn("Generation " + generationNumber);
+//				if ((generationNumber % 100)==0) 
+//					Logger.getLogger("file").warn("Generation " + generationNumber);
 				
 			}
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");

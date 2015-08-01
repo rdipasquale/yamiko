@@ -1,7 +1,9 @@
 package ar.edu.ungs.yamiko.problems.vrp.problems;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
+import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
@@ -36,6 +39,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence;
+import ar.edu.ungs.yamiko.workflow.BestIndHolder;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
 
@@ -44,9 +48,10 @@ public class CVRPTWCordeau101GeoParallel
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=250;
-	private static final int MAX_GENERATIONS=6000;
+	private static final int INDIVIDUALS=200;
+	private static final int MAX_GENERATIONS=10000;
  
+	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
     {
 		double lat01Ini=-34.481013;
@@ -114,7 +119,7 @@ public class CVRPTWCordeau101GeoParallel
 			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
-			
+			BestIndHolder.setFitnessComparator(new FitnessComparator<Integer[]>());
 			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			cross=new SBXCrossover(30d, c, m, fit);
@@ -150,6 +155,12 @@ public class CVRPTWCordeau101GeoParallel
 			Calendar cal=Calendar.getInstance();
 			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+	
+			Collection<Individual<Integer[]>> bestIndSet=new ArrayList<Individual<Integer[]>>();
+			for (Individual<Integer[]> individual : BestIndHolder.getBest()) 
+				bestIndSet.add((Individual<Integer[]>)individual);
+			
+			VRPPopulationPersistence.writePopulation(bestIndSet ,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
 			
 			

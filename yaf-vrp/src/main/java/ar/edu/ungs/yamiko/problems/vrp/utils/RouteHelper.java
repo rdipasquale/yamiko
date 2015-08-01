@@ -10,7 +10,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.apache.xerces.dom.DeepNodeListImpl;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -21,7 +20,6 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
-import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
@@ -326,8 +324,10 @@ public class RouteHelper {
 	 */
 	public static final List<List<Integer>> convertListIntoListOfLists(List<Integer> inds)
 	{
+		if(inds==null) return null;
 		List<List<Integer>> salida=new ArrayList<List<Integer>>();
-		
+		if(inds.size()==0) return salida;
+		if (inds.get(0)!=0) inds.add(0,0);
 		int pivote=-1;
 		for (Integer i: inds) {
 			if (i==0)
