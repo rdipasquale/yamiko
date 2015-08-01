@@ -1,6 +1,8 @@
 package ar.edu.ungs.yamiko.problems.vrp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -36,11 +38,14 @@ public class SBXCrossover extends VRPCrossover{
 	private int capacity;
 	private int vehicles;
 	private VRPFitnessEvaluator vrp;
+	private int minVehicles;
+	private static final Double PROB_DESC_VEHICLES=0.3d;
 	
 	public SBXCrossover(double vel,int _capacity, int _vehicles, VRPFitnessEvaluator _vrp) {
 		avgVelocity=vel;
 		capacity=_capacity;
 		vehicles=_vehicles;
+		minVehicles=_vehicles-2;
 		vrp=_vrp;
 	}	
 
@@ -90,6 +95,27 @@ public class SBXCrossover extends VRPCrossover{
 		if (pendientes.size()>0)
 			p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 		
+		/** DEBUG **/
+		HashSet<Integer> p1p=new HashSet<Integer>();
+		p1p.addAll(p1prima);
+		List<Integer> p1pepe=IntegerStaticHelper.deepCopyIndasList(p1);
+		HashSet<Integer> p1solo=new HashSet<Integer>();
+		p1solo.addAll(p1pepe);		
+		if (p1p.size()<p1solo.size())
+			System.out.println("EError");
+		
+		int cerosP1p=Collections.frequency(p1prima, 0);
+		if (cerosP1p<minVehicles)
+		{
+			p1prima=RouteHelper.splitRoutes(p1prima, minVehicles-cerosP1p);
+			cerosP1p=Collections.frequency(p1prima, 0);
+		}
+		int cerosP1=Collections.frequency(p1pepe, 0);
+		if (cerosP1p<cerosP1)
+			if (StaticHelper.randomDouble(1)>PROB_DESC_VEHICLES)
+				p1prima=RouteHelper.splitRoutes(p1prima, 1);
+
+		
 		// 10) Se crea el descendiente D2 de manera recíproca analogando los puntos 2-9.
 		breakPoint=StaticHelper.randomInt(r2.size());
 		sNew=new ArrayList<Integer>();
@@ -109,7 +135,29 @@ public class SBXCrossover extends VRPCrossover{
 				pendientes.add(i);
 		if (pendientes.size()>0)
 			p2prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p2prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
-				
+
+		
+		/** DEBUG **/
+		HashSet<Integer> p2p=new HashSet<Integer>();
+		p2p.addAll(p2prima);
+		List<Integer> p2pepe=IntegerStaticHelper.deepCopyIndasList(p2);
+		HashSet<Integer> p2solo=new HashSet<Integer>();
+		p2solo.addAll(p2pepe);		
+		if (p2p.size()<p2solo.size())
+			System.out.println("EError");
+		
+		int cerosP2p=Collections.frequency(p2prima, 0);
+		if (cerosP2p<minVehicles)
+		{
+			p2prima=RouteHelper.splitRoutes(p2prima, minVehicles-cerosP2p);
+			cerosP2p=Collections.frequency(p2prima, 0);
+		}
+		int cerosP2=Collections.frequency(p2pepe, 0);
+		if (cerosP2p<cerosP2)
+			if (StaticHelper.randomDouble(1)>PROB_DESC_VEHICLES)
+				p2prima=RouteHelper.splitRoutes(p2prima, 1);
+
+		
 		Integer[] desc1=p1prima.toArray(new Integer[0]);
 		Integer[] desc2=p2prima.toArray(new Integer[0]);
 		Individual<Integer[]> d1=IntegerStaticHelper.create(p1.getGenotype().getChromosomes().get(0).name(), desc1);

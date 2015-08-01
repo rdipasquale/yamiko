@@ -23,5 +23,10 @@ public interface AcceptEvaluator<T> {
 	 * @return			-> List<Individual<T>>
 	 */
 	public List<Individual<T>> execute(List<Individual<T>> children, List<Individual<T>> parents);
-
+	
+	/**
+	 * Indica si es un evaluador de aceptación que desarrolla los individuos o no.
+	 * @return
+	 */
+	public boolean isDevelopsIndividuals();
 }

@@ -22,6 +22,9 @@ public class DescendantAcceptEvaluator<T> implements AcceptEvaluator<T>{
 	public DescendantAcceptEvaluator() {
 	}
 	
-	
+	@Override
+	public boolean isDevelopsIndividuals() {
+		return false;
+	}
 	
 }

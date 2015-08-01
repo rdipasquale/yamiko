@@ -20,6 +20,7 @@ import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
@@ -70,6 +71,7 @@ public class SparkParallelGA<T> implements Serializable{
 			final Broadcast<Double> bcCrossProb=sc.broadcast(parameter.getCrossoverProbability());
 			final Broadcast<Mutator<T>> bcMut=sc.broadcast(parameter.getMutator());
 			final Broadcast<Double> bcMutProb=sc.broadcast(parameter.getMutationProbability());
+			final Broadcast<AcceptEvaluator<T>> bcDesc=sc.broadcast(parameter.getAcceptEvaluator());
 			
 			SparkHelper<T> helper=new SparkHelper<T>();
 			
@@ -101,11 +103,7 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				JavaRDD<List<Individual<T>>> tuplasRDD=sc.parallelize(tuplas);
 
-				JavaRDD<List<Individual<T>>> descendantsRDD=helper.crossover(tuplasRDD,bcCross,bcCrossProb,sc);
-				
-				// FIXME: Con la política de reemplazos que implementé tengo un problema: busca al padre para reemplazar... Por tanto si hay un padre
-				// que se reproduce mucho por su performance, lo va a reemplazar una vez y no va a incorporar toda su desdendencia...
-				// Corregir en la versión serial!!!! FIXED!
+				JavaRDD<List<Individual<T>>> descendantsRDD=helper.crossover(tuplasRDD,bcCross,bcCrossProb,bcDesc,sc);
 				
 				List<List<Individual<T>>> descendants=descendantsRDD.collect();
 				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
@@ -128,8 +126,8 @@ public class SparkParallelGA<T> implements Serializable{
 				
 				generationNumber++;
 				
-				//if (Math.IEEEremainder(generationNumber,100)==0) 
-				Logger.getLogger("file").warn("Generation " + generationNumber);
+				if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Generation " + generationNumber);
 				
 			}
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");

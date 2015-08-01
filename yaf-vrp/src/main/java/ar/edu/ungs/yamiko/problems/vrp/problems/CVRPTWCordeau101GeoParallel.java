@@ -18,8 +18,9 @@ import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
-import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator;
+import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
@@ -123,11 +124,13 @@ public class CVRPTWCordeau101GeoParallel
 			((ParallelUniqueIntegerPopulationInitializer)popI).setStartWithZero(true);
 			((ParallelUniqueIntegerPopulationInitializer)popI).setMaxValue(n);	
 
+			AcceptEvaluator<Integer[]> acceptEvaluator=new DescendantModifiedAcceptEvaluator<Integer[]>(rma,genome,fit);
+
 			rma.develop(genome, optInd);
 			Double fitnesOptInd=fit.execute(optInd);
 			log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 	
-			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, new DescendantAcceptEvaluator<Integer[]>(), 
+			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, acceptEvaluator, 
 					fit, cross, new GVRMutatorRandom(), 
 					null, popI, null, new ProbabilisticRouletteSelector(), 
 					new GlobalSingleSparkPopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);

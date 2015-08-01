@@ -108,11 +108,12 @@ public class SerialGA<T> {
 				
 				generationNumber++;
 				
-				//if (Math.IEEEremainder(generationNumber,1000)==0) 
-				Logger.getLogger("file").warn("Generation " + generationNumber + "...");
+				if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Generation " + generationNumber + "...");
 				
 				
 			}
+			
 			Logger.getLogger("file").warn("... Cumplidas " + generationNumber + " Generaciones.");
 
 			for (Individual<T> individual : p)

@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.apache.xerces.dom.DeepNodeListImpl;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -20,6 +21,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped;
+import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
@@ -316,6 +318,38 @@ public class RouteHelper {
 				});
 		return rutasNoVacias;
 	}
+	
+	/**
+	 * Convierte una tira de clientes única en una lista de listas
+	 * @param inds
+	 * @return
+	 */
+	public static final List<List<Integer>> convertListIntoListOfLists(List<Integer> inds)
+	{
+		List<List<Integer>> salida=new ArrayList<List<Integer>>();
+		
+		int pivote=-1;
+		for (Integer i: inds) {
+			if (i==0)
+			{
+				pivote++;
+				salida.add(new ArrayList<Integer>());
+			}
+			salida.get(pivote).add(i);			
+		}
+		return salida;
+	}
+	
+	/**
+	 * Devuelve las rutas ordenadas por logitud decreciente a partir de una lista de enteros
+	 * @param inds
+	 * @return
+	 * @throws IndividualNotDeveloped
+	 */
+	public static final List<List<Integer>> getOrdereredRouteListFromListInt(List<Integer> inds) 
+	{
+		return getOrdereredRouteListFromList(convertListIntoListOfLists(inds));
+	}	
 
 	/**
 	 * Crea un grafo representando la solución al VRP a partir de un individuo
@@ -513,9 +547,48 @@ public class RouteHelper {
 	 */
 	public static final List<List<Integer>> insertClientsFullRestriction(List<Integer> clients,List<Integer> dest, DistanceMatrix matrix,double avgVelocity,int capacity,int vehicles,VRPFitnessEvaluator vrp)
 	{
+		List<Integer> deepCopyDest=new ArrayList<Integer>();
+		deepCopyDest.addAll(dest);
+		
 		List<List<Integer>> dest2=new ArrayList<List<Integer>>();
 		dest2.add(dest);
-		return insertClientsFullRestriction(clients, matrix,avgVelocity,capacity,vehicles,dest2,vrp);
+		List<List<Integer>> salida=insertClientsFullRestriction(clients, matrix,avgVelocity,capacity,vehicles,dest2,vrp);
+		
+		List<Integer> faltantes=new ArrayList<Integer>();
+		for (Integer i : deepCopyDest) 
+		{
+			boolean found=false;
+			for (List<Integer> li : salida)
+				if (li.contains(i))
+				{
+					found=true;
+					break;
+				}
+			if (!found) faltantes.add(i);
+		}
+		for (Integer i : clients) 
+		{
+			boolean found=false;
+			for (List<Integer> li : salida)
+				if (li.contains(i))
+				{
+					found=true;
+					break;
+				}
+			if (!found) faltantes.add(i);
+		}
+		if (faltantes.size()==0) return salida;
+		if (salida.size()<vehicles)
+		{
+			faltantes.add(0,0);
+			salida.add(faltantes);
+		}
+		else
+		{
+			salida=getOrdereredRouteListFromList(salida);
+			salida.get(salida.size()-1).addAll(faltantes);
+		}
+		return salida;
 	}
 
 	/**
@@ -638,7 +711,7 @@ public class RouteHelper {
 				}					
 			}
 		}
-		if ((System.currentTimeMillis()-ts)>2000) System.out.println("FIN - Insert Full REstriction " + (System.currentTimeMillis()-ts) + "ms");
+		if ((System.currentTimeMillis()-ts)>5000) System.out.println("FIN - Insert Full REstriction " + (System.currentTimeMillis()-ts) + "ms");
 		return graphToListOfLists(g);
 	}
 
@@ -703,4 +776,24 @@ public class RouteHelper {
 		return newGraph;
 	}	
 
+	/**
+	 * Divide la lista en más rutas... En la práctica, inserta ceros en las secuencias más largas
+	 * @param clients
+	 * @param howManyRoutes
+	 * @return
+	 */
+	public static final List<Integer> splitRoutes(List<Integer> clients,int howManyRoutes)
+	{
+		for (int i=0;i<howManyRoutes;i++)
+		{
+			List<List<Integer>> lista=getOrdereredRouteListFromListInt(clients);
+			int mitad=(lista.get(0).size()/2)-1;
+			if (mitad>=lista.get(0).size()) mitad--;
+			if (mitad<0) mitad=0;
+			clients.add(clients.indexOf(lista.get(0).get(mitad)),0);
+		}
+		return clients;
+	}
+	
+	
 }

@@ -12,6 +12,7 @@ import org.apache.spark.broadcast.Broadcast;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
 import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator;
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.Crossover;
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent;
@@ -56,14 +57,14 @@ public class SparkHelper<T> implements Serializable {
 		
 	}
 	
-	protected JavaRDD<List<Individual<T>>> crossover(final JavaRDD<List<Individual<T>>> tuplasRDD,final Broadcast<Crossover<T>> bcCross,final Broadcast<Double> bcCrossProb,final JavaSparkContext sc)
+	protected JavaRDD<List<Individual<T>>> crossover(final JavaRDD<List<Individual<T>>> tuplasRDD,final Broadcast<Crossover<T>> bcCross,final Broadcast<Double> bcCrossProb,final Broadcast<AcceptEvaluator<T>> bcDesc,final JavaSparkContext sc)
 	{
 		return tuplasRDD.map(new Function<List<Individual<T>>, List<Individual<T>>>(){
 			private static final long serialVersionUID = 3681838353965887520L;
 			@Override
 			public List<Individual<T>> call(List<Individual<T>> parents) throws Exception {
 				if (StaticHelper.randomDouble(1d)<=bcCrossProb.getValue())
-					return bcCross.getValue().execute(parents);
+					return bcDesc.getValue().execute(parents, bcCross.getValue().execute(parents));
 				else
 					return null;
 			}
