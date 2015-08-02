@@ -15,7 +15,6 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
@@ -103,8 +102,6 @@ public class CVRPTWCordeau101Geo
 			RoutesMorphogenesisAgent rma;
 			PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
 			
-			BestIndHolder.setFitnessComparator(new FitnessComparator<Integer[]>());
-
 			rma=new RoutesMorphogenesisAgent(customers);
 			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 			translators.put(gene, ribosome);
@@ -144,9 +141,21 @@ public class CVRPTWCordeau101Geo
 
 			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
+			log.warn("Promedio -> " + (par.getMaxGenerations()/new Double(par.getMaxGenerations()))+ " ms/generacion");
+
+			double prom=0d;
+			int cont=0;
+			for (Individual<Integer[]> i : ga.getFinalPopulation()) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio población final =" +prom);
+			
 			
 			Calendar cal=Calendar.getInstance();
-			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");			
 			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
 			Collection<Individual<Integer[]>> bestIndSet=new ArrayList<Individual<Integer[]>>();
@@ -154,6 +163,17 @@ public class CVRPTWCordeau101Geo
 				bestIndSet.add((Individual<Integer[]>)individual);
 			
 			VRPPopulationPersistence.writePopulation(bestIndSet ,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+
+			prom=0d;
+			cont=0;
+			for (Individual<Integer[]> i : bestIndSet) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio mejores individuos =" +prom);
+			
 			
 		} catch (YamikoException e) {
 			e.printStackTrace();

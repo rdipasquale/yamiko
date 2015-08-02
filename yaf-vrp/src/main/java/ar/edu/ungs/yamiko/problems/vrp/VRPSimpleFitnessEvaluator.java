@@ -57,7 +57,7 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		}
 		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
 		fitness+=maxVehPenal;
-		fitness+=fitness*calcOmitPenalty(rutas);
+		fitness+=fitness*calcOmitPenalty(rutas,getMatrix().getCustomers().size());
 		return fitness;
 	}
 	

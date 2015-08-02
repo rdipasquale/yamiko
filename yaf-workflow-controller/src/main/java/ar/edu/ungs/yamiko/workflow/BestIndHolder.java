@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
-import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator;
+import ar.edu.ungs.yamiko.ga.domain.impl.FitnessInvertedComparator;
 
 @SuppressWarnings("rawtypes")
 public class BestIndHolder implements Serializable{
@@ -19,18 +19,8 @@ public class BestIndHolder implements Serializable{
 	public static int CAPACITY=100;
 	
 	private static ArrayList<Individual>best=new ArrayList<Individual>();
-	private static FitnessComparator fitnessComparator;
+	private static FitnessInvertedComparator fitnessComparator=new FitnessInvertedComparator<Integer[]>();
 	
-	
-	
-	public static FitnessComparator getFitnessComparator() {
-		return fitnessComparator;
-	}
-
-	public static void setFitnessComparator(FitnessComparator fitnessComparator) {
-		BestIndHolder.fitnessComparator = fitnessComparator;
-	}
-
 	public static void holdBestIndCol(Collection<Individual> col)
 	{
 		for (Individual i : col) {

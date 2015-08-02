@@ -3,6 +3,7 @@ package ar.edu.ungs.yamiko.problems.vrp.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -794,6 +795,22 @@ public class RouteHelper {
 		}
 		return clients;
 	}
-	
+
+	/**
+	 * Quita duplicados de una lista de enteros que no sean 0
+	 * @param listContainingDuplicates
+	 * @return
+	 */
+	public static void removeDuplicates(List<Integer> listContainingDuplicates) {
+		 
+		final Set<Integer> setToReturn = new HashSet<Integer>();
+		final Set<Integer> set1 = new HashSet<Integer>();
+ 
+		for (Integer yourInt : listContainingDuplicates) 
+			if (yourInt!=0) if (!set1.add(yourInt)) setToReturn.add(yourInt);
+			
+		for (Integer integer : setToReturn) 
+			listContainingDuplicates.remove((Object)integer);
+	}
 	
 }

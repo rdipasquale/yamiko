@@ -18,7 +18,6 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
-import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
@@ -122,7 +121,6 @@ public class CVRPTWCordeau101GeoParallel
 			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
-			BestIndHolder.setFitnessComparator(new FitnessComparator<Integer[]>());
 			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			cross=new SBXCrossover(30d, c, m, fit);
@@ -154,6 +152,17 @@ public class CVRPTWCordeau101GeoParallel
 
 			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
+			log.warn("Promedio -> " + (par.getMaxGenerations()/new Double(par.getMaxGenerations()))+ " ms/generacion");
+		
+			double prom=0d;
+			int cont=0;
+			for (Individual<Integer[]> i : ga.getFinalPopulation()) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio población final =" +prom);
 			
 			Calendar cal=Calendar.getInstance();
 			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
@@ -165,6 +174,15 @@ public class CVRPTWCordeau101GeoParallel
 			
 			VRPPopulationPersistence.writePopulation(bestIndSet ,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
+			prom=0d;
+			cont=0;
+			for (Individual<Integer[]> i : bestIndSet) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio mejores individuos =" +prom);
 			
 			
 		} catch (YamikoException e) {

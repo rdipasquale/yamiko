@@ -62,6 +62,8 @@ public class SerialGA<T> {
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 				Individual<T> bestIndGen=p.iterator().next();
+				double fitnessProm=0d;
+				int cont=0;
 				for (Individual<T> individual : p)
 				{
 					if (individual.getFitness()==null)
@@ -80,9 +82,12 @@ public class SerialGA<T> {
 						bestIndGen=individual;
 						BestIndHolder.holdBestInd(bestIndGen);						
 					}
+					fitnessProm+=individual.getFitness();
+					cont++;
 				}
-				if ((generationNumber % 100)==0) 
-					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness());
+				fitnessProm=fitnessProm/cont;
+				//if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness() + " -- fitness promedio: " + fitnessProm);
 
 				parameter.getSelector().setPopulation(p);
 				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);

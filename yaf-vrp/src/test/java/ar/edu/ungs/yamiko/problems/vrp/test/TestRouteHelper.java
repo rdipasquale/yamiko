@@ -42,6 +42,8 @@ import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer;
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.TimeWindow;
+import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
+import ar.edu.ungs.yamiko.problems.vrp.VRPSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 
 public class TestRouteHelper {
@@ -786,4 +788,64 @@ public class TestRouteHelper {
 		assertNotNull(prueba);
 	}
 
+	@Test
+	public void testRemoveDuplicates()
+	{
+		List<Integer> l =new ArrayList<Integer>();
+		l.add(0);
+		l.add(1);
+		l.add(2);
+		l.add(3);
+		l.add(4);
+		l.add(5);
+		l.add(0);
+		l.add(2);
+		l.add(3);
+		l.add(3);
+		l.add(4);
+		l.add(5);
+		l.add(6);
+		l.add(7);
+		l.add(0);
+		l.add(0);
+		RouteHelper.removeDuplicates(l);
+		assertTrue(l.size()==12);
+	}
+	
+	@Test
+	public void testCountDuplicates()
+	{
+		List<Integer> l =new ArrayList<Integer>();
+		l.add(0);
+		l.add(1);
+		l.add(2);
+		List<Integer> l2 =new ArrayList<Integer>();
+		l2.add(3);
+		l2.add(4);
+		l2.add(5);
+		List<Integer> l3 =new ArrayList<Integer>();
+		l3.add(0);
+		l3.add(2);
+		l3.add(3);
+		List<Integer> l4 =new ArrayList<Integer>();
+		l4.add(3);
+		l4.add(4);
+		l4.add(5);
+		List<List<Integer>> r1 =new ArrayList<List<Integer>>();
+		r1.add(l);
+		r1.add(l2);
+		List<List<Integer>> r2 =new ArrayList<List<Integer>>();
+		r2.add(l3);
+		r2.add(l4);
+		VRPFitnessEvaluator v=new VRPSimpleFitnessEvaluator(0d,0,null);
+		int a=v.calcDuplicatePenalty(r1, 5);
+		int b=v.calcDuplicatePenalty(r2, 5);
+		r1.add(l3);
+		int c=v.calcDuplicatePenalty(r1, 5);
+		
+		assertTrue(a==0);
+		assertTrue(b==1);
+		assertTrue(c==2);
+	}	
+	
 }

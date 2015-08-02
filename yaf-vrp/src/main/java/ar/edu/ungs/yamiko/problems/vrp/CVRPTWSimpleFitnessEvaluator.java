@@ -83,10 +83,11 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		
 		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
-		fitness+=fitness*calcOmitPenalty(rutas);
+		fitness+=fitness*calcOmitPenalty(rutas,getMatrix().getCustomers().size());
 		double minVehiclesPenalty=rutas.size()<(maxVehiculos-2)?MIN_VEHICLES_VIOLATION*(maxVehiculos-2-rutas.size()):0;
 		fitness+=minVehiclesPenalty;
-		
+		fitness+=super.calcDuplicatePenalty(rutas, getMatrix().getCustomers().size())*(maxFitness/getMatrix().getCustomers().size());
+
 		return fitness;
 	}
 	

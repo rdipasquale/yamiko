@@ -33,6 +33,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final int MIN_VEHICLES_VIOLATION=180000;
 	private double maxFitness;
 	private int vehicles;
+	private int clients;
 
 	/** FIXME: Funcion para intervalos de media hora solamente **/
 	private int intervalMinutes=30;
@@ -81,8 +82,10 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 			
 		}
 
-		double minVehiclesPenalty=rutas.size()<(vehicles-2)?MIN_VEHICLES_VIOLATION*(vehicles-2-rutas.size()):0;
-		return totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty;
+		double minVehiclesPenalty=rutas.size()<(vehicles-2)?MIN_VEHICLES_VIOLATION*(vehicles-2-rutas.size()):0;		
+		double fitness=totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty+super.calcDuplicatePenalty(rutas, clients)*(maxFitness/clients);
+		fitness+=fitness*calcOmitPenalty(rutas,clients);
+		return fitness;
 	}
 	
 	@Override
@@ -95,12 +98,13 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		return maxFitness-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles) {
+	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles,int _clients) {
 
 		maxFitness=maxFITNESS;
 		setMap(_map);
 		setMatrix(dm);
 		vehicles=_vehicles;
+		clients=_clients;
 	}	
 	
 	@Override
@@ -131,7 +135,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 			GeodesicalCustomer custI=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[i]);
 			if (custI.getTimeWindow()!=null)
 			{
-				t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());				
+				t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());
 				gap+=custI.getTimeWindow().minGap(t, custI.getSoftTimeWindowMargin());				
 				t.add(Calendar.MINUTE, custI.getServiceDuration());				
 			}
@@ -168,10 +172,13 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		for (int i=0;i<r.length;i++)
 		{
 			GeodesicalCustomer custI=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[i]);
-			t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());
-			dist+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._1();				
-			time+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2();				
-			t.add(Calendar.MINUTE, custI.getServiceDuration());				
+			if ((i==0?0:r[i-1])!=r[i])
+			{
+				t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());
+				dist+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._1();				
+				time+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2();				
+				t.add(Calendar.MINUTE, custI.getServiceDuration());								
+			}
 		}
 		return new Tuple2<Double, Double>(dist, time);
 	}

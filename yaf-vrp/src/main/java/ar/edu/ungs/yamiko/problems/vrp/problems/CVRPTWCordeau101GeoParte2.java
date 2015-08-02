@@ -1,8 +1,13 @@
 package ar.edu.ungs.yamiko.problems.vrp.problems;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -15,6 +20,7 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene;
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome;
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
+import ar.edu.ungs.yamiko.ga.domain.impl.FitnessInvertedComparator;
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation;
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
@@ -23,7 +29,6 @@ import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptEvaluator;
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWGeodesiacalGPSFitnessEvaluator;
-import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorSwap;
@@ -36,6 +41,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser;
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence;
 import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalc;
+import ar.edu.ungs.yamiko.workflow.BestIndHolder;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 
@@ -44,11 +50,12 @@ public class CVRPTWCordeau101GeoParte2
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=200;
-	private static final int MAX_GENERATIONS=10000;
+	private static final int INDIVIDUALS=20;
+	private static final int MAX_GENERATIONS=100;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
 
+	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
     {
 		double lat01Ini=-34.481013;
@@ -117,7 +124,6 @@ public class CVRPTWCordeau101GeoParte2
 			String chromosomeName="X";
 			VRPCrossover cross; 
 			RoutesMorphogenesisAgent rma;
-			PopulationInitializer<Integer[]> popI =new VRPFilePopulationInitializer(popFile);
 			
 
 			rma=new RoutesMorphogenesisAgent(customers);
@@ -128,11 +134,43 @@ public class CVRPTWCordeau101GeoParte2
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
 			Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(customerRouteFile);
-			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m);
+			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
-			cross=new SBXCrossover(30d, c, m, new CVRPTWSimpleFitnessEvaluator(new Double(c), 30d, m,matrix,140000000d));
+			//cross=new SBXCrossover(30d, c, m, new CVRPTWSimpleFitnessEvaluator(new Double(c), 30d, m,matrix,140000000d));
+			cross=new SBXCrossover(30d, c, m, fit);
 			cross.setMatrix(matrix);
 	
+			// Acá levantamos varios files con individuos salidos de la etapa 1 para calcularles el fitness con 
+			// el fitness calculator de la etapa 2 y tomar los n mejores.
+			List<Individual<Integer[]>> population=new ArrayList<Individual<Integer[]>>();
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestIndSet-2-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestInd-2-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salida-2-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salidaBestInd-1-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salida-1-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salidaBestInd-1-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salida-1-8.txt"));
+			List<Individual<Integer[]>> populationDepurada=new ArrayList<Individual<Integer[]>>();
+			HashSet<Double> dupli=new HashSet<Double>(); 
+			for (Individual<Integer[]> individual : population)
+			{
+				individual.setFitness(null);
+				rma.develop(genome, individual);
+				individual.setFitness(fit.execute(individual));
+				if (dupli.add(individual.getFitness()))
+					populationDepurada.add(individual);
+			}				
+			Collections.sort(populationDepurada,new FitnessInvertedComparator<Integer[]>());
+			if (populationDepurada.size()>individuals) populationDepurada=populationDepurada.subList(0, individuals);
+			popFile="/media/ricardo/hd/logs/etapa2input.txt";
+			VRPPopulationPersistence.writePopulation(populationDepurada, popFile);
+			population=null;
+			dupli=null;
+			// --------------------------------------------------------------------
+			
+			PopulationInitializer<Integer[]> popI =new VRPFilePopulationInitializer(popFile);
+
+			
 			AcceptEvaluator<Integer[]> acceptEvaluator=new DescendantModifiedAcceptEvaluator<Integer[]>(rma,genome,fit);
 
 			rma.develop(genome, optInd);
@@ -155,10 +193,37 @@ public class CVRPTWCordeau101GeoParte2
 
 			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
-			
+			log.warn("Promedio -> " + (par.getMaxGenerations()/new Double(par.getMaxGenerations()))+ " ms/generacion");
+	
+			double prom=0d;
+			int cont=0;
+			for (Individual<Integer[]> i : ga.getFinalPopulation()) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio población final =" +prom);
+				
 			Calendar cal=Calendar.getInstance();
 			VRPPopulationPersistence.writePopulation( ga.getFinalPopulation(),wPath+"salidaFase2-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			VRPPopulationPersistence.writePopulation( winner,wPath+"salidaFase2BestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			
+			Collection<Individual<Integer[]>> bestIndSet=new ArrayList<Individual<Integer[]>>();
+			for (Individual<Integer[]> individual : BestIndHolder.getBest()) 
+				bestIndSet.add((Individual<Integer[]>)individual);			
+			VRPPopulationPersistence.writePopulation(bestIndSet ,wPath+"salidaEtapa2BestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			
+			prom=0d;
+			cont=0;
+			for (Individual<Integer[]> i : bestIndSet) 
+			{
+				prom+=i.getFitness();
+				cont++;
+			}
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio mejores individuos =" +prom);
+
 			
 		} catch (YamikoException e) {
 			e.printStackTrace();

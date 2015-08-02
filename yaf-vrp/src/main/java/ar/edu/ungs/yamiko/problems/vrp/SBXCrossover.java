@@ -96,6 +96,7 @@ public class SBXCrossover extends VRPCrossover{
 			p1prima=RouteHelper.insertClientsFullRestrictionAsSimpleList(pendientes,p1prima, getMatrix(), avgVelocity, capacity, vehicles, vrp);
 		
 		/** DEBUG **/
+		RouteHelper.removeDuplicates(p1prima);
 		HashSet<Integer> p1p=new HashSet<Integer>();
 		p1p.addAll(p1prima);
 		List<Integer> p1pepe=IntegerStaticHelper.deepCopyIndasList(p1);
@@ -138,6 +139,7 @@ public class SBXCrossover extends VRPCrossover{
 
 		
 		/** DEBUG **/
+		RouteHelper.removeDuplicates(p2prima);
 		HashSet<Integer> p2p=new HashSet<Integer>();
 		p2p.addAll(p2prima);
 		List<Integer> p2pepe=IntegerStaticHelper.deepCopyIndasList(p2);
