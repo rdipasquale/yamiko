@@ -27,9 +27,12 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 	 * 
 	 */
 	private static final long serialVersionUID = -2473729053134474976L;
-	public static double MAX_FITNESS=10000000000d;
+//	public static double MAX_FITNESS=10000000000d;
 	public static final int CALC_MIN_GAP_INCREMENT_MINUTES=5;
 	public static final int TIMEWINDOWS_VIOLATION_WEIGHT=60*30;
+	public static final int MIN_VEHICLES_VIOLATION=180000;
+	private double maxFitness;
+	private int vehicles;
 
 	/** FIXME: Funcion para intervalos de media hora solamente **/
 	private int intervalMinutes=30;
@@ -78,7 +81,8 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 			
 		}
 
-		return totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT);
+		double minVehiclesPenalty=rutas.size()<(vehicles-2)?MIN_VEHICLES_VIOLATION*(vehicles-2-rutas.size()):0;
+		return totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty;
 	}
 	
 	@Override
@@ -88,14 +92,15 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 
-		return MAX_FITNESS-calcFullPenalties(rutas);
+		return maxFitness-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm) {
+	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles) {
 
-		CVRPTWGeodesiacalGPSFitnessEvaluator.MAX_FITNESS=maxFITNESS;
+		maxFitness=maxFITNESS;
 		setMap(_map);
 		setMatrix(dm);
+		vehicles=_vehicles;
 	}	
 	
 	@Override

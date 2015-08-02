@@ -782,7 +782,7 @@ public class TestRouteHelper {
 		List<Integer> clients=new ArrayList<Integer>();
 		clients.add(1);
 		clients.add(3);
-		prueba=RouteHelper.insertClientsFullRestriction(clients, dm, 1d, 3, 3, prueba, new CVRPTWCartesianSimpleFitnessEvaluator(3d, 1d, 3,dm));
+		prueba=RouteHelper.insertClientsFullRestriction(clients, dm, 1d, 3, 3, prueba, new CVRPTWCartesianSimpleFitnessEvaluator(3d, 1d, 3,dm,14000000d));
 		assertNotNull(prueba);
 	}
 

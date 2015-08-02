@@ -82,8 +82,7 @@ public class CVRPTWCordeau101Parallel
 //			cross=new GVRCrossover();
 //			cross.setMatrix(matrix);
 			
-			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
-			fit.setMatrix(matrix);
+			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m,matrix,140000000d);
 			cross=new SBXCrossover(1d, c, m, fit);
 			cross.setMatrix(matrix);
 		

@@ -24,17 +24,19 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	 * 
 	 */
 	private static final long serialVersionUID = -2473729053134474976L;
+	public static final int MIN_VEHICLES_VIOLATION=180000;
 	public static final double MAX_TIME_ROUTE_MINUTES=1200d;
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=500d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=1000d;
-	public static final double MAX_FITNESS=100000000d;
+	//public static final double MAX_FITNESS=100000000d;
 	//public static final double PENAL_PER_ROUTE_METROS=30d;
 	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
 	private int maxVehiculos;
+	private double maxFitness;
 
 	public double calcFullPenalties(List<List<Integer>> rutas) {
 		double totalDist=0d;
@@ -69,6 +71,9 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		double maxVehPenal=Math.pow(cantRutas*totalDist*PLUS_PER_ROUTE,calcMaxVehiclePenalty(cantRutas,maxVehiculos));
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
 		fitness+=fitness*calcOmitPenalty(rutas);
+		
+		double minVehiclesPenalty=rutas.size()<(maxVehiculos-2)?MIN_VEHICLES_VIOLATION*(maxVehiculos-2-rutas.size()):0;
+		fitness+=minVehiclesPenalty;
 	//	System.out.println("Fitness= " + (MAX_FITNESS-fitness) + " Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 
 		return fitness;
@@ -84,22 +89,24 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 		if (rutas==null)
 			return 0;
-		return MAX_FITNESS-calcFullPenalties(rutas);
+		return maxFitness-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
+	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
 		setMatrix(dm);
-	}
-
-	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
-		capacity=_capacity;
-		avgVelocity=_velocity;
-		maxVehiculos=maxVehicles;
+		maxFitness=maxFITNESS;
 
 	}
+
+//	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
+//		capacity=_capacity;
+//		avgVelocity=_velocity;
+//		maxVehiculos=maxVehicles;
+//
+//	}
 	
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)
 	{

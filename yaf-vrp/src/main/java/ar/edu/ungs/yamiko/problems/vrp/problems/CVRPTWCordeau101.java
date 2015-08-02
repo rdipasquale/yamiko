@@ -68,9 +68,7 @@ public class CVRPTWCordeau101
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
-			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
-			fit.setMatrix(matrix);
-			//cross=new LCSXCrossover(1d, c, m, fit);
+			VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(c),60d/1000d,m,matrix,14000000d);
 			cross=new SBXCrossover(1d, c, m, fit);
 			cross.setMatrix(matrix);
 

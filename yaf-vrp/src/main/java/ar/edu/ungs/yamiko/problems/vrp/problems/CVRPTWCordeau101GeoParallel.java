@@ -47,10 +47,12 @@ import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
 public class CVRPTWCordeau101GeoParallel 
 {
 	private static Logger log=Logger.getLogger("file");
-	private static final String WORK_PATH="src/main/resources/";
+	//private static final String WORK_PATH="src/main/resources/";
+	private static final String WORK_PATH="/media/ricardo/hd/logs/";
 	private static final int INDIVIDUALS=200;
 	private static final int MAX_GENERATIONS=10000;
- 
+	private static final String URI_SPARK="spark://192.168.1.40:7077";
+
 	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
     {
@@ -87,7 +89,8 @@ public class CVRPTWCordeau101GeoParallel
     		
     		log.warn("Init");
     		
-        	SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101GeoParallel");
+        	SparkConf conf = new SparkConf().setMaster(URI_SPARK).setAppName("CVRPTWCordeau101GeoParallel");
+//        	SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101GeoParallel");
         	//SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
             JavaSparkContext sc = new JavaSparkContext(conf);
     		

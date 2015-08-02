@@ -98,8 +98,7 @@ public class TestManyCrossoversParallel {
 
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());
 		
-		VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(capacity),60d/1000d,vehicles);
-		fit.setMatrix(matrix);
+		VRPFitnessEvaluator fit= new CVRPTWCartesianSimpleFitnessEvaluator(new Double(capacity),60d/1000d,vehicles,matrix,14000000d);
     	
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);

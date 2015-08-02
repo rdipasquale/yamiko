@@ -62,7 +62,6 @@ public class SerialGA<T> {
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 				Individual<T> bestIndGen=p.iterator().next();
-				BestIndHolder.holdBestInd(bestIndGen);
 				for (Individual<T> individual : p)
 				{
 					if (individual.getFitness()==null)

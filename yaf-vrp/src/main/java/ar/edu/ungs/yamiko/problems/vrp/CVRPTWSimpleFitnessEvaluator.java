@@ -28,12 +28,24 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=10000d;
-	public static double MAX_FITNESS=10000000000d;
+	public static final int MIN_VEHICLES_VIOLATION=180000;
+	//public static double MAX_FITNESS=10000000000d;
 	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
 	private int maxVehiculos;
+	private double maxFitness;
+	
+	
+
+	public double getMaxFitness() {
+		return maxFitness;
+	}
+
+	public void setMaxFitness(double maxFitness) {
+		this.maxFitness = maxFitness;
+	}
 
 	@Override
 	public double calcFullPenalties(List<List<Integer>> rutas) {
@@ -72,6 +84,9 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
 		fitness+=fitness*calcOmitPenalty(rutas);
+		double minVehiclesPenalty=rutas.size()<(maxVehiculos-2)?MIN_VEHICLES_VIOLATION*(maxVehiculos-2-rutas.size()):0;
+		fitness+=minVehiclesPenalty;
+		
 		return fitness;
 	}
 	
@@ -82,27 +97,27 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 
-		return MAX_FITNESS-calcFullPenalties(rutas);
+		return maxFitness-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
-		capacity=_capacity;
-		avgVelocity=_velocity;
-		maxVehiculos=maxVehicles;
-	}
-	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
-		capacity=_capacity;
-		avgVelocity=_velocity;
-		maxVehiculos=maxVehicles;
-		setMatrix(dm);
-	}
+//	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {
+//		capacity=_capacity;
+//		avgVelocity=_velocity;
+//		maxVehiculos=maxVehicles;
+//	}
+//	
+//	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm) {
+//		capacity=_capacity;
+//		avgVelocity=_velocity;
+//		maxVehiculos=maxVehicles;
+//		setMatrix(dm);
+//	}
 	
 	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
-		CVRPTWSimpleFitnessEvaluator.MAX_FITNESS=maxFITNESS;
+		maxFitness=maxFITNESS;
 		setMatrix(dm);
 	}	
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)

@@ -88,8 +88,7 @@ public class TestCordeauParser {
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d,m);
-		fit.setMatrix(matrix);
+		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),60d/1000d,m,matrix,14000000d);
 		rma.develop(genome, ind);
 		Double fitnesOptInd=fit.execute(ind);
 		System.out.println("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
