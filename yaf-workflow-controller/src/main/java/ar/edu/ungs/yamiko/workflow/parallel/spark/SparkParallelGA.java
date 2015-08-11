@@ -90,7 +90,7 @@ public class SparkParallelGA<T> implements Serializable{
 					bestInd=bestOfGeneration;					
 				}
 
-				//if ((generationNumber % 100)==0) 
+				if ((generationNumber % 100)==0) 
 					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 
 				parameter.getSelector().setPopulation(p);

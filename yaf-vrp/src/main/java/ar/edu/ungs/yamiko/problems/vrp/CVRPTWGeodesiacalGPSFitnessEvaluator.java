@@ -29,8 +29,8 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 	private static final long serialVersionUID = -2473729053134474976L;
 //	public static double MAX_FITNESS=10000000000d;
 	public static final int CALC_MIN_GAP_INCREMENT_MINUTES=5;
-	public static final int TIMEWINDOWS_VIOLATION_WEIGHT=60*30;
-	public static final int MIN_VEHICLES_VIOLATION=180000;
+	public static final double TIMEWINDOWS_VIOLATION_WEIGHT=60*30;
+	public static final double MIN_VEHICLES_VIOLATION=180000;
 	private double maxFitness;
 	private int vehicles;
 	private int clients;
@@ -83,7 +83,7 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		}
 
 		double minVehiclesPenalty=rutas.size()<(vehicles-2)?MIN_VEHICLES_VIOLATION*(vehicles-2-rutas.size()):0;		
-		double fitness=totalDist+(totalTime*60)+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty+super.calcDuplicatePenalty(rutas, clients)*(maxFitness/clients);
+		double fitness=totalDist+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty+super.calcDuplicatePenalty(rutas, clients)*(maxFitness/clients);
 		fitness+=fitness*calcOmitPenalty(rutas,clients);
 		return fitness;
 	}
@@ -132,6 +132,12 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		int gap=0;
 		for (int i=0;i<r.length;i++)
 		{
+			if (i>0) 
+				if (r[i-1]==r[i]) 
+				{
+					gap+=MIN_VEHICLES_VIOLATION*10;
+					break;
+				}
 			GeodesicalCustomer custI=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[i]);
 			if (custI.getTimeWindow()!=null)
 			{

@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import scala.Tuple2;
 import ar.edu.ungs.yamiko.ga.domain.Gene;
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -22,6 +23,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome;
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer;
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializer;
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper;
+import ar.edu.ungs.yamiko.problems.vrp.CVRPTWGeodesiacalGPSFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.Customer;
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix;
@@ -274,5 +276,58 @@ public class TestCordeauGeodesicalParser {
 		System.out.println("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 		
 	}
+	
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testValidateOptIndGeo2() throws Exception{
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
+
+		int[] holder=new int[3];		
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
+		int m=holder[0];
+		int n=holder[1];
+		int c=holder[2];
+		
+		Genome<Integer[]> genome;
+		Gene gene=new BasicGene("Gene X", 0, n+m);
+		
+		Ribosome<Integer[]> ribosome=new ByPassRibosome();
+		String chromosomeName="X";
+		
+		
+		Integer[] indi=new Integer[]{0 , 9 , 6 , 8 , 91 , 100 , 0 , 11 , 13 , 13 , 0 , 21 , 42 , 43 , 24 , 96 , 98 , 92 , 0 , 23 , 3 , 0 , 40 , 45 , 46 , 48 , 50 , 52 , 51 , 44 , 59 , 57 , 56 , 77 , 67 , 65 , 62 , 74 , 72 , 0 , 69 , 66 , 4 , 2 , 1 , 75 , 0 , 71 , 70 , 73 , 79 , 0 , 78 , 76 , 81 , 80 }; 
+		
+		
+		Individual<Integer[]> ind=IntegerStaticHelper.create(chromosomeName, indi);
+				
+		
+		VRPCrossover cross; 
+		RoutesMorphogenesisAgent rma;
+		PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
+		
+		rma=new RoutesMorphogenesisAgent(customers);
+		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
+		translators.put(gene, ribosome);
+		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
+
+		DistanceMatrix matrix=new DistanceMatrix(customers.values());
+		
+		cross=new GVRCrossover();
+		cross.setMatrix(matrix);
+		
+		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile("/media/ricardo/hd/logs/customerRoutes.txt");
+		VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n);
+
+//		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
+		fit.setMatrix(matrix);
+		rma.develop(genome, ind);
+		Double fitnesOptInd=fit.execute(ind);
+		System.out.println("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+		
+	}	
 	
 }

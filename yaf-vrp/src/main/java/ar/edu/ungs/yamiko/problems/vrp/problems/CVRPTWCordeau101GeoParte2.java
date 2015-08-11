@@ -50,11 +50,11 @@ public class CVRPTWCordeau101GeoParte2
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=20;
+	private static final int INDIVIDUALS=200;
 	private static final int MAX_GENERATIONS=100;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
-	private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
-
+	//private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
+	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutes.txt";
 	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
     {
@@ -143,13 +143,17 @@ public class CVRPTWCordeau101GeoParte2
 			// Acá levantamos varios files con individuos salidos de la etapa 1 para calcularles el fitness con 
 			// el fitness calculator de la etapa 2 y tomar los n mejores.
 			List<Individual<Integer[]>> population=new ArrayList<Individual<Integer[]>>();
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestIndSet-2-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestInd-2-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salida-2-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salidaBestInd-1-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salida-1-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salidaBestInd-1-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salida-1-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestIndSet-2-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salidaBestInd-2-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - clustercasanodos1-4/salida-2-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salidaBestInd-1-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salida-1-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salidaBestInd-1-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salida-1-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestIndSet-3-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salida-3-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestInd-3-8.txt"));
+			
 			List<Individual<Integer[]>> populationDepurada=new ArrayList<Individual<Integer[]>>();
 			HashSet<Double> dupli=new HashSet<Double>(); 
 			for (Individual<Integer[]> individual : population)
@@ -193,7 +197,7 @@ public class CVRPTWCordeau101GeoParte2
 
 			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
-			log.warn("Promedio -> " + (par.getMaxGenerations()/new Double(par.getMaxGenerations()))+ " ms/generacion");
+			log.warn("Promedio -> " + ((t2-t1)/new Double(par.getMaxGenerations()))+ " ms/generacion");
 	
 			double prom=0d;
 			int cont=0;

@@ -43,9 +43,10 @@ import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 public class CVRPTWCordeau101Geo 
 {
 	private static Logger log=Logger.getLogger("file");
-	private static final String WORK_PATH="src/main/resources/";
+//	private static final String WORK_PATH="src/main/resources/";
+	private static final String WORK_PATH="/media/ricardo/hd/logs/";
 	private static final int INDIVIDUALS=200;
-	private static final int MAX_GENERATIONS=10000;
+	private static final int MAX_GENERATIONS=100;
  
 	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
@@ -109,7 +110,8 @@ public class CVRPTWCordeau101Geo
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
-			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
+			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,1000000000d);
+			
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			cross=new SBXCrossover(30d, c, m, fit);
 			cross.setMatrix(matrix);
@@ -141,7 +143,7 @@ public class CVRPTWCordeau101Geo
 
 			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
 			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
-			log.warn("Promedio -> " + (par.getMaxGenerations()/new Double(par.getMaxGenerations()))+ " ms/generacion");
+			log.warn("Promedio -> " + ((t2-t1)/new Double(par.getMaxGenerations()))+ " ms/generacion");
 
 			double prom=0d;
 			int cont=0;

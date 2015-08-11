@@ -43,10 +43,10 @@ public class VRPFilePopulationInitializerParallel extends ParallelUniqueIntegerP
 	}
 	
 	public VRPFilePopulationInitializerParallel(JavaSparkContext sc,
-			String fileName, JavaSparkContext sparkC) {
+			String fileName) {
 		super(sc);
 		this.fileName = fileName;
-		this.sparkC = sparkC;
+		this.sparkC = sc;
 	}
 
 
