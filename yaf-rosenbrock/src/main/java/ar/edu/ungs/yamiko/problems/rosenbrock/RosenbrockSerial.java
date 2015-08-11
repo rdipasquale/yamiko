@@ -45,7 +45,7 @@ public class RosenbrockSerial
         Parameter<BitSet> par=	new Parameter<BitSet>(0.035, 0.9, 200, new DescendantAcceptEvaluator<BitSet>(), 
         						new RosenbrockFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
         						null, new BitSetRandomPopulationInitializer(), null, new ProbabilisticRouletteSelector(), 
-        						new GlobalSinglePopulation<BitSet>(genome), 2500, 5000d,new BitSetMorphogenesisAgent(),genome);
+        						new GlobalSinglePopulation<BitSet>(genome), 2500, 6000d,new BitSetMorphogenesisAgent(),genome);
     	
         SerialGA<BitSet> ga=new SerialGA<BitSet>(par);
         
