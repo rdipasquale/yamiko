@@ -53,7 +53,7 @@ public class CVRPTWCordeau101GeoParte2Parallel
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
 	private static final int INDIVIDUALS=200;
-	private static final int MAX_GENERATIONS=100;
+	private static final int MAX_GENERATIONS=19000;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	//private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
 	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutes.txt";
@@ -143,7 +143,7 @@ public class CVRPTWCordeau101GeoParte2Parallel
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
 			Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(customerRouteFile);
-			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n);
+			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n,m);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			//cross=new SBXCrossover(30d, c, m, new CVRPTWSimpleFitnessEvaluator(new Double(c), 30d, m,matrix,140000000d));
 			cross=new SBXCrossover(30d, c, m, fit);
@@ -159,9 +159,12 @@ public class CVRPTWCordeau101GeoParte2Parallel
 //			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/serial/salida-1-8.txt"));
 //			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salidaBestInd-1-8.txt"));
 //			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salvar - local8/salida-1-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestIndSet-3-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salida-3-8.txt"));
-			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestInd-3-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestIndSet-3-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salida-3-8.txt"));
+//			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/salidaBestInd-3-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salidaBestIndSet-18-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salida-18-8.txt"));
+			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salidaBestInd-18-8.txt"));
 			
 			List<Individual<Integer[]>> populationDepurada=new ArrayList<Individual<Integer[]>>();
 			HashSet<Double> dupli=new HashSet<Double>(); 

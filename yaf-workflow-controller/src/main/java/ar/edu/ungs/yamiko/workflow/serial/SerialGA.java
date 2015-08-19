@@ -87,7 +87,7 @@ public class SerialGA<T> {
 				}
 				fitnessProm=fitnessProm/cont;
 				//if ((generationNumber % 100)==0) 
-					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness() + " -- fitness promedio: " + fitnessProm);
+					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness() + " -- fitness promedio: " + fitnessProm + "{[" + bestIndGen.getFitness() + ";" + fitnessProm +"]}");
 
 				parameter.getSelector().setPopulation(p);
 				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);

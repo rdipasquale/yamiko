@@ -30,10 +30,11 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 //	public static double MAX_FITNESS=10000000000d;
 	public static final int CALC_MIN_GAP_INCREMENT_MINUTES=5;
 	public static final double TIMEWINDOWS_VIOLATION_WEIGHT=60*30;
-	public static final double MIN_VEHICLES_VIOLATION=180000;
+	public static final double MIN_VEHICLES_VIOLATION=200000;
 	private double maxFitness;
 	private int vehicles;
 	private int clients;
+	private int minRoutes;
 
 	/** FIXME: Funcion para intervalos de media hora solamente **/
 	private int intervalMinutes=30;
@@ -81,10 +82,14 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 			totalGap+=gap;
 			
 		}
-
-		double minVehiclesPenalty=rutas.size()<(vehicles-2)?MIN_VEHICLES_VIOLATION*(vehicles-2-rutas.size()):0;		
+		double maxVehPen=super.calcMaxVehiclePenalty(rutas.size(), vehicles);
+		if (maxVehPen>1)
+			maxVehPen*=MIN_VEHICLES_VIOLATION;
+		else
+			maxVehPen=0d;
+		double minVehiclesPenalty=rutas.size()<minRoutes?MIN_VEHICLES_VIOLATION*(minRoutes-rutas.size()):0;		
 		double fitness=totalDist+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty+super.calcDuplicatePenalty(rutas, clients)*(maxFitness/clients);
-		fitness+=fitness*calcOmitPenalty(rutas,clients);
+		fitness+=fitness*calcOmitPenalty(rutas,clients)+maxVehPen;
 		return fitness;
 	}
 	
@@ -98,13 +103,14 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		return maxFitness-calcFullPenalties(rutas);
 	}
 	
-	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles,int _clients) {
+	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles,int _clients,int minRoutesV) {
 
 		maxFitness=maxFITNESS;
 		setMap(_map);
 		setMatrix(dm);
 		vehicles=_vehicles;
 		clients=_clients;
+		minRoutes=minRoutesV;
 	}	
 	
 	@Override

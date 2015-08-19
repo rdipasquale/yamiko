@@ -269,7 +269,7 @@ public class TestCordeauGeodesicalParser {
 		cross=new GVRCrossover();
 		cross.setMatrix(matrix);
 		
-		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
+		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d,m);
 		fit.setMatrix(matrix);
 		rma.develop(genome, ind);
 		Double fitnesOptInd=fit.execute(ind);
@@ -320,7 +320,7 @@ public class TestCordeauGeodesicalParser {
 		cross.setMatrix(matrix);
 		
 		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile("/media/ricardo/hd/logs/customerRoutes.txt");
-		VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n);
+		VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n,m);
 
 //		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
 		fit.setMatrix(matrix);

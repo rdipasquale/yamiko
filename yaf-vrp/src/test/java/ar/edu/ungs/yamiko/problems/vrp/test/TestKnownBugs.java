@@ -45,7 +45,7 @@ public class TestKnownBugs {
 	
 		DistanceMatrix matrix=new DistanceMatrix(customers.values());		
 
-		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d);
+		VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,14000000d,m-2);
 		
 		
 		Integer[] p1=new Integer[]{81, 76, 71, 58, 60, 56, 53, 57, 55, 54, 59, 0, 3, 5, 7, 8, 9, 6, 4, 1, 2, 75, 23, 0, 19, 15, 14, 16, 12, 18, 17, 13, 45, 46, 44, 42, 41, 40, 43, 83, 82, 85, 84, 0, 21, 22, 24, 25, 26, 28, 30, 27, 29, 20, 64, 68, 0, 48, 0, 52, 49, 47, 51, 50, 88, 89, 91, 86, 87, 90, 62, 63, 67, 65, 74, 99, 0, 69, 66, 61, 72, 38, 37, 34, 33, 0, 92, 93, 97, 100, 94, 78, 0, 96, 95, 98, 73, 70, 79, 80, 77};

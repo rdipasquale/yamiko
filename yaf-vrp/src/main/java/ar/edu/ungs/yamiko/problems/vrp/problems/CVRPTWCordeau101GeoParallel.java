@@ -122,7 +122,7 @@ public class CVRPTWCordeau101GeoParallel
 			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
 
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
-			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,1000000000d);
+			VRPFitnessEvaluator fit= new CVRPTWSimpleFitnessEvaluator(new Double(c),30d,m,matrix,1000000000d,10);
 			
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			cross=new SBXCrossover(30d, c, m, fit);

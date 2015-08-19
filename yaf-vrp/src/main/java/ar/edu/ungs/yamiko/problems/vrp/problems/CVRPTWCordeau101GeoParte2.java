@@ -134,7 +134,7 @@ public class CVRPTWCordeau101GeoParte2
 			DistanceMatrix matrix=new DistanceMatrix(customers.values());
 			
 			Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(customerRouteFile);
-			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n);
+			VRPFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n,m);
 			//cross=new GVRCrossover(); //1d, c, m, fit);
 			//cross=new SBXCrossover(30d, c, m, new CVRPTWSimpleFitnessEvaluator(new Double(c), 30d, m,matrix,140000000d));
 			cross=new SBXCrossover(30d, c, m, fit);

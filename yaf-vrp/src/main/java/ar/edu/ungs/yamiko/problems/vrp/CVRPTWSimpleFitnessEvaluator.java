@@ -28,13 +28,14 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 	public static final double PENAL_MAX_TIME_ROUTE_METROS=25000d;
 	public static final double PENAL_TW_LIMIT_MINUTES=60d;
 	public static final double PENAL_TW_LIMIT_METROS=10000d;
-	public static final int MIN_VEHICLES_VIOLATION=180000;
+	public static final int MIN_VEHICLES_VIOLATION=200000;
 	//public static double MAX_FITNESS=10000000000d;
 	public static final double PLUS_PER_ROUTE=0.1;
 	public static final double PENAL_PER_CAPACITY_X=10d;
 	public double capacity;
 	private double avgVelocity;
 	private int maxVehiculos;
+	private int minRoutes;
 	private double maxFitness;
 	
 	
@@ -84,7 +85,7 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		//System.out.println("Penalidades: Distancia=" + totalDist + " Penalidades por falta de capacidad=" + totalCapPenal + " Penalidades por Exceso de tiempo de ruta="+totalMaxTimePenal + " Penalidades por violación de TW="+totalTWPenal+ " Penalidades por cant. de vehículos=" + maxVehPenal);
 		fitness+=totalDist+totalCapPenal+totalMaxTimePenal+totalTWPenal+maxVehPenal;
 		fitness+=fitness*calcOmitPenalty(rutas,getMatrix().getCustomers().size());
-		double minVehiclesPenalty=rutas.size()<(maxVehiculos-2)?MIN_VEHICLES_VIOLATION*(maxVehiculos-2-rutas.size()):0;
+		double minVehiclesPenalty=rutas.size()<minRoutes?MIN_VEHICLES_VIOLATION*(minRoutes-rutas.size()):0;
 		fitness+=minVehiclesPenalty;
 		fitness+=super.calcDuplicatePenalty(rutas, getMatrix().getCustomers().size())*(maxFitness/getMatrix().getCustomers().size());
 
@@ -114,12 +115,14 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 //		setMatrix(dm);
 //	}
 	
-	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS) {
+	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS,int minRoutesV) {
 		capacity=_capacity;
 		avgVelocity=_velocity;
 		maxVehiculos=maxVehicles;
 		maxFitness=maxFITNESS;
 		setMatrix(dm);
+		minRoutes=minRoutesV;
+
 	}	
 	public double calcTWPenalty(Customer c1, Customer c2, double deltaTiempo)
 	{
