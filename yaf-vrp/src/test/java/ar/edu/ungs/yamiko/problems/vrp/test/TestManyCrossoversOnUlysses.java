@@ -38,7 +38,7 @@ import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA;
 
-public class TestManyCrossovers {
+public class TestManyCrossoversOnUlysses {
 
 	@Before
 	public void setUp() throws Exception {
