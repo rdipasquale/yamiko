@@ -121,6 +121,22 @@ public class DistributedRouteCalc implements Serializable{
 		return salida;
 	}
 
+	public static Map<Short,Map<Short,List<String>>> getMapRoutesFromFileByPeriod(String dest,Integer period) throws IOException
+	{
+		if (dest==null) return null;
+		Map<Short,Map<Short,List<String>>> salida=new HashMap<Short,Map<Short,List<String>>>();;
+
+		Collection<CustomerRoute> customers=CustomersPersistence.readCustomerRoutes(dest);
+		for (CustomerRoute c: customers) {
+			if (c.getTimeRange()==period)
+			{
+				if (salida.get(((short)(c.getFrom())))==null) salida.put(((short)(c.getFrom())), new HashMap<Short,List<String>>());
+				if (salida.get(((short)(c.getFrom()))).get(((short)(c.getTo())))==null) salida.get(((short)(c.getFrom()))).put(((short)(c.getTo())),c.getRoute());
+			}			
+		}
+		
+		return salida;
+	}
 }
 	
 

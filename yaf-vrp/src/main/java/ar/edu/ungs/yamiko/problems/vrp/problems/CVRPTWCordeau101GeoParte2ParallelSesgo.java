@@ -48,16 +48,16 @@ import ar.edu.ungs.yamiko.workflow.Parameter;
 import ar.edu.ungs.yamiko.workflow.parallel.spark.SparkParallelGA;
 
 
-public class CVRPTWCordeau101GeoParte2Parallel 
+public class CVRPTWCordeau101GeoParte2ParallelSesgo 
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=2000;
-	private static final int MAX_GENERATIONS=2;
+	private static final int INDIVIDUALS=200;
+	private static final int MAX_GENERATIONS=9000;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	//private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
-	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutes.txt";
-	private static final String URI_SPARK="local[4]";
+	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutesSesgada.txt";
+	private static final String URI_SPARK="local[8]";
 
 	@SuppressWarnings("unchecked")
 	public static void main( String[] args )
@@ -165,6 +165,7 @@ public class CVRPTWCordeau101GeoParte2Parallel
 			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salidaBestIndSet-18-8.txt"));
 			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salida-18-8.txt"));
 			population.addAll(VRPPopulationPersistence.adaptReadPopulation("/media/ricardo/hd/logs/100000Serial/salidaBestInd-18-8.txt"));
+			population.add(optInd);
 			
 			List<Individual<Integer[]>> populationDepurada=new ArrayList<Individual<Integer[]>>();
 			HashSet<Double> dupli=new HashSet<Double>(); 
@@ -195,7 +196,7 @@ public class CVRPTWCordeau101GeoParte2Parallel
 			Parameter<Integer[]> par=	new Parameter<Integer[]>(0.035, 0.99, individuals, acceptEvaluator, 
 									fit, cross, new GVRMutatorSwap(), 
 									null, popI, null, new ProbabilisticRouletteSelector(), 
-									new GlobalSingleSparkPopulation<Integer[]>(genome), maxGenerations, fitnesOptInd,rma,genome);
+									new GlobalSingleSparkPopulation<Integer[]>(genome), maxGenerations, fitnesOptInd*2,rma,genome);
 			
 			SparkParallelGA<Integer[]> ga=new SparkParallelGA<Integer[]>(par,sc);
 			

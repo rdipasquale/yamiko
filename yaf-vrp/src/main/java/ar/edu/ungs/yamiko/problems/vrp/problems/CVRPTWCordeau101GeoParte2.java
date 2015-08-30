@@ -50,8 +50,8 @@ public class CVRPTWCordeau101GeoParte2
 {
 	private static Logger log=Logger.getLogger("file");
 	private static final String WORK_PATH="src/main/resources/";
-	private static final int INDIVIDUALS=200;
-	private static final int MAX_GENERATIONS=100;
+	private static final int INDIVIDUALS=2000;
+	private static final int MAX_GENERATIONS=2;
 	private static final String POP_FILE="src/main/resources/salida-31-7.txt";
 	//private static final String CUSTOMER_ROUTE_FILES="hdfs://192.168.1.40:9000/customerRoutes.txt";
 	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutes.txt";

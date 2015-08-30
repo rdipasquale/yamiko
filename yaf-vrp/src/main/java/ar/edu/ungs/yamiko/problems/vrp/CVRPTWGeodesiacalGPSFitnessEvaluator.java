@@ -49,6 +49,51 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		this.map = map;
 	}
 	
+	public void showRoutesDetail(List<List<Integer>> rutas,Map<Short,Map<Short,List<String>>> mapa) {
+		double totalDist=0d;
+		double totalTime=0d;
+		int totalGap=0;
+		int gap=0;
+		
+		for (List<Integer> rr: rutas) {
+			
+			List<Integer> r=new ArrayList<Integer>();
+			r.addAll(rr);
+			if (r.get(0)==0) r.remove(0);
+			if (r.get(r.size()-1)!=0) r.add(0);
+			
+			
+			Calendar t0=calcT0(r.get(0));
+			gap=calcGap(r, t0);
+
+			if (gap>0)
+			{
+				Tuple2<Calendar, Integer> minG=calcMinGap(rr, t0, gap);
+				t0=minG._1();
+				gap=minG._2();
+			}
+			
+			System.out.println("Ruta " + r + ". Comienza a las " + t0.get(Calendar.HOUR_OF_DAY) + ":" + String.format("%02d", t0.get(Calendar.MINUTE)) + " con un gap de " + gap +" minutos.");
+			
+			Tuple2<Double, Double> distTime=calcDistTimePrint(r,t0,mapa);
+			
+			totalDist+=distTime._1();
+			totalTime+=distTime._2();
+			totalGap+=gap;
+			
+		}
+		double maxVehPen=super.calcMaxVehiclePenalty(rutas.size(), vehicles);
+		if (maxVehPen>1)
+			maxVehPen*=MIN_VEHICLES_VIOLATION;
+		else
+			maxVehPen=0d;
+		double minVehiclesPenalty=rutas.size()<minRoutes?MIN_VEHICLES_VIOLATION*(minRoutes-rutas.size()):0;		
+		double fitness=totalDist+(totalTime*60)+(totalGap*TIMEWINDOWS_VIOLATION_WEIGHT)+minVehiclesPenalty+super.calcDuplicatePenalty(rutas, clients)*(maxFitness/clients);
+		fitness+=fitness*calcOmitPenalty(rutas,clients)+maxVehPen;
+		System.out.println("Penalidad: "+ fitness);
+	
+	}
+	
 	@Override
 	public double calcFullPenalties(List<List<Integer>> rutas) {
 
@@ -247,5 +292,34 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		return new Tuple2<Calendar, Integer>(minT0, minGap);
 	}
 	
+	private Tuple2<Double, Double> calcDistTimePrint(final List<Integer> rr,final Calendar t0,Map<Short,Map<Short,List<String>>> mapa)
+	{
+		Integer[] r=rr.toArray(new Integer[0]);
+		double dist=0d;
+		double time=0d;
+		Calendar t=(Calendar)t0.clone();
+		for (int i=0;i<r.length;i++)
+		{
+			if (i==0)
+				System.out.print("Depósito => "+ r[i]);
+			else
+				System.out.print(i==0?0:r[i-1] + " => "+ r[i]);
+			GeodesicalCustomer custI=(GeodesicalCustomer)getMatrix().getCustomerMap().get(r[i]);
+			if ((i==0?0:r[i-1])!=r[i])
+			{
+				System.out.println(" saliendo a las " + t.get(Calendar.HOUR_OF_DAY) + ":" + String.format("%02d", t.get(Calendar.MINUTE)) + ". Recorrido:");
+				for (String s: mapa.get(i==0?(short)0:(short)r[i-1].intValue()).get((short)r[i].intValue())) 
+					if (s!=null)
+						if (s.trim().length()>0)
+							System.out.println("\t"+s);				
+				t.add(Calendar.MINUTE, new Long(Math.round(getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2())).intValue());
+				dist+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._1();				
+				time+=getMap().get( (short)(i==0?0:r[i-1]) ).get((short)r[i].intValue()).get(getInterval(t))._2();				
+				t.add(Calendar.MINUTE, custI.getServiceDuration());								
+			}
+		}
+		return new Tuple2<Double, Double>(dist, time);
+	}
+
 	
 }

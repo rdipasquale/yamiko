@@ -4,7 +4,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -33,6 +35,7 @@ import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent;
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover;
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator;
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser;
+import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper;
 import ar.edu.ungs.yamiko.problems.vrp.utils.TruckFlagEncoder;
 import ar.edu.ungs.yamiko.problems.vrp.utils.spark.DistributedRouteCalc;
 
@@ -136,6 +139,122 @@ public class TestCordeauGeodesicalParser {
 		System.out.println("El máximo fitness " + maxFit + " se dio en la iteración " + maxI + " con [" + lat01Ini + "," + lon01Ini +"] [" + maxlat02Ini + "," + maxlon02Ini + "]");
 	}
 
+	private static final String CUSTOMER_ROUTE_FILES="/media/ricardo/hd/logs/customerRoutes.txt";
+	private static final String CUSTOMER_ROUTE_FILES_SESGADA="/media/ricardo/hd/logs/customerRoutesSesgada.txt";
+
+	@Test
+	public void testProbarRecorridosSubOptimos() throws Exception{
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
+
+		int[] holder=new int[3];		
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
+		int m=holder[0];
+		int n=holder[1];
+		//int c=holder[2];
+		assertTrue(customers.keySet().size()==101);
+		Individual<Integer[]> ind=CordeauGeodesicParser.parseSolution("src/test/resources/c101.res");
+		assertNotNull(ind);
+		
+		Genome<Integer[]> genome;
+		Gene gene=new BasicGene("Gene X", 0, n+m);
+		
+		Ribosome<Integer[]> ribosome=new ByPassRibosome();
+		String chromosomeName="X";
+		VRPCrossover cross; 
+		RoutesMorphogenesisAgent rma;
+		//PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
+		
+		rma=new RoutesMorphogenesisAgent(customers);
+		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
+		translators.put(gene, ribosome);
+		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
+
+		DistanceMatrix matrix=new DistanceMatrix(customers.values());
+		
+		cross=new GVRCrossover();
+		cross.setMatrix(matrix);
+
+		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(CUSTOMER_ROUTE_FILES);
+		CVRPTWGeodesiacalGPSFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n,m);
+		fit.setMatrix(matrix);
+		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map2=DistributedRouteCalc.getMapFromFile(CUSTOMER_ROUTE_FILES_SESGADA);
+		CVRPTWGeodesiacalGPSFitnessEvaluator fit2= new CVRPTWGeodesiacalGPSFitnessEvaluator(map2,1000000000d,matrix,m,n,m);
+		fit2.setMatrix(matrix);
+		
+		rma.develop(genome, ind);
+		
+		Map<Short,Map<Short,List<String>>> mapa=DistributedRouteCalc.getMapRoutesFromFileByPeriod(CUSTOMER_ROUTE_FILES_SESGADA,30);
+		
+		System.out.println("Calculo Normal:");
+		fit.showRoutesDetail(RouteHelper.convertListIntoListOfLists(Arrays.asList(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation())),mapa);
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("Calculo Penalidad:");
+		fit2.showRoutesDetail(RouteHelper.convertListIntoListOfLists(Arrays.asList(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation())),mapa);		
+		
+	}
+	
+	@Test
+	public void testProbarRecorridosSubOptimos2() throws Exception{
+		double lat01Ini=-34.481013;
+		double lat02Ini=-34.930460;
+		double lon01Ini=-58.325518;
+		double lon02Ini=-58.870122;
+
+		int[] holder=new int[3];		
+		Map<Integer, Customer> customers=CordeauGeodesicParser.parse("src/main/resources/c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60);
+		int m=holder[0];
+		int n=holder[1];
+		//int c=holder[2];
+		assertTrue(customers.keySet().size()==101);
+		Individual<Integer[]> ind=CordeauGeodesicParser.parseSolution("src/test/resources/c101.res");
+		assertNotNull(ind);
+		
+		Genome<Integer[]> genome;
+		Gene gene=new BasicGene("Gene X", 0, n+m);
+		
+		Ribosome<Integer[]> ribosome=new ByPassRibosome();
+		String chromosomeName="X";
+		VRPCrossover cross; 
+		RoutesMorphogenesisAgent rma;
+		//PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
+		
+		rma=new RoutesMorphogenesisAgent(customers);
+		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
+		translators.put(gene, ribosome);
+		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);
+
+		DistanceMatrix matrix=new DistanceMatrix(customers.values());
+		
+		cross=new GVRCrossover();
+		cross.setMatrix(matrix);
+
+		Map<Short,Map<Short,Map<Integer,Tuple2<Double, Double>>>> map=DistributedRouteCalc.getMapFromFile(CUSTOMER_ROUTE_FILES);
+		CVRPTWGeodesiacalGPSFitnessEvaluator fit= new CVRPTWGeodesiacalGPSFitnessEvaluator(map,1000000000d,matrix,m,n,m);
+		fit.setMatrix(matrix);
+		
+		rma.develop(genome, ind);
+		
+		Map<Short,Map<Short,List<String>>> mapa=DistributedRouteCalc.getMapRoutesFromFileByPeriod(CUSTOMER_ROUTE_FILES_SESGADA,30);
+		
+		System.out.println("Optimo Etapa 1:");
+		fit.showRoutesDetail(RouteHelper.convertListIntoListOfLists(Arrays.asList(ind.getGenotype().getChromosomes().get(0).getFullRawRepresentation())),mapa);
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------");
+		System.out.println("Optimo Etapa 2:");
+		fit.showRoutesDetail(RouteHelper.convertListIntoListOfLists(Arrays.asList(new Integer[]{0 , 5 , 3 , 7 , 8 , 10 , 11 , 9 , 6 , 4 , 2 , 1 , 75 , 0 , 13 , 17 , 18 , 19 , 15 , 16 , 14 , 12 , 99 , 0 , 20 , 24 , 25 , 27 , 29 , 30 , 28 , 26 , 23 , 22 , 21 , 0 , 32 , 33 , 31 , 35 , 37 , 38 , 39 , 36 , 34 , 52 , 0 , 43 , 42 , 41 , 40 , 44 , 46 , 45 , 48 , 51 , 50 , 49 , 47 , 0 , 57 , 55 , 54 , 53 , 56 , 58 , 60 , 59 , 0 , 67 , 65 , 63 , 62 , 74 , 72 , 61 , 64 , 68 , 66 , 69 , 0 , 81 , 78 , 76 , 71 , 70 , 73 , 77 , 79 , 80 , 0 , 90 , 87 , 86 , 83 , 82 , 84 , 85 , 88 , 89 , 91 , 0 , 98 , 96 , 95 , 94 , 92 , 93 , 97 , 100 })),mapa);		
+		
+	}
+	
+
+	
 	@SuppressWarnings("unused")
 	@Test
 	public void testValidateReviewFitnessCordeauGeo() throws Exception{
@@ -181,10 +300,10 @@ public class TestCordeauGeodesicalParser {
 		
 		for (Integer cc : customers.keySet()) 
 			if (cc!=0)
-				System.out.println(((GeodesicalCustomer)customers.get(cc)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(cc)).getLongitude());
+				System.out.println(((GeodesicalCustomer)customers.get(cc)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(cc)).getLongitude() + " {" + cc + "}");
 		
-		System.out.println("Depósito:");
-		System.out.println(((GeodesicalCustomer)customers.get(0)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(0)).getLongitude());
+		//System.out.println("Depósito:");
+		System.out.println(((GeodesicalCustomer)customers.get(0)).getLatitude()+ " , " + ((GeodesicalCustomer)customers.get(0)).getLongitude() + " {Deposito}");
 		
 	}
 
