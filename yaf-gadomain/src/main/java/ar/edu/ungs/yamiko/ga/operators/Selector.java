@@ -11,28 +11,25 @@ import ar.edu.ungs.yamiko.ga.domain.Population;
  * @created 08-Oct-2013 11:41:32 p.m.
  * @author ricardo
  */
-public interface Selector {
+public interface Selector<T> {
 
 	/**
 	 * Selecciona un individuo de una población.
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	public Individual execute();
+	public Individual<T> execute();
 
 	/**
 	 * Selecciona n individuos
 	 * @param n
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	public List<Individual> executeN(int n);
+	public List<Individual<T>> executeN(int n);
 	
 	/**
 	 * Establece una población de trabajo
 	 * @param p
 	 */
-	@SuppressWarnings("rawtypes")
 	public void setPopulation(Population p);
 	
 }
