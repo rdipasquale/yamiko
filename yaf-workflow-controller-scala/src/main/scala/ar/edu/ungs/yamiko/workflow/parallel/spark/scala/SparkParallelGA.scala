@@ -84,39 +84,35 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
 					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 
 				parameter.getSelector().setPopulation(p)				
-				val candidates:List[Individual[T]]=parameter.getSelector().executeN((p.size()*2).intValue());
+				val candidates:List[Individual[T]]=(parameter.getSelector().executeN((p.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
 				
 				val tuplasSer=candidates zip candidates.tail.tail;
 				
 				val tuplas=sc.parallelize(tuplasSer);
 								
-				val descendants=tuplas.map{parents => 
-				  val parentsJ: java.util.Collection[Individual[T]] = new ArrayList[Individual[T]]();
+				var descendants=tuplas.map{parents => 
+				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
+				  parentsJ.add(parents._1);
+				  parentsJ.add(parents._2);
 				  if (StaticHelper.randomDouble(1d)<=bcCrossProb.value)
-					                                      bcDesc.value.execute(bcCross.value.execute(parents),parents);
+					                                      bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ);
 				                                      else null}
 
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				List<List<Individual<T>>> descendants=descendantsRDD.collect();
-				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
-				for (List<Individual<T>> l : descendants) 
-					if (l!=null) 
-						newPop.addAll(l);
+//				List<List<Individual<T>>> descendants=descendantsRDD.collect();
+//				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
+//				for (List<Individual<T>> l : descendants) 
+//					if (l!=null) 
+//						newPop.addAll(l);
 				
 				if (bestInd!=null)
-					if (!newPop.contains(bestInd))
-						newPop.add(bestInd);
+          if (descendants.filter(a => a.equals(bestInd))==null)
+          {
+            val list=new ArrayList[Individual[T]]();
+            list.add(bestInd);
+            descendants.union(sc.parallelize(Array(list)))
+          }
+				if (descendants.count()>parameter.getPopulationSize()) descendants.dro remove(0);
+
 				
 				if (newPop.size()>parameter.getPopulationSize()) newPop.remove(0);
 				else
