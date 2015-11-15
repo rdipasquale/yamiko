@@ -26,6 +26,7 @@ import java.util.List
 import java.util.ArrayList
 import org.apache.spark.rdd.RDD
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator
 
 class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
   
@@ -43,7 +44,7 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
 			if (parameter.getSelector()==null) throw new NullSelector() ;
   }
   
-  def run() =
+  def run():Individual[T] =
 		{
       validateParameters();
     	var generationNumber=0;
@@ -90,13 +91,13 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
 				
 				val tuplas=sc.parallelize(tuplasSer);
 								
-				var descendants=tuplas.map{parents => 
+				var descendants=tuplas.flatMap{parents => 
 				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
 				  parentsJ.add(parents._1);
 				  parentsJ.add(parents._2);
 				  if (StaticHelper.randomDouble(1d)<=bcCrossProb.value)
 					                                      bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ);
-				                                      else null}
+				                                      else parentsJ}
 
 //				List<List<Individual<T>>> descendants=descendantsRDD.collect();
 //				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
@@ -109,30 +110,33 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
           {
             val list=new ArrayList[Individual[T]]();
             list.add(bestInd);
-            descendants.union(sc.parallelize(Array(list)))
+            descendants.union(sc.parallelize(list))
           }
-				if (descendants.count()>parameter.getPopulationSize()) descendants.dro remove(0);
+				if (descendants.count()<parameter.getPopulationSize())
+          descendants.takeOrdered(parameter.getPopulationSize().intValue()-descendants.count().intValue())(FitnessOrdering);
 
+				descendants.map { i => if (StaticHelper.randomDouble(1d)<=bcMutProb.value)
+					                     bcMut.value.execute(i);
+				                       else i}
 				
-				if (newPop.size()>parameter.getPopulationSize()) newPop.remove(0);
-				else
-					if (newPop.size()<parameter.getPopulationSize())
-						newPop.addAll(helper.tomarNMejores(p.getRDD(), (int)parameter.getPopulationSize()-newPop.size(), sc));
-
-				p.setPopAndParallelize(newPop, sc);
+			  if (descendants.count()>parameter.getPopulationSize())
+				  p.setPopAndParallelize(descendants.take(parameter.getPopulationSize().intValue()).toList,sc);				
+				else 
+				  p.setRDD(descendants);
 				
-				p.setRDD(helper.mutate(p.getRDD(), bcMut, bcMutProb, sc));
+				generationNumber+=1
 				
-				generationNumber++;
-				
-//				if ((generationNumber % 100)==0) 
-//					Logger.getLogger("file").warn("Generation " + generationNumber);
+				if ((generationNumber % 100)==0) 
+					Logger.getLogger("file").warn("Generation " + generationNumber);
 				
 			}
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
 			
-			p.setRDD(helper.developPopulation(p.getRDD(), bcMA, bcG, bcFE, sc));
-			finalPopulation=p;
+      p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null) {
+                                  					    bcMA.value.develop(bcG.value,i)
+                                  					    i.setFitness(bcFE.value.execute(i))
+                                  					   }
+			                                      i} 
 			return bestInd;
 			
 		}
