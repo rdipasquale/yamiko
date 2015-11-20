@@ -30,7 +30,10 @@ import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator
 
 class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
   
-  object FitnessOrdering extends Ordering[Individual[T]] {
+  var _finalPop:RDD[Individual[T]] = null
+  def finalPopulation:RDD[Individual[T]] = _finalPop 
+  
+  private object FitnessOrdering extends Ordering[Individual[T]] {
     def compare(a:Individual[T], b:Individual[T]) = a.getFitness() compareTo (b.getFitness())
   }
   
@@ -137,7 +140,10 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
                                   					    i.setFitness(bcFE.value.execute(i))
                                   					   }
 			                                      i} 
-			return bestInd;
+			
+      _finalPop=p.getRDD.rdd
+
+      return bestInd;
 			
 		}
 }
