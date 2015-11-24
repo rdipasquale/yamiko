@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.workflow;
 
+import java.io.Serializable;
+
 import ar.edu.ungs.yamiko.ga.domain.Genome;
 import ar.edu.ungs.yamiko.ga.domain.Population;
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator;
@@ -17,8 +19,12 @@ import ar.edu.ungs.yamiko.ga.operators.Selector;
  * @author ricardo
  *
  */
-public class Parameter<T> {
+public class Parameter<T> implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1940084709284853667L;
 	private double mutationProbability;
 	private double crossoverProbability;
 	private long populationSize;

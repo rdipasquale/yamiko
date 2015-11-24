@@ -28,7 +28,7 @@ import org.apache.spark.rdd.RDD
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator
 
-class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
+class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ) extends Serializable{
   
   var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
@@ -74,8 +74,8 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ){
                                   					    i.setFitness(bcFE.value.execute(i))
                                   					   }
 			                                      i} 
-				
-				val bestOfGeneration=p.getRDD.rdd.max()(FitnessOrdering);
+				val tempPop:RDD[Individual[T]] =p.getRDD.rdd
+				val bestOfGeneration=tempPop.max()(FitnessOrdering);
 				
 				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
