@@ -35,7 +35,7 @@ public class Parameter<T> implements Serializable{
 	private IndividualValidator<T> individualValidator;
 	private PopulationInitializer<T> populationInitializer;
 	private Repair<T> repair;
-	private Selector selector;
+	private Selector<T> selector;
 	private Population<T> populationInstance;
 	private long maxGenerations;
 	private double optimalFitness;
@@ -78,7 +78,7 @@ public class Parameter<T> implements Serializable{
 		return repair;
 	}
 
-	public Selector getSelector() {
+	public Selector<T> getSelector() {
 		return selector;
 	}
 
@@ -262,7 +262,7 @@ public class Parameter<T> implements Serializable{
 		this.repair = repair;
 	}
 
-	public void setSelector(Selector selector) {
+	public void setSelector(Selector<T> selector) {
 		this.selector = selector;
 	}
 
@@ -279,7 +279,7 @@ public class Parameter<T> implements Serializable{
 			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
 			Mutator<T> mutator, IndividualValidator<T> individualValidator,
 			PopulationInitializer<T> populationInitializer, Repair<T> repair,
-			Selector selector, Population<T> populationInstance,
+			Selector<T> selector, Population<T> populationInstance,
 			long maxGenerations, double optimalFitness,MorphogenesisAgent<T> morp,Genome<T> genome) {
 		super();
 		this.mutationProbability = mutationProbability;

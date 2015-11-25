@@ -16,6 +16,17 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  */
 public class BitSetRandomPopulationInitializer implements PopulationInitializer<BitSet>{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5669449366940621602L;
+
+	@Override
+	public boolean isOuterInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	public void execute(Population<BitSet> population) {
 		if (population==null) return;
 		// 1 cromosoma

@@ -35,6 +35,8 @@ import ar.edu.ungs.yamiko.ga.domain.Individual
 import java.util.ArrayList
 import java.util.Collection
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
+import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializerScala
+import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 
 object App {
   
@@ -99,7 +101,7 @@ object App {
 			    val chromosomeName="X"
 //			VRPCrossover cross; 
 	//		RoutesMorphogenesisAgent rma;
-	    	  val popI =new ParallelUniqueIntegerPopulationInitializer(sc);
+	    	  val popI =new ParallelUniqueIntegerPopulationInitializerScala();
 		
 
 			    val rma=new RoutesMorphogenesisAgent(customers);
@@ -114,29 +116,28 @@ object App {
     			val cross=new SBXCrossover(30d, c, m, fit);
     			cross.setMatrix(matrix);
 
-    			(popI.asInstanceOf[ParallelUniqueIntegerPopulationInitializer]).setMaxZeros(m);
-    			(popI.asInstanceOf[ParallelUniqueIntegerPopulationInitializer]).setStartWithZero(true);
-    			(popI.asInstanceOf[ParallelUniqueIntegerPopulationInitializer]).setMaxValue(n);	
-
 			    val acceptEvaluator:AcceptEvaluator[Array[Integer]] =new DescendantModifiedAcceptEvaluator[Array[Integer]](rma,genome,fit)
 
 			    rma.develop(genome, optInd)
 			    val fitnesOptInd=fit.execute(optInd)
 			
 			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
-	
+
+			    val pop=new GlobalSingleSparkPopulation[Array[Integer]](genome);
+			    popI.execute(pop, sc, true, n, m)
+			    
 			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 0.99, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
-    					null, popI, null, new ProbabilisticRouletteSelector(), 
-    					new GlobalSingleSparkPopulation[Array[Integer]](genome), maxGenerations, fitnesOptInd,rma,genome)
+    					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelector(), 
+    					pop, maxGenerations, fitnesOptInd,rma,genome)
 
-			    val ga=new SparkParallelGA[Array[Integer]](par,sc)
+			    val ga=new SparkParallelGA[Array[Integer]](par)
 					
 			    val t1=System.currentTimeMillis()
 			
 			    log.warn("Iniciando ga.run() -> par.getMaxGenerations()=" + par.getMaxGenerations() + " par.getPopulationSize()=" + par.getPopulationSize() + " Crossover class=" + cross.getClass().getName());
 			    
-			    val winner= ga.run()
+			    val winner= ga.run(sc)
 			
 			    val t2=System.currentTimeMillis();
 			    log.warn("Fin ga.run()");

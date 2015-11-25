@@ -30,6 +30,6 @@ public interface Selector<T> {
 	 * Establece una población de trabajo
 	 * @param p
 	 */
-	public void setPopulation(Population p);
+	public void setPopulation(Population<T> p);
 	
 }

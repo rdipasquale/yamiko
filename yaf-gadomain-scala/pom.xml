@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>ar.edu.ungs</groupId>
-  <artifactId>yaf-vrp-scala</artifactId>
+  <artifactId>yaf-gadomain-scala</artifactId>
   <version>1.0.0</version>
   <name>${project.artifactId}</name>
-  <description>yaf-vrp-scala</description>
+  <description>${project.artifactId}</description>
   <inceptionYear>2015</inceptionYear>
   <licenses>
     <license>
@@ -62,16 +62,10 @@
 	  <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>ar.edu.ungs.yamiko.problems</groupId>
-	  <artifactId>yaf-vrp</artifactId>
-	  <version>1.0.0</version>
-	</dependency>
-    <dependency>
-       <groupId>ar.edu.ungs</groupId>
-	  <artifactId>yaf-gadomain-scala</artifactId>
-	  <version>1.0.0</version>
-	</dependency>
-	    
+	  <groupId>ar.edu.ungs.yamiko</groupId>
+	  <artifactId>yaf-gadomain</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>	    
+    </dependency>
   </dependencies>
 
   <build>

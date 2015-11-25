@@ -1,4 +1,6 @@
 package ar.edu.ungs.yamiko.ga.operators;
+import java.io.Serializable;
+
 import ar.edu.ungs.yamiko.ga.domain.Population;
 
 /**
@@ -9,12 +11,18 @@ import ar.edu.ungs.yamiko.ga.domain.Population;
  * @version 1.0
  * @param <T>
  */
-public interface PopulationInitializer<T> {
+public interface PopulationInitializer<T> extends Serializable {
 
 	/**
 	 * Inicializa la población
 	 * @param population
 	 */
 	public void execute(Population<T> population);
+	
+	/**
+	 * Esta propiedad sirve para determinar cuando la poblacion debe inicializarse de forma externa.
+	 * @return
+	 */
+	public boolean isOuterInitialized();
 
 }

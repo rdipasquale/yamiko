@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.operators.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,51 +15,50 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  * @author ricardo
  *
  */
-public class ProbabilisticRouletteSelector implements Selector {
+public class ProbabilisticRouletteSelector<T> implements Selector<T>,Serializable{
 
-	@SuppressWarnings("rawtypes")
-	private Population p;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1021721399295562069L;
+	private Population<T> p;
 
 	public ProbabilisticRouletteSelector() {
 		
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public void setPopulation(Population p) {
+	public void setPopulation(Population<T> p) {
 		this.p = p;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Individual execute() {
+	public Individual<T> execute() {
 		double roulette[]=buildRoulette();
 		double rou=StaticHelper.randomDouble(roulette[roulette.length-1]);
 		int selected=SearchHelper.binaryRangeSearch(roulette, rou);
-		return (Individual)p.getAll().get(selected);
+		return (Individual<T>)p.getAll().get(selected);
 	}	
 	
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List<Individual> executeN(int n) {
+	public List<Individual<T>> executeN(int n) {
 		double roulette[]=buildRoulette();
-		List<Individual> salida=new ArrayList<Individual>();
+		List<Individual<T>> salida=new ArrayList<Individual<T>>();
 		for (int i=0;i<n;i++)
 		{
 			double rou=StaticHelper.randomDouble(roulette[roulette.length-1]);
 			int selected=SearchHelper.binaryRangeSearch(roulette, rou);
-			salida.add((Individual)p.getAll().get(selected));			
+			salida.add((Individual<T>)p.getAll().get(selected));			
 		}
 		return salida;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private double[] buildRoulette()
 	{
 		double[] salida=new double[p.getAll().size()];
 		double suma=0;
 		for (int i=0;i<p.getAll().size();i++)
 		{
-			suma+=((Individual)(p.getAll().get(i))).getFitness();
+			suma+=((Individual<T>)(p.getAll().get(i))).getFitness();
 			salida[i]=suma;
 		}
 		return salida;

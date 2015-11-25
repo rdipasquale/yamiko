@@ -90,7 +90,7 @@ public class SerialGA<T> {
 					Logger.getLogger("file").warn("Mejor Individuo Generación " + generationNumber + " Fitness: " + bestIndGen.getFitness() + " -- fitness promedio: " + fitnessProm + "{[" + bestIndGen.getFitness() + ";" + fitnessProm +"]}");
 
 				parameter.getSelector().setPopulation(p);
-				List<Individual> candidates=parameter.getSelector().executeN((int)p.size()*2);
+				List<Individual<T>> candidates=parameter.getSelector().executeN((int)p.size()*2);
 				
 				Iterator ite=candidates.iterator();
 				Set<Individual<T>> replacedChildren=new HashSet<Individual<T>>();

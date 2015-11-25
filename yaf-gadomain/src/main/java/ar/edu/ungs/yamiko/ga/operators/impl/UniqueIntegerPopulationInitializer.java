@@ -17,10 +17,19 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper;
  */
 public class UniqueIntegerPopulationInitializer implements PopulationInitializer<Integer[]>{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7970877202311118717L;
 	private int maxZeros=1;
 	private boolean startWithZero=false;	
 	private int maxValue;
 	
+	@Override
+	public boolean isOuterInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	public int getMaxValue() {
 		return maxValue;

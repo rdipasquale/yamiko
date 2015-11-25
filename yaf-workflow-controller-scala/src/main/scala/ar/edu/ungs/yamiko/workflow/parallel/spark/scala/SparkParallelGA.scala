@@ -27,13 +27,14 @@ import java.util.ArrayList
 import org.apache.spark.rdd.RDD
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator
+import ar.edu.ungs.yamiko.ga.domain.Population
 
-class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ) extends Serializable{
+class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
   
   var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
   
-  private object FitnessOrdering extends Ordering[Individual[T]] {
+  private object FitnessOrdering extends Ordering[Individual[T]] with Serializable{
     def compare(a:Individual[T], b:Individual[T]) = a.getFitness() compareTo (b.getFitness())
   }
   
@@ -47,7 +48,7 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ) extends Ser
 			if (parameter.getSelector()==null) throw new NullSelector() ;
   }
   
-  def run():Individual[T] =
+  def run(sc:SparkContext ):Individual[T] =
 		{
       validateParameters();
     	var generationNumber=0;
@@ -68,14 +69,13 @@ class SparkParallelGA[T] (parameter: Parameter[T] ,sc:SparkContext ) extends Ser
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
-			  p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)
+			  val developed=p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)
                                   				    {
                                   					    bcMA.value.develop(bcG.value,i)
                                   					    i.setFitness(bcFE.value.execute(i))
                                   					   }
 			                                      i} 
-				val tempPop:RDD[Individual[T]] =p.getRDD.rdd
-				val bestOfGeneration=tempPop.max()(FitnessOrdering);
+				val bestOfGeneration=developed.max()(FitnessOrdering);
 				
 				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
