@@ -86,7 +86,8 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 
 				//if ((generationNumber % 100)==0) 
 					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
-
+					
+				p.setRDD(developed)
 				parameter.getSelector().setPopulation(p)				
 				val candidates:List[Individual[T]]=(parameter.getSelector().executeN((p.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
 				

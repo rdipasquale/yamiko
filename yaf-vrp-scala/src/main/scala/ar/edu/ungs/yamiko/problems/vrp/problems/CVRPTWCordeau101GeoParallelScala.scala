@@ -124,6 +124,7 @@ object App {
 			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
 
 			    val pop=new GlobalSingleSparkPopulation[Array[Integer]](genome);
+			    pop.setSize(individuals);
 			    popI.execute(pop, sc, true, n, m)
 			    
 			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 0.99, individuals, acceptEvaluator, 
