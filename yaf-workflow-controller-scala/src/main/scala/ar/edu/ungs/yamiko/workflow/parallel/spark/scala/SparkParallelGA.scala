@@ -77,6 +77,11 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			                                      i} 
 				val bestOfGeneration=developed.max()(FitnessOrdering);
 				
+				// DEBUG
+				developed.takeOrdered(developed.count().intValue())(FitnessOrdering).foreach { x => Logger.getLogger("file").warn("Generation " + generationNumber + " -> Individuo " + x.getId() + "/" + developed.count() + "-> Fitness: " + x.getFitness()) };
+				// DEBUG
+				
+				
 				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
 				{
@@ -114,7 +119,7 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
           {
             val list=new ArrayList[Individual[T]]();
             list.add(bestInd);
-            descendants.union(sc.parallelize(list))
+            descendants=descendants.union(sc.parallelize(list))
           }
 				if (descendants.count()<parameter.getPopulationSize())
           descendants.takeOrdered(parameter.getPopulationSize().intValue()-descendants.count().intValue())(FitnessOrdering);

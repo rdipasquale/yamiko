@@ -27,7 +27,7 @@ class ParallelUniqueIntegerPopulationInitializerScala extends PopulationInitiali
   {
       //val bc:Broadcast[Genome[Array[Int]]] = sc.broadcast(p.getGenome())
       val pop:ArrayBuffer[Individual[Array[Integer]]]=new ArrayBuffer[Individual[Array[Integer]]]();
-      for( i <- 0 to p.size().intValue()){
+      for( i <- 1 to p.size().intValue()){
 				var zeros:Int=0;
 				var verificador:Set[Integer]=new HashSet[Integer]("verificador",p.getGenome.size());
 				val numeros:Array[Integer]=new Array[Integer](p.getGenome.size());
