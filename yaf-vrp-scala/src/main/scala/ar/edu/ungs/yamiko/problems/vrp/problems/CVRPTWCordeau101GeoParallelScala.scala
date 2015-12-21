@@ -42,8 +42,8 @@ object App {
   
   val log=Logger.getLogger("file")
   val WORK_PATH="/media/ricardo/hd/logs/"
-	val INDIVIDUALS=5
-	val MAX_GENERATIONS=10	
+	val INDIVIDUALS=200
+	val MAX_GENERATIONS=10000	
 	//private static final String URI_SPARK="spark://192.168.1.40:7077";
 	val URI_SPARK="local[8]"
 

@@ -69,16 +69,23 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
+			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
+			  
 			  val developed=p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)
                                   				    {
                                   					    bcMA.value.develop(bcG.value,i)
                                   					    i.setFitness(bcFE.value.execute(i))
                                   					   }
 			                                      i} 
-				val bestOfGeneration=developed.max()(FitnessOrdering);
-				
+
+			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> developed");
+			  
+			  val bestOfGeneration=developed.max()(FitnessOrdering);
+
+			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> max");
+			  
 				// DEBUG
-				developed.takeOrdered(developed.count().intValue())(FitnessOrdering).foreach { x => Logger.getLogger("file").warn("Generation " + generationNumber + " -> Individuo " + x.getId() + "/" + developed.count() + "-> Fitness: " + x.getFitness()) };
+				//developed.takeOrdered(developed.count().intValue())(FitnessOrdering).foreach { x => Logger.getLogger("file").warn("Generation " + generationNumber + " -> Individuo " + x.getId() + "/" + developed.count() + "-> Fitness: " + x.getFitness()) };
 				// DEBUG
 				
 				

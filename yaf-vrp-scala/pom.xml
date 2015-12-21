@@ -120,6 +120,32 @@
           </includes>
         </configuration>
       </plugin>
+      
+<!--       <plugin> -->
+<!--         <groupId>org.apache.maven.plugins</groupId> -->
+<!--         <artifactId>maven-shade-plugin</artifactId> -->
+<!--         <version>2.4.2</version> -->
+<!--         <executions> -->
+<!--           <execution> -->
+<!--             <phase>package</phase> -->
+<!--             <goals> -->
+<!--               <goal>shade</goal> -->
+<!--             </goals> -->
+<!--             <configuration> -->
+<!--               <artifactSet> -->
+<!--                 <includes> -->
+<!--                   <include>ar.edu.ungs.yamiko:yaf-gadomain</include> -->
+<!--                   <include>ar.edu.ungs:yaf-gadomain-scala</include> -->
+<!--                   <include>ar.edu.ungs:yamiko.problems:yaf-vrp</include> -->
+<!--                   <include>ar.edu.ungs:yamiko:yaf-workflow-controller</include> -->
+<!--                   <include>ar.edu.ungs:yaf-workflow-controller-scala</include> -->
+<!--                 </includes> -->
+<!--               </artifactSet> -->
+<!--             </configuration> -->
+<!--           </execution> -->
+<!--         </executions> -->
+<!--       </plugin>     -->
+      
     </plugins>
 
   </build>
