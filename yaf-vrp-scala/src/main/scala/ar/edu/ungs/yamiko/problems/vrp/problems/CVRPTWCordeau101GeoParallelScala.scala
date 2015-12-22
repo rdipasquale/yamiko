@@ -59,6 +59,7 @@ object App {
     	var wPath=WORK_PATH;
 		  var individuals=INDIVIDUALS;
 		  var maxGenerations=MAX_GENERATIONS;
+		  var uriSpark=URI_SPARK;
 		  if (args!=null)
   			if (args.length==1)
   				wPath=args(0);
@@ -75,12 +76,19 @@ object App {
   						individuals=Integer.parseInt(args(1));
   						maxGenerations=Integer.parseInt(args(2));
   					}
- 
+  				else
+  					if (args.length>3)
+  					{
+  						wPath=args(0);
+  						individuals=Integer.parseInt(args(1));
+  						maxGenerations=Integer.parseInt(args(2));
+  						uriSpark=args(3);
+  					} 
     	try {
     		
     		log.warn("Init");
     		
-        	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("CVRPTWCordeau101GeoParallel");
+        	val conf = new SparkConf().setMaster(uriSpark).setAppName("CVRPTWCordeau101GeoParallel");
 //        	SparkConf conf = new SparkConf().setMaster("local[8]").setAppName("CVRPTWCordeau101GeoParallel");
         	//SparkConf conf = new SparkConf().setAppName("CVRPTWCordeau101");
           val sc=new SparkContext(conf)
