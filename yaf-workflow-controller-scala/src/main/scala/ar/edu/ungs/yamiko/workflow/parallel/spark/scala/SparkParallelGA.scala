@@ -1,33 +1,36 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark.scala
 
-import ar.edu.ungs.yamiko.workflow.Parameter
+import java.util.ArrayList
+import java.util.List
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.seqAsJavaList
+
+import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
+import org.apache.spark.api.java.JavaRDD.fromRDD
+import org.apache.spark.api.java.JavaSparkContext.fromSparkContext
+import org.apache.spark.broadcast.Broadcast
+import org.apache.spark.rdd.RDD
+
+import ar.edu.ungs.yamiko.ga.domain.Genome
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
+import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability
 import ar.edu.ungs.yamiko.ga.exceptions.NullAcceptEvaluator
 import ar.edu.ungs.yamiko.ga.exceptions.NullCrossover
-import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability
 import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator
 import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer
 import ar.edu.ungs.yamiko.ga.exceptions.NullSelector
-import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import org.apache.spark.broadcast.Broadcast
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
+import ar.edu.ungs.yamiko.ga.operators.Crossover
+import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.operators.Mutator
-import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
-import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
-import ar.edu.ungs.yamiko.ga.domain.Genome
-import ar.edu.ungs.yamiko.ga.operators.Crossover
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
-import ar.edu.ungs.yamiko.ga.domain.Individual
-import ar.edu.ungs.yamiko.workflow.BestIndHolder
-import org.apache.log4j.Logger
-import scala.collection.JavaConversions._
 import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper
-import java.util.List
-import java.util.ArrayList
-import org.apache.spark.rdd.RDD
-import scala.collection.mutable.ListBuffer
-import ar.edu.ungs.yamiko.ga.domain.impl.FitnessComparator
-import ar.edu.ungs.yamiko.ga.domain.Population
+import ar.edu.ungs.yamiko.workflow.BestIndHolder
+import ar.edu.ungs.yamiko.workflow.Parameter
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
 
 class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
   
@@ -63,6 +66,19 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			val bcMut:Broadcast[Mutator[T]]=sc.broadcast(parameter.getMutator());
 			val bcMutProb:Broadcast[Double]=sc.broadcast(parameter.getMutationProbability());
 			val bcDesc:Broadcast[AcceptEvaluator[T]]=sc.broadcast(parameter.getAcceptEvaluator());
+			
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMorphogenesisAgent()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMorphogenesisAgent()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getGenome()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getGenome()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getFitnessEvaluator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getFitnessEvaluator()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getCrossover()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getCrossover()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getCrossoverProbability()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getCrossoverProbability()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMutator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMutator()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMutationProbability()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMutationProbability()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getAcceptEvaluator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getAcceptEvaluator()));
+			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter) -> " + ObjectSizeCalculator.getObjectSize(parameter));
+			
+			
+			
 			
 			val p:GlobalSingleSparkPopulation[T]=parameter.getPopulationInstance().asInstanceOf[GlobalSingleSparkPopulation[T]];
 			parameter.getPopulationInitializer().execute(p);
