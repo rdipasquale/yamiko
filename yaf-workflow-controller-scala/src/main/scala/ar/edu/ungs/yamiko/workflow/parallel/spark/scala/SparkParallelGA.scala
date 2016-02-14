@@ -103,13 +103,8 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			  
 			  val bestOfGeneration=developed.max()(FitnessOrdering);
 
-			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> max");
+			  //Logger.getLogger("file").warn("Generation " + generationNumber + " -> max = " + bestOfGeneration.getFitness);
 			  
-				// DEBUG
-				//developed.takeOrdered(developed.count().intValue())(FitnessOrdering).foreach { x => Logger.getLogger("file").warn("Generation " + generationNumber + " -> Individuo " + x.getId() + "/" + developed.count() + "-> Fitness: " + x.getFitness()) };
-				// DEBUG
-				
-				
 				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
 				{
@@ -118,7 +113,7 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 				}
 
 				//if ((generationNumber % 100)==0) 
-					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+				Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 					
 				p.setRDD(developed)
 				parameter.getSelector().setPopulation(p)				
@@ -143,30 +138,24 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
             bcDesc.value.execute(children,parentsJ);
 				  }
 				  else parentsJ}
-
-//				List<List<Individual<T>>> descendants=descendantsRDD.collect();
-//				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
-//				for (List<Individual<T>> l : descendants) 
-//					if (l!=null) 
-//						newPop.addAll(l);
-				
-				if (bestInd!=null)
-          if (descendants.filter(a => a.equals(bestInd))==null)
-          {
+		
+//				if (bestInd!=null)
+//          if (descendants.filter(a => a.equals(bestInd))==null)
+//          {
             val list=new ArrayList[Individual[T]]();
             list.add(bestInd);
             descendants=descendants.union(sc.parallelize(list))
-          }
-				if (descendants.count()<parameter.getPopulationSize())
-          descendants.takeOrdered(parameter.getPopulationSize().intValue()-descendants.count().intValue())(FitnessOrdering);
+//          }
+//				if (descendants.count()<parameter.getPopulationSize())
+//          descendants.takeOrdered(parameter.getPopulationSize().intValue()-descendants.count().intValue())(FitnessOrdering);
 
 				descendants.map { i => if (StaticHelper.randomDouble(1d)<=bcMutProb.value)
 					                     bcMut.value.execute(i);
 				                       else i}
 				
-			  if (descendants.count()>parameter.getPopulationSize())
-				  p.setPopAndParallelize(descendants.take(parameter.getPopulationSize().intValue()).toList,sc);				
-				else 
+//			  if (descendants.count()>parameter.getPopulationSize())
+//				  p.setPopAndParallelize(descendants.take(parameter.getPopulationSize().intValue()).toList,sc);				
+//				else 
 				  p.setRDD(descendants);
 				
 				generationNumber+=1

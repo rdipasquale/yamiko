@@ -135,7 +135,7 @@ object App {
 			    pop.setSize(individuals);
 			    popI.execute(pop, sc, true, n, m)
 			    
-			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 0.99, individuals, acceptEvaluator, 
+			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 1, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
     					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelector(), 
     					pop, maxGenerations, fitnesOptInd,rma,genome)
