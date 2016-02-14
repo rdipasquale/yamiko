@@ -21,7 +21,6 @@ import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator
 import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
-import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptEvaluator
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom
@@ -37,6 +36,7 @@ import java.util.Collection
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializerScala
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
 
 object App {
   
@@ -124,7 +124,7 @@ object App {
     			val cross=new SBXCrossover(30d, c, m, fit);
     			cross.setMatrix(matrix);
 
-			    val acceptEvaluator:AcceptEvaluator[Array[Integer]] =new DescendantModifiedAcceptEvaluator[Array[Integer]](rma,genome,fit)
+			    val acceptEvaluator:AcceptEvaluator[Array[Integer]] =new DescendantModifiedAcceptLigthEvaluator()
 
 			    rma.develop(genome, optInd)
 			    val fitnesOptInd=fit.execute(optInd)

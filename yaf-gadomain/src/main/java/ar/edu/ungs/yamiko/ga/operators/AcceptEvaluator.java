@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.operators;
 
+import java.io.Serializable;
 import java.util.List;
 
 import ar.edu.ungs.yamiko.ga.domain.Individual;
@@ -13,7 +14,7 @@ import ar.edu.ungs.yamiko.ga.domain.Individual;
  * @created 08-Oct-2013 11:40:56 p.m.
  * @param <T>
  */
-public interface AcceptEvaluator<T> {
+public interface AcceptEvaluator<T> extends Serializable{
 
 	/**
 	 * Devuelve la colección de individuos aceptados para ser incorporados a la población.

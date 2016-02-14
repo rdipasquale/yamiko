@@ -94,7 +94,7 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			  
 			  val developed=p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)
                                   				    {
-                                  					    bcMA.value.develop(bcG.value,i)
+			                                          if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
                                   					    i.setFitness(bcFE.value.execute(i))
                                   					   }
 			                                      i} 
@@ -133,8 +133,16 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 				  parentsJ.add(parents._1);
 				  parentsJ.add(parents._2);
 				  if (StaticHelper.randomDouble(1d)<=bcCrossProb.value)
-					                                      bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ);
-				                                      else parentsJ}
+				  {
+            val children = bcCross.value.execute(parentsJ)
+				    for (ind <- children)
+				    {
+				      if (ind.getPhenotype==null) bcMA.value.develop(bcG.value, ind )
+				      if (ind.getFitness==null) ind.setFitness(bcFE.value.execute(ind))
+				    }				      
+            bcDesc.value.execute(children,parentsJ);
+				  }
+				  else parentsJ}
 
 //				List<List<Individual<T>>> descendants=descendantsRDD.collect();
 //				List<Individual<T>> newPop=new ArrayList<Individual<T>>((int)parameter.getPopulationSize());
