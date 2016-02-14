@@ -87,7 +87,7 @@ public class TestLCSXCrossOver {
 		customers.put(8,new GeodesicalCustomer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 19, 0)));		
 		customers.put(9,new GeodesicalCustomer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 19, 0)));		
 		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));		
-		RoutesMorphogenesisAgent rma=new RoutesMorphogenesisAgent(customers);
+		RoutesMorphogenesisAgent rma=new RoutesMorphogenesisAgent();
 		for (Individual<Integer[]> ind: population) 
 			rma.develop(genome, ind);		
 		i1=population.getAll().get(0);
@@ -164,7 +164,7 @@ public class TestLCSXCrossOver {
 		customers.put(8,new GeodesicalCustomer(8, "Cliente 8", null, -34.597730, -58.372378,new TimeWindow(8,0, 19, 0)));		
 		customers.put(9,new GeodesicalCustomer(9, "Cliente 9", null, -34.661575, -58.477091,new TimeWindow(8,0, 19, 0)));		
 		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,new TimeWindow(8,0, 10, 0)));		
-		RoutesMorphogenesisAgent rma=new RoutesMorphogenesisAgent(customers);
+		RoutesMorphogenesisAgent rma=new RoutesMorphogenesisAgent();
 		for (Individual<Integer[]> ind: population) 
 			rma.develop(genome, ind);		
 		i1=population.getAll().get(0);

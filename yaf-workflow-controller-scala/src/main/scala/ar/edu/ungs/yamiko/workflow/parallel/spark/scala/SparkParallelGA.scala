@@ -2,17 +2,14 @@ package ar.edu.ungs.yamiko.workflow.parallel.spark.scala
 
 import java.util.ArrayList
 import java.util.List
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
-
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD.fromRDD
 import org.apache.spark.api.java.JavaSparkContext.fromSparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
-
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
@@ -31,6 +28,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
+
 
 class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
   
@@ -83,8 +81,15 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			val p:GlobalSingleSparkPopulation[T]=parameter.getPopulationInstance().asInstanceOf[GlobalSingleSparkPopulation[T]];
 			parameter.getPopulationInitializer().execute(p);
 			
+			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
+//			  if (generationNumber>1)
+//  			  for (name <- p.getAll) 
+//  			    Logger.getLogger("file").warn("Size of " + "Ind -> " + ObjectSizeCalculator.getObjectSize(name) + " - Genotipo: " + ObjectSizeCalculator.getObjectSize(name.getGenotype) + " - Phenotipo: " + ObjectSizeCalculator.getObjectSize(name.getPhenotype) + " - Mapa de alelos del fenotipo: " + ObjectSizeCalculator.getObjectSize(name.getPhenotype.getAlleleMap)
+//  			        + " - key: " + ObjectSizeCalculator.getObjectSize(name.getPhenotype.getAlleleMap.keySet()) + " - valueSet: " + ObjectSizeCalculator.getObjectSize(name.getPhenotype.getAlleleMap.values()))
+  			
+			  
 			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
 			  val developed=p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)

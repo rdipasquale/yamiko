@@ -28,13 +28,14 @@ public class RoutesMorphogenesisAgent implements MorphogenesisAgent<Integer[]>,S
 	 * 
 	 */
 	private static final long serialVersionUID = 7428856797394286072L;
-	private Map<Integer,Customer> customers;
 	
-	
-	public RoutesMorphogenesisAgent(Map<Integer, Customer> customers) {
-		super();
-		this.customers = customers;
-	}
+//	private Map<Integer,Customer> customers;
+//	
+//	
+//	public RoutesMorphogenesisAgent(Map<Integer, Customer> customers) {
+//		super();
+//		this.customers = customers;
+//	}
 
 	/**
 	 * 
@@ -68,7 +69,8 @@ public class RoutesMorphogenesisAgent implements MorphogenesisAgent<Integer[]>,S
 				visitas.add(allele[i]);
 				i++;
 			}
-			salida.add(new Route(visitas,customers));
+			//salida.add(new Route(visitas,customers));
+			salida.add(new Route(visitas));
 		}
 		return salida;
 	}

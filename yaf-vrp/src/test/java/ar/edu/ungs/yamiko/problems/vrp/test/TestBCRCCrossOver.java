@@ -72,7 +72,7 @@ public class TestBCRCCrossOver {
 		population=new GlobalSinglePopulation<Integer[]>(genome);
 		population.setSize(2L);
 		popI.execute(population);
-		rma=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent();
 		for (Individual<Integer[]> ind: population) 
 			rma.develop(genome, ind);		
 		i1=population.getAll().get(0);

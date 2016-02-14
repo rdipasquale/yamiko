@@ -13,7 +13,9 @@ public class Route implements Serializable{
 	 */
 	private static final long serialVersionUID = -7031376641111549703L;
 	private List<Integer> routeModel=new ArrayList<Integer>();
-	private List<Customer> routeRepresentation=new ArrayList<Customer>();
+
+	// Por un tema de memoria se decide no incluir la lista de Clientes en todas las rutas
+//	private List<Customer> routeRepresentation=new ArrayList<Customer>();
 	
 	public Route() {
 		// TODO Auto-generated constructor stub
@@ -28,20 +30,17 @@ public class Route implements Serializable{
 		return routeModel;
 	}
 
-	public List<Customer> getRouteRepresentation() {
-		return routeRepresentation;
-	}
+//	public List<Customer> getRouteRepresentation() {
+//		return routeRepresentation;
+//	}
+
+	
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((routeModel == null) ? 0 : routeModel.hashCode());
-		result = prime
-				* result
-				+ ((routeRepresentation == null) ? 0 : routeRepresentation
-						.hashCode());
+		result = prime * result + ((routeModel == null) ? 0 : routeModel.hashCode());
 		return result;
 	}
 
@@ -59,42 +58,39 @@ public class Route implements Serializable{
 				return false;
 		} else if (!routeModel.equals(other.routeModel))
 			return false;
-		if (routeRepresentation == null) {
-			if (other.routeRepresentation != null)
-				return false;
-		} else if (!routeRepresentation.equals(other.routeRepresentation))
-			return false;
 		return true;
 	}
 
-	public Route(List<Integer> routeModel, List<Customer> routeRepresentation) {
-		super();
-		this.routeModel = routeModel;
-		this.routeRepresentation = routeRepresentation;
-	}
+//	public Route(List<Integer> routeModel, List<Customer> routeRepresentation) {
+//		super();
+//		this.routeModel = routeModel;
+//		this.routeRepresentation = routeRepresentation;
+//	}
 
 	public Route(List<Integer> routeModel) {
 		super();
 		this.routeModel = routeModel;
 	}
 	
-	public Route(List<Integer> routeModel, Map<Integer,Customer> customers) {
-		super();
-		this.routeModel = routeModel;
-		buildRouteRepresentation(customers);
-	}
+//	public Route(List<Integer> routeModel, Map<Integer,Customer> customers) {
+//		super();
+//		this.routeModel = routeModel;
+//		buildRouteRepresentation(customers);
+//	}
 	
-	private void buildRouteRepresentation(Map<Integer,Customer> customers)
+	public List<Customer> buildRouteRepresentation(Map<Integer,Customer> customers)
 	{
+		List<Customer> routeRepresentation=new ArrayList<Customer>();
 		for (Integer i : routeModel) 
-			this.routeRepresentation.add(customers.get(i));
+			routeRepresentation.add(customers.get(i));
+		return routeRepresentation;
 	}
 	
-	public Route(Integer[] route, Map<Integer,Customer> customers) {
-		super();
-		this.routeModel.addAll(Arrays.asList(route));
-		buildRouteRepresentation(customers);
-	}
+//	public Route(Integer[] route, Map<Integer,Customer> customers) {
+//		super();
+//		this.routeModel.addAll(Arrays.asList(route));
+//		buildRouteRepresentation(customers);
+//	}
 
 	@Override
 	public String toString() {

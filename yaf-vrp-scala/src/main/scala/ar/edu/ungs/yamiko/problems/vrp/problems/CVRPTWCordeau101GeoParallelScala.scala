@@ -112,7 +112,7 @@ object App {
 	    	  val popI =new ParallelUniqueIntegerPopulationInitializerScala();
 		
 
-			    val rma=new RoutesMorphogenesisAgent(customers);
+			    val rma=new RoutesMorphogenesisAgent();
 			    val translators=new HashMap[Gene, Ribosome[Array[Integer]]]();
 			    translators.put(gene, ribosome);
 			    val genome=new DynamicLengthGenome[Array[Integer]](chromosomeName, gene, ribosome,n+m)

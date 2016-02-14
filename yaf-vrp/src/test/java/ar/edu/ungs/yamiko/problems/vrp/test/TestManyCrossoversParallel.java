@@ -91,7 +91,7 @@ public class TestManyCrossoversParallel {
         JavaSparkContext sc = new JavaSparkContext("local","VRPTWParallel",System.getenv("SPARK_HOME"), System.getenv("JARS"));
     	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
 
-		rma=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent();
 		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 		translators.put(gene, ribosome);
 		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,customers.keySet().size()-1+vehicles);

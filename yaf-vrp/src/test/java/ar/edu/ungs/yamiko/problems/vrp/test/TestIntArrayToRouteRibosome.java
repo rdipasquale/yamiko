@@ -27,7 +27,7 @@ public class TestIntArrayToRouteRibosome {
 		customers.put(2,new GeodesicalCustomer(2, "Cliente 2", null, 0, 0));
 		customers.put(3,new GeodesicalCustomer(3, "Cliente 3", null, 0, 0));		
 		customers.put(3,new GeodesicalCustomer(4, "Cliente 4", null, 0, 0));		
-		rma=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent();
 	}
 
 	@After

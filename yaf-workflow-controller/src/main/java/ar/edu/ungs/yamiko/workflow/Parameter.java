@@ -41,6 +41,7 @@ public class Parameter<T> implements Serializable{
 	private double optimalFitness;
 	private MorphogenesisAgent<T> morphogenesisAgent;
 	private Genome<T> genome;
+
 	
 	public double getMutationProbability() {
 		return mutationProbability;

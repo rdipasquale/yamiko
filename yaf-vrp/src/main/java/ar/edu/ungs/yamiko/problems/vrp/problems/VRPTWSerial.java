@@ -57,7 +57,8 @@ public class VRPTWSerial
 		customers.put(8,new GeodesicalCustomer(8, "Cliente 8", null, -34.597730, -58.372378,null,0d,30,15));		
 		customers.put(9,new GeodesicalCustomer(9, "Cliente 9", null, -34.661575, -58.477091,null,0d,30,15));		
 		customers.put(10,new GeodesicalCustomer(10, "Cliente 10", null, -34.557589, -58.418383,null,0d,30,15));	
-		rma=new RoutesMorphogenesisAgent(customers);
+		//rma=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent();
 		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 		translators.put(gene, ribosome);
 		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,15);

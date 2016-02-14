@@ -76,7 +76,7 @@ public class TestCordeauParser {
 		PopulationInitializer<Integer[]> popI =new UniqueIntegerPopulationInitializer();
 		
 
-		rma=new RoutesMorphogenesisAgent(customers);
+		rma=new RoutesMorphogenesisAgent();
 		Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 		translators.put(gene, ribosome);
 		genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);

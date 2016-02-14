@@ -126,7 +126,7 @@ public class CVRPTWCordeau101GeoParte2
 			RoutesMorphogenesisAgent rma;
 			
 
-			rma=new RoutesMorphogenesisAgent(customers);
+			rma=new RoutesMorphogenesisAgent();
 			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 			translators.put(gene, ribosome);
 			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);

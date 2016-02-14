@@ -116,7 +116,7 @@ public class CVRPTWCordeau101GeoParallel
 	    	PopulationInitializer<Integer[]> popI =new ParallelUniqueIntegerPopulationInitializer(sc);
 		
 
-			rma=new RoutesMorphogenesisAgent(customers);
+			rma=new RoutesMorphogenesisAgent();
 			Map<Gene, Ribosome<Integer[]>> translators=new HashMap<Gene, Ribosome<Integer[]>>();
 			translators.put(gene, ribosome);
 			genome=new DynamicLengthGenome<Integer[]>(chromosomeName, gene, ribosome,n+m);

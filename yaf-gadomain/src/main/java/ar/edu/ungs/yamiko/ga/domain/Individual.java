@@ -10,12 +10,12 @@ package ar.edu.ungs.yamiko.ga.domain;
  */
 public interface Individual<T> {
 
-	public Genotype<T> getGenotype();
 	public Phenotype getPhenotype();
-	public void setGenotype(Genotype<T> genotype);
 	public void setPhenotype(Phenotype phenotype);
 	public Double getFitness();
 	public void setFitness(Double fitness); 	
 	public long getId();
 	public void setId(long id);
+	public Genotype<T> getGenotype();
+	public void setGenotype(Genotype<T> genotype);
 }
