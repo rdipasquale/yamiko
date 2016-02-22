@@ -33,7 +33,7 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 
 
-class SparkParallelIslandsGA[T] (parameter: Parameter[T]) extends Serializable{
+class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int) extends Serializable{
   
   var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
@@ -67,43 +67,36 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T]) extends Serializable{
 			val bcMut:Broadcast[Mutator[T]]=sc.broadcast(parameter.getMutator());
 			val bcMutProb:Broadcast[Double]=sc.broadcast(parameter.getMutationProbability());
 			val bcDesc:Broadcast[AcceptEvaluator[T]]=sc.broadcast(parameter.getAcceptEvaluator());
-			
 			val bcPopI:Broadcast[PopulationInitializer[T]]=sc.broadcast(parameter.getPopulationInitializer());
-			
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMorphogenesisAgent()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMorphogenesisAgent()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getGenome()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getGenome()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getFitnessEvaluator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getFitnessEvaluator()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getCrossover()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getCrossover()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getCrossoverProbability()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getCrossoverProbability()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMutator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMutator()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getMutationProbability()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getMutationProbability()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter.getAcceptEvaluator()) -> " + ObjectSizeCalculator.getObjectSize(parameter.getAcceptEvaluator()));
-//			Logger.getLogger("file").warn("Size of " + "ObjectSizeCalculator.getObjectSize(parameter) -> " + ObjectSizeCalculator.getObjectSize(parameter));
-			
+		
 			var pops:ArrayList[DistributedPopulation[T]]=new ArrayList[DistributedPopulation[T]];
-			for(i <- 1 to parameter.getMaxNodes) 
-			  pops.add(new DistributedPopulation[T](parameter.getGenome)); 			
-			var populations:RDD[DistributedPopulation[T]]=sc.parallelize(pops,parameter.getMaxNodes)
+			for(i <- 1 to parameter.getMaxNodes) {
+			    val popAux:DistributedPopulation[T]=new DistributedPopulation[T](parameter.getGenome);
+			    popAux.setSize(parameter.getPopulationInstance.size())
+			    pops.add(popAux); 
+			} 			
 			
-			populations=populations.map{p:DistributedPopulation[T] => bcPopI.value.execute(p);p;}
-			populations.foreach { x => println(x.getAll().size()) }
+			val populations0:RDD[DistributedPopulation[T]]=sc.parallelize(pops,parameter.getMaxNodes)
+			var populations:RDD[DistributedPopulation[T]]=populations0.map{p:DistributedPopulation[T] =>  bcPopI.value.execute(p); p}
 			
-			
-//			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
-//			{
-//			  
-//			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
-//			  
-//			  val developed=p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null)
-//                                  				    {
-//			                                          if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
-//                                  					    i.setFitness(bcFE.value.execute(i))
-//                                  					   }
-//			                                      i} 
-//
-//			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> developed");
-//			  
-//			  val bestOfGeneration=developed.max()(FitnessOrdering);
+			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
+			{
+			  
+			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
+			  
+			  val developed=populations.map { dp:DistributedPopulation[T] => 
+			    for(g <- 1 to isolatedGenerations) 
+			    {
+			        dp.getAll().foreach { i:Individual[T] => 
+    			        if (i.getFitness()==null)
+    				      {
+                      if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
+    					        i.setFitness(bcFE.value.execute(i))
+    					    }
+                }
+			        
+			        Logger.getLogger("file").warn("Generation " + generationNumber + " -> developed");
+              val bestOfGeneration=dp.max()(FitnessOrdering);
 //			  
 //				BestIndHolder.holdBestInd(bestOfGeneration);				
 //				if (bestOfGeneration.getFitness()>bestFitness)
@@ -154,7 +147,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T]) extends Serializable{
 //				if ((generationNumber % 100)==0) 
 //					Logger.getLogger("file").warn("Generation " + generationNumber);
 //				
-//			}
+			}
 //			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
 //			
 //      p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null) {
