@@ -44,7 +44,7 @@ public class ParallelUniqueIntegerPopulationInitializer extends UniqueIntegerPop
 	public static JavaRDD<Individual<Integer[]>> execute(final boolean startWithZero,final int maxValue,final int maxZeros,final JavaSparkContext sparkC, final Population<Integer[]> population) {
 	
 		final Broadcast<Genome<Integer[]>> bc= sparkC.broadcast(population.getGenome());
-		JavaRDD<Integer> lista=sparkC.parallelize(Arrays.asList(new Integer[(int)population.size()]));
+		JavaRDD<Integer> lista=sparkC.parallelize(Arrays.asList(new Integer[population.size().intValue()]));
 		JavaRDD<Individual<Integer[]>> salida=lista.map(new Function<Integer, Individual<Integer[]>>() {
 
 			/**

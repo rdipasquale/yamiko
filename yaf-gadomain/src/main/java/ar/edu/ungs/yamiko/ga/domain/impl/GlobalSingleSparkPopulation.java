@@ -28,7 +28,7 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 	private static final long serialVersionUID = 1722893820724398016L;
 	private List<Individual<T>> pop;
 	private Genome<T> genome;
-	private long size;
+	private Long size;
 	JavaRDD<Individual<T>> p;
 	private boolean newRdd=false;
 	private boolean listModified=true;
@@ -64,7 +64,7 @@ public class GlobalSingleSparkPopulation<T> implements Population<T>,ParallelOpe
 		return pop.iterator();
 	}
 
-	public long size() {
+	public Long size() {
 		return size;
 	}
 

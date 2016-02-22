@@ -41,6 +41,7 @@ public class Parameter<T> implements Serializable{
 	private double optimalFitness;
 	private MorphogenesisAgent<T> morphogenesisAgent;
 	private Genome<T> genome;
+	private int maxNodes;
 
 	
 	public double getMutationProbability() {
@@ -318,6 +319,46 @@ public class Parameter<T> implements Serializable{
 		this.genome = genome;
 	}
 
+	public int getMaxNodes() {
+		return maxNodes;
+	}
+
+	public void setMaxNodes(int maxNodes) {
+		this.maxNodes = maxNodes;
+	}
+
+	public void setPopulationSize(long populationSize) {
+		this.populationSize = populationSize;
+	}
+
+	public Parameter(double mutationProbability, double crossoverProbability,
+			long populationSize, AcceptEvaluator<T> acceptEvaluator,
+			FitnessEvaluator<T> fitnessEvaluator, Crossover<T> crossover,
+			Mutator<T> mutator, IndividualValidator<T> individualValidator,
+			PopulationInitializer<T> populationInitializer, Repair<T> repair,
+			Selector<T> selector, Population<T> populationInstance,
+			long maxGenerations, double optimalFitness,MorphogenesisAgent<T> morp,Genome<T> genome,int maxNodes_) {
+		super();
+		this.mutationProbability = mutationProbability;
+		this.crossoverProbability = crossoverProbability;
+		this.populationSize = populationSize;
+		this.acceptEvaluator = acceptEvaluator;
+		this.fitnessEvaluator = fitnessEvaluator;
+		this.crossover = crossover;
+		this.mutator = mutator;
+		this.individualValidator = individualValidator;
+		this.populationInitializer = populationInitializer;
+		this.repair = repair;
+		this.selector = selector;
+		this.populationInstance = populationInstance;
+		this.maxGenerations = maxGenerations;
+		this.optimalFitness = optimalFitness;
+		this.populationInstance.setSize(populationSize);
+		this.morphogenesisAgent=morp;
+		this.genome=genome;
+		this.maxNodes=maxNodes_;
+	}
+	
 	
 	
 	

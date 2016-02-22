@@ -38,7 +38,7 @@ import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationIniti
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
 
-object App {
+object CVRPTWCordeau101GeoParallelScala {
   
   val log=Logger.getLogger("file")
   val WORK_PATH="/media/ricardo/hd/logs/"

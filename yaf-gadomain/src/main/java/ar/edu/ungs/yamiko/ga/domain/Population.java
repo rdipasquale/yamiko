@@ -1,5 +1,6 @@
 package ar.edu.ungs.yamiko.ga.domain;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,9 +14,9 @@ import java.util.List;
  * @created 08-Oct-2013 11:39:38 p.m.
  * @param <T>
  */
-public interface Population<T> extends Iterable<Individual<T>>{
+public interface Population<T> extends Iterable<Individual<T>>,Serializable{
 	
-	public long size();
+	public Long size();
 	public void setSize(Long _size);
 	public Genome<T> getGenome();
 	public void addIndividual(Individual<T> i);

@@ -17,9 +17,13 @@ import ar.edu.ungs.yamiko.ga.domain.Population;
  */
 public class GlobalSinglePopulation<T> implements Population<T>{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3282106112375675636L;
 	private List<Individual<T>> pop;
 	private Genome<T> genome;
-	private long size;
+	private Long size;
 	
 	public GlobalSinglePopulation(Genome<T> g) {
 		genome=g;
@@ -41,7 +45,7 @@ public class GlobalSinglePopulation<T> implements Population<T>{
 		return pop.iterator();
 	}
 
-	public long size() {
+	public Long size() {
 		return size;
 	}
 
