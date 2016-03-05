@@ -28,9 +28,10 @@ import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
-import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+
 
 
 class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int) extends Serializable{
@@ -96,22 +97,35 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                 }
 			        
 			        Logger.getLogger("file").warn("Generation " + generationNumber + " -> developed");
-              val bestOfGeneration=dp.max()(FitnessOrdering);
+
+			        val bestOfGeneration=dp.max()(FitnessOrdering);
+      				BestIndHolder.holdBestInd(bestOfGeneration);				
+      				if (bestOfGeneration.getFitness()>bestFitness)
+      				{
+      					bestFitness=bestOfGeneration.getFitness();
+      					bestInd=bestOfGeneration;					
+      				}
+      				Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+
+				      parameter.getSelector().setPopulation(dp)				
+				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
+      				val tuplasSer=candidates zip candidates.tail.tail;
+      				      				
+      				tuplasSer.foreach(f))
+      				//            val children = bcCross.value.execute(parentsJ)
+//				    for (ind <- children)
+//				    {
+//				      if (ind.getPhenotype==null) bcMA.value.develop(bcG.value, ind )
+//				      if (ind.getFitness==null) ind.setFitness(bcFE.value.execute(ind))
+//				    }				      
+//            bcDesc.value.execute(children,parentsJ);
+
+			    }
 //			  
-//				BestIndHolder.holdBestInd(bestOfGeneration);				
-//				if (bestOfGeneration.getFitness()>bestFitness)
-//				{
-//					bestFitness=bestOfGeneration.getFitness();
-//					bestInd=bestOfGeneration;					
-//				}
 //
-//				Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 //					
 //				p.setRDD(developed)
-//				parameter.getSelector().setPopulation(p)				
-//				val candidates:List[Individual[T]]=(parameter.getSelector().executeN((p.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
 //				
-//				val tuplasSer=candidates zip candidates.tail.tail;
 //				
 //				val tuplas=sc.parallelize(tuplasSer);
 //								
@@ -147,7 +161,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 //				if ((generationNumber % 100)==0) 
 //					Logger.getLogger("file").warn("Generation " + generationNumber);
 //				
-			}
+			
 //			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
 //			
 //      p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null) {
