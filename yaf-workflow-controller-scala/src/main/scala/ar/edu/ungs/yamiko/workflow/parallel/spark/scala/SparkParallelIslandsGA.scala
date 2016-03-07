@@ -96,84 +96,49 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     					    }
                 }
 			        
-			        Logger.getLogger("file").warn("Generation " + generationNumber + " -> developed");
+			        Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> developed");
 
-			        val bestOfGeneration=dp.max()(FitnessOrdering);
+			        val bestOfGeneration=dp.getAll().max()(FitnessOrdering);
       				BestIndHolder.holdBestInd(bestOfGeneration);				
       				if (bestOfGeneration.getFitness()>bestFitness)
       				{
       					bestFitness=bestOfGeneration.getFitness();
       					bestInd=bestOfGeneration;					
       				}
-      				Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+      				Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 
 				      parameter.getSelector().setPopulation(dp)				
 				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
       				val tuplasSer=candidates zip candidates.tail.tail;
-      				      				
-      				tuplasSer.foreach(f))
-      				//            val children = bcCross.value.execute(parentsJ)
-//				    for (ind <- children)
-//				    {
-//				      if (ind.getPhenotype==null) bcMA.value.develop(bcG.value, ind )
-//				      if (ind.getFitness==null) ind.setFitness(bcFE.value.execute(ind))
-//				    }				      
-//            bcDesc.value.execute(children,parentsJ);
+      				  
+      				val descendants=new ListBuffer[Individual[T]]
+      				for (t <- tuplasSer)
+      				{
+        				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
+			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
+			            if (t._1.getFitness==null) t._1.setFitness(bcFE.value.execute(t._1))
+			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
+			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
+        				  parentsJ.add(t._1);
+        				  parentsJ.add(t._2);
+        				  for (d <- bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ))
+        				  {
+        				    if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
+				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
+				            if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+      					  }      				    
+      				}
+      				
 
 			    }
-//			  
-//
-//					
-//				p.setRDD(developed)
-//				
-//				
-//				val tuplas=sc.parallelize(tuplasSer);
-//								
-//				var descendants=tuplas.flatMap{parents => 
-//				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
-//				  parentsJ.add(parents._1);
-//				  parentsJ.add(parents._2);
-//				  if (StaticHelper.randomDouble(1d)<=bcCrossProb.value)
-//				  {
-//            val children = bcCross.value.execute(parentsJ)
-//				    for (ind <- children)
-//				    {
-//				      if (ind.getPhenotype==null) bcMA.value.develop(bcG.value, ind )
-//				      if (ind.getFitness==null) ind.setFitness(bcFE.value.execute(ind))
-//				    }				      
-//            bcDesc.value.execute(children,parentsJ);
-//				  }
-//				  else parentsJ}
-//		
-//            val list=new ArrayList[Individual[T]]();
-//            list.add(bestInd);
-//            descendants=descendants.union(sc.parallelize(list))
-//
-//				descendants.map { i => if (StaticHelper.randomDouble(1d)<=bcMutProb.value)
-//					                     bcMut.value.execute(i);
-//				                       else i}
-//				
-//
-//				  p.setRDD(descendants);
-//				
-//				generationNumber+=1
-//				
-//				if ((generationNumber % 100)==0) 
-//					Logger.getLogger("file").warn("Generation " + generationNumber);
-//				
-			
-//			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
-//			
-//      p.getRDD.rdd.map { i:Individual[T] => if (i.getFitness()==null) {
-//                                  					    bcMA.value.develop(bcG.value,i)
-//                                  					    i.setFitness(bcFE.value.execute(i))
-//                                  					   }
-//			                                      i} 
-//			
-//      _finalPop=p.getRDD.rdd
-//
-//      return bestInd;
 
-			return null;
+    			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
+
+			    generationNumber+=isolatedGenerations
+          _finalPop=descendants
+    
+          return bestInd;
+
 		}
 }
