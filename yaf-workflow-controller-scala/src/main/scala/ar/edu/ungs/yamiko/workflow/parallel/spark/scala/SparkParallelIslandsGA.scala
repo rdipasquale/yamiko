@@ -39,9 +39,9 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
   
-  private object FitnessOrdering extends Ordering[Individual[T]] with Serializable{
-    def compare(a:Individual[T], b:Individual[T]) = a.getFitness() compareTo (b.getFitness())
-  }
+//  private object FitnessOrdering extends Ordering[Individual[T]] with Serializable{
+//    def compare(a:Individual[T], b:Individual[T]) = a.getFitness() compareTo (b.getFitness())
+//  }
   
   private def validateParameters() = {
 			if (parameter.getAcceptEvaluator()==null) throw new NullAcceptEvaluator();
@@ -69,6 +69,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			val bcMutProb:Broadcast[Double]=sc.broadcast(parameter.getMutationProbability());
 			val bcDesc:Broadcast[AcceptEvaluator[T]]=sc.broadcast(parameter.getAcceptEvaluator());
 			val bcPopI:Broadcast[PopulationInitializer[T]]=sc.broadcast(parameter.getPopulationInitializer());
+			val bcMR:Broadcast[Int]=sc.broadcast((parameter.getMigrationRatio()*parameter.getMaxNodes).toInt); 
 		
 			var pops:ArrayList[DistributedPopulation[T]]=new ArrayList[DistributedPopulation[T]];
 			for(i <- 1 to parameter.getMaxNodes) {
@@ -78,67 +79,93 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			} 			
 			
 			val populations0:RDD[DistributedPopulation[T]]=sc.parallelize(pops,parameter.getMaxNodes)
-			var populations:RDD[DistributedPopulation[T]]=populations0.map{p:DistributedPopulation[T] =>  bcPopI.value.execute(p); p}
+			var populations:RDD[DistributedPopulation[T]]=populations0.map{p:DistributedPopulation[T] =>  bcPopI.value.execute(p); p}.cache()
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 			  
 			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
-			  val developed=populations.map { dp:DistributedPopulation[T] => 
-			    for(g <- 1 to isolatedGenerations) 
-			    {
-			        dp.getAll().foreach { i:Individual[T] => 
-    			        if (i.getFitness()==null)
-    				      {
-                      if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
-    					        i.setFitness(bcFE.value.execute(i))
-    					    }
-                }
-			        
-			        Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> developed");
-
-			        val bestOfGeneration=dp.getAll().max()(FitnessOrdering);
-      				BestIndHolder.holdBestInd(bestOfGeneration);				
-      				if (bestOfGeneration.getFitness()>bestFitness)
-      				{
-      					bestFitness=bestOfGeneration.getFitness();
-      					bestInd=bestOfGeneration;					
-      				}
-      				Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
-
-				      parameter.getSelector().setPopulation(dp)				
-				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
-      				val tuplasSer=candidates zip candidates.tail.tail;
-      				  
-      				val descendants=new ListBuffer[Individual[T]]
-      				for (t <- tuplasSer)
-      				{
-        				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
-			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
-			            if (t._1.getFitness==null) t._1.setFitness(bcFE.value.execute(t._1))
-			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
-			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
-        				  parentsJ.add(t._1);
-        				  parentsJ.add(t._2);
-        				  for (d <- bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ))
-        				  {
-        				    if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
-				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
-				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
-				            if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
-      					  }      				    
-      				}
-      				
-
-			    }
-
-    			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
-
-			    generationNumber+=isolatedGenerations
-          _finalPop=descendants
+			  populations=populations.map { dp:DistributedPopulation[T] => 
+			        val descendants=new ListBuffer[Individual[T]]
+    			    for(g <- 1 to isolatedGenerations) 
+    			    {
+    			        dp.getAll().foreach { i:Individual[T] => 
+        			        if (i.getFitness()==null)
+        				      {
+                          if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
+        					        i.setFitness(bcFE.value.execute(i))
+        					    }
+                    }
+    			        
+    			        Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> developed");
     
-          return bestInd;
+    			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
+          				BestIndHolder.holdBestInd(bestOfGeneration);				
+          				if (bestOfGeneration.getFitness()>bestFitness)
+          				{
+          					bestFitness=bestOfGeneration.getFitness();
+          					bestInd=bestOfGeneration;					
+          				}
+          				Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+    
+    				      parameter.getSelector().setPopulation(dp)				
+    				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
+          				val tuplasSer=candidates zip candidates.tail.tail;
+          				  
+          				
+          				for (t <- tuplasSer)
+          				{
+            				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
+    			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
+    			            if (t._1.getFitness==null) t._1.setFitness(bcFE.value.execute(t._1))
+    			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
+    			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
+            				  parentsJ.add(t._1);
+            				  parentsJ.add(t._2);
+            				  for (d <- bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ))
+            				  {
+            				    if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+    				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
+    				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
+    				            if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+          					  }      				    
+          				}
+          				
+    
+    			    }
+			    dp.replacePopulation(descendants);
+			    dp
+			    }
+			  
+			  generationNumber+=isolatedGenerations
+			  
+			  // Acá hay que hacer la migración
+			  val topInds=populations.map {  dp:DistributedPopulation[T] =>  
+			      dp.getAll().sortBy(_.getFitness).reverse
+			      (dp.getId(),dp.getAll().take(bcMR.value))
+			      }
+			  
+			  for(ti <- topInds) {println("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0))}			  
+			  
+			  val bcTopInds=sc.broadcast(topInds.collect());
+			  
+			  populations.foreach { dp:DistributedPopulation[T] => 
+			    // TODO: Verificar que esté ordenado
+			    dp.replacePopulation(dp.getAll().dropRight(bcMR.value)++bcTopInds.value.find(_._1 == dp.getId()).get._2 ) 
+			  }
+
+			}
+
+			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
+
+	    
+      _finalPop=populations.flatMap {  dp:DistributedPopulation[T] =>  
+			      dp.getAll().sortBy(_.getFitness).reverse
+			      dp.getAll().take(bcMR.value)
+			      }
+
+      return bestInd;
 
 		}
 }

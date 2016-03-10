@@ -12,6 +12,7 @@ class DistributedPopulation[T](genome:Genome[T]) extends Population[T]{
   
   private val pop:ListBuffer[Individual[T]]=new ListBuffer[Individual[T]]();
   private var auxSize:java.lang.Long=0l;
+  private val id=(Math.random()*100000).asInstanceOf[Int];
 
   def addIndividual(i: Individual[T])= {pop+=i}
   def removeIndividual(i: Individual[T]) = {pop.remove(i)}
@@ -21,10 +22,12 @@ class DistributedPopulation[T](genome:Genome[T]) extends Population[T]{
 
   def replaceIndividual(x: Individual[T],y:Individual[T])={pop.remove(x);pop.add(y)}
 
-  def replacePopulation(col: java.util.Collection[ar.edu.ungs.yamiko.ga.domain.Individual[T]])={pop.clear();pop.addAll(col)}
+  def replacePopulation(col: java.util.Collection[Individual[T]])={pop.clear();pop.addAll(col)}
+  def replacePopulation(col: ListBuffer[Individual[T]])={pop.clear();pop.addAll(col)}
   
   def setSize(l: java.lang.Long)= {auxSize=l}
   def size(): java.lang.Long= {return auxSize}  
+  def getId():Int= {return id}  
 
   def iterator(): java.util.Iterator[Individual[T]] = {return pop.iterator}
 
