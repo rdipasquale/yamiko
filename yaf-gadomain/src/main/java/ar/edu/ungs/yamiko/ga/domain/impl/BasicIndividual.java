@@ -82,6 +82,11 @@ public class BasicIndividual<T> implements Individual<T>,Serializable {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "BasicIndividual [id=" + id + ", fitness=" + fitness + "]";
+	}
+
 	
 	
 	

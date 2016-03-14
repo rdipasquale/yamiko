@@ -48,10 +48,10 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 	val INDIVIDUALS=200
 	val MAX_GENERATIONS=10000	
 	//private static final String URI_SPARK="spark://192.168.1.40:7077";
-	val URI_SPARK="local[8]"
-  val MAX_NODES=8
+	val URI_SPARK="local[1]"
+  val MAX_NODES=1
   val MIGRATION_RATIO=0.05
-  val ISOLATED_GENERATIONS=100
+  val ISOLATED_GENERATIONS=3
 	val lat01Ini= -34.481013
 	val lat02Ini= -34.930460
 	val lon01Ini= -58.325518
@@ -108,12 +108,9 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val n=holder(1) // Customers
 			    val c=holder(2) // Capacidad (max)
 
-//			Genome<Integer[]> genome;
 			    val gene=new BasicGene("Gene X", 0, n+m)			
 			    val ribosome:Ribosome[Array[Integer]]=new ByPassRibosome()
 			    val chromosomeName="X"
-//			VRPCrossover cross; 
-	//		RoutesMorphogenesisAgent rma;
 	    	  val popI =new UniqueIntegerPopulationInitializerScala(true, n, m);
 		
 
@@ -137,8 +134,6 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
 
 			    val pop=new DistributedPopulation[Array[Integer]](genome);
-//			    pop.setSize(individuals);
-//			    popI.execute(pop, sc, true, n, m)
 			    
 			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 1, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 

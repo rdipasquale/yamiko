@@ -117,9 +117,10 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 					
 				p.setRDD(developed)
 				parameter.getSelector().setPopulation(p)				
-				val candidates:List[Individual[T]]=(parameter.getSelector().executeN((p.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
+				val candidates:List[Individual[T]]=(parameter.getSelector().executeN((p.size()).intValue())).asInstanceOf[List[Individual[T]]];
 				
-				val tuplasSer=candidates zip candidates.tail.tail;
+        val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
+				
 				
 				val tuplas=sc.parallelize(tuplasSer);
 								

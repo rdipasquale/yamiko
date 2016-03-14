@@ -69,7 +69,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			val bcMutProb:Broadcast[Double]=sc.broadcast(parameter.getMutationProbability());
 			val bcDesc:Broadcast[AcceptEvaluator[T]]=sc.broadcast(parameter.getAcceptEvaluator());
 			val bcPopI:Broadcast[PopulationInitializer[T]]=sc.broadcast(parameter.getPopulationInitializer());
-			val bcMR:Broadcast[Int]=sc.broadcast((parameter.getMigrationRatio()*parameter.getMaxNodes).toInt); 
+			val bcMR:Broadcast[Int]=sc.broadcast((parameter.getMigrationRatio()*parameter.getPopulationSize).toInt);			
 		
 			var pops:ArrayList[DistributedPopulation[T]]=new ArrayList[DistributedPopulation[T]];
 			for(i <- 1 to parameter.getMaxNodes) {
@@ -86,7 +86,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  
 			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
-			  populations=populations.map { dp:DistributedPopulation[T] => 
+			  val populations2=populations.map { dp:DistributedPopulation[T] => 
 			        val descendants=new ListBuffer[Individual[T]]
     			    for(g <- 1 to isolatedGenerations) 
     			    {
@@ -98,22 +98,15 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
         					    }
                     }
     			        
-    			        Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> developed");
+    			        Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
     
     			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
-          				BestIndHolder.holdBestInd(bestOfGeneration);				
-          				if (bestOfGeneration.getFitness()>bestFitness)
-          				{
-          					bestFitness=bestOfGeneration.getFitness();
-          					bestInd=bestOfGeneration;					
-          				}
-          				Logger.getLogger("file").warn("Generation " + (generationNumber+g) + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+          				Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
     				      parameter.getSelector().setPopulation(dp)				
-    				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()*2).intValue())).asInstanceOf[List[Individual[T]]];
-          				val tuplasSer=candidates zip candidates.tail.tail;
-          				  
-          				
+    				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue())).asInstanceOf[List[Individual[T]]];
+          				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
+
           				for (t <- tuplasSer)
           				{
             				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
@@ -123,12 +116,18 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
             				  parentsJ.add(t._1);
             				  parentsJ.add(t._2);
-            				  for (d <- bcDesc.value.execute(bcCross.value.execute(parentsJ),parentsJ))
+            				  val desc=bcCross.value.execute(parentsJ);
+            				  for (d <- desc)
+            				  {
+      			            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d)
+      			            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
+            				  }
+            				  for (d <- bcDesc.value.execute(desc,parentsJ))
             				  {
             				    if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
     				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
     				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
-    				            if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+    				            descendants+=d
           					  }      				    
           				}
           				
@@ -136,25 +135,53 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     			    }
 			    dp.replacePopulation(descendants);
 			    dp
-			    }
+			   }
 			  
 			  generationNumber+=isolatedGenerations
 			  
 			  // Acá hay que hacer la migración
-			  val topInds=populations.map {  dp:DistributedPopulation[T] =>  
-			      dp.getAll().sortBy(_.getFitness).reverse
-			      (dp.getId(),dp.getAll().take(bcMR.value))
-			      }
+			  populations2.foreach {  dp:DistributedPopulation[T] =>dp.getAll().sortBy(_.getFitness).reverse}
 			  
-			  for(ti <- topInds) {println("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0))}			  
+			  val topInds=populations2.map {  dp:DistributedPopulation[T] => (dp.getId(),dp.getAll().take(bcMR.value))}
+			  
+			  val topIndsArray=topInds.collect()
+			  
+			  for(ti <- topIndsArray)  { println("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0)) }
+			  
+			  val bestOfGeneration=topIndsArray.maxBy(_._2.get(0).getFitness)._2.get(0)
+				BestIndHolder.holdBestInd(bestOfGeneration);				
+				if (bestOfGeneration.getFitness()>bestFitness)
+				{
+					bestFitness=bestOfGeneration.getFitness();
+					bestInd=bestOfGeneration;					
+				}
+				
+			  var swap=0
+			  for(ti <- 0 to topIndsArray.size-1) 
+			  {
+			    if (ti==0)
+			    {
+			      swap=topIndsArray(ti)._1
+			      topIndsArray(ti)=(topIndsArray(topIndsArray.size-1)._1,topIndsArray(ti)._2)
+			    }
+			    else
+			    {
+			      val swap2=topIndsArray(ti)._1
+			      topIndsArray(ti)=(swap,topIndsArray(ti)._2)
+			      swap=swap2
+			    }
+			  }
 			  
 			  val bcTopInds=sc.broadcast(topInds.collect());
 			  
-			  populations.foreach { dp:DistributedPopulation[T] => 
+			  populations2.foreach { dp:DistributedPopulation[T] => 
 			    // TODO: Verificar que esté ordenado
+			    dp.getAll().sortBy(_.getFitness).reverse
 			    dp.replacePopulation(dp.getAll().dropRight(bcMR.value)++bcTopInds.value.find(_._1 == dp.getId()).get._2 ) 
 			  }
 
+			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness)
+			  populations=populations2
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
