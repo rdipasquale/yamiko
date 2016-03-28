@@ -66,12 +66,12 @@ public class CartesianCustomer extends Customer {
 		int lowGap=Math.abs(t2From-(this.timeWindowFrom+timeTravel.intValue()+getServiceDuration()));
 		int upperGap=Math.abs(this.timeWindowTo+timeTravel.intValue()+getServiceDuration()-t2To);
 		
-		if (lowGap<marginInMinutes || upperGap<marginInMinutes) return 0;
+		if (lowGap<=marginInMinutes || upperGap<=marginInMinutes) return 0;
 
 		int lowGap2=Math.abs(t2From-(this.timeWindowTo+timeTravel.intValue()+getServiceDuration()));
 		int upperGap2=Math.abs(this.timeWindowFrom+timeTravel.intValue()+getServiceDuration()-t2To);
 		
-		if (lowGap2<marginInMinutes || upperGap2<marginInMinutes) return 0;
+		if (lowGap2<=marginInMinutes || upperGap2<=marginInMinutes) return 0;
 		
 		return Math.min(Math.min(lowGap, upperGap),Math.min(lowGap2, upperGap2));		
 	}
