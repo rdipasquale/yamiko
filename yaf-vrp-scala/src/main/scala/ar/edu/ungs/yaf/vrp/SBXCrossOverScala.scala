@@ -27,7 +27,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper
  * @author ricardo
  *
  */
-class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicles:Int,vrp:VRPFitnessEvaluator) extends VRPCrossover{
+class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicles:Int,vrp:VRPFitnessEvaluator,distanceMatrix:Array[Array[Double]],bcMatrix:Array[List[(Int,Double)]]) extends VRPCrossover{
   
 	val PROB_DESC_VEHICLES:Double=0.3d;
 
@@ -60,7 +60,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  for (r<-p2) if(r!=p2.get(randomRoute2)) d2::r.diff(sNew2)
 
     //9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.
-	  //for (t<- p1.get(randomRoute1).diff(sNew1))
+	  for (t<- p1.get(randomRoute1).diff(sNew1))
+	    
 	    // insertar x criterio bajo costo en d1
 	  //for (t<- p2.get(randomRoute2).diff(sNew2)) // insertar x criterio bajo costo en d1
 	  
