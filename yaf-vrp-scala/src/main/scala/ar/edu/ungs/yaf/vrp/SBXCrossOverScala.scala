@@ -2,7 +2,6 @@ package ar.edu.ungs.yaf.vrp
 
 import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover
 import scala.collection.JavaConversions._
-import java.lang.Double
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelperScala
@@ -59,11 +58,9 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  for (r<-p1) if(r!=p1.get(randomRoute1)) d1::r.diff(sNew1)
 	  for (r<-p2) if(r!=p2.get(randomRoute2)) d2::r.diff(sNew2)
 
-    //9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.
-	  for (t<- p1.get(randomRoute1).diff(sNew1))
-	    
-	    // insertar x criterio bajo costo en d1
-	  //for (t<- p2.get(randomRoute2).diff(sNew2)) // insertar x criterio bajo costo en d1
+    //9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.	  
+	  BestCostMatrix.insertBC(p1.get(randomRoute1).diff(sNew1), bcMatrix, d1)
+	  BestCostMatrix.insertBC(p2.get(randomRoute1).diff(sNew2), bcMatrix, d2)
 	  
 	  //8) Se agrega todo Snew a D1.
     //10) Se crea el descendiente D2 de manera recíproca analogando los puntos 3-9.
