@@ -12,6 +12,7 @@ import ar.edu.ungs.yaf.vrp.SBXCrossOverScala
 import scala.collection.JavaConversions._
 import ar.edu.ungs.yamiko.problems.vrp.Customer
 import ar.edu.ungs.yamiko.problems.vrp.utils.ScalaAdaptor
+import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer
 
 @Test
 class BestCostTest {
@@ -43,9 +44,6 @@ class BestCostTest {
 	    
 	    val bcMatrix:Array[List[(Int,Double)]]=BestCostMatrix.build(matrix.getMatrix, ScalaAdaptor.toScala(customers));
 	    
-			val cross=new SBXCrossOverScala(30d, c, m, m-2,fit,matrix.getMatrix,bcMatrix);
-	    
-      
       assertTrue(true)
       
     }

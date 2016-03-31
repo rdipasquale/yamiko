@@ -40,6 +40,9 @@ import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluat
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializerScala
+import ar.edu.ungs.yaf.vrp.SBXCrossOverScala
+import ar.edu.ungs.yaf.vrp.BestCostMatrix
+import ar.edu.ungs.yamiko.problems.vrp.utils.ScalaAdaptor
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   
@@ -123,8 +126,10 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val fit:VRPFitnessEvaluator= new CVRPTWSimpleFitnessEvaluator(c,30d,m,matrix,1000000000d,10);
 			
     			//cross=new GVRCrossover(); //1d, c, m, fit);
-    			val cross=new SBXCrossover(30d, c, m, fit);
-    			cross.setMatrix(matrix);
+    			//val cross=new SBXCrossover(30d, c, m, fit);
+    			//cross.setMatrix(matrix);
+    			
+			    val cross=new SBXCrossOverScala(30d, c, m, m-1,fit,matrix.getMatrix,BestCostMatrix.build(matrix.getMatrix, ScalaAdaptor.toScala(customers)));	    
 
 			    val acceptEvaluator:AcceptEvaluator[Array[Integer]] =new DescendantModifiedAcceptLigthEvaluator()
 
