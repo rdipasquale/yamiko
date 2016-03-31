@@ -16,7 +16,7 @@ import ar.edu.ungs.yamiko.ga.operators.Selector;
 
 /**
  * Parámetros de una corrida de GA
- * @author ricardo
+ * @author ricardo	
  *
  */
 public class Parameter<T> implements Serializable{
