@@ -20,6 +20,7 @@ object BestCostMatrix {
   private val PROM_VEL_KM_H=30d
   private val PROM_VEL_M_MIN=PROM_VEL_KM_H*1000/60
   private val UMBRAL_MIN=30
+  private val CARTESIAN_MARGIN=3
   
   def calcMinGap(c1:GeodesicalCustomer,c2:GeodesicalCustomer,timeTravel:Double):Double ={return c1.getTimeWindow.minGap(c2.getTimeWindow, c2.getSoftTimeWindowMargin, timeTravel, c2.getServiceDuration)}
   
@@ -27,6 +28,7 @@ object BestCostMatrix {
     if (clients!=null && bcMatrix!=null && dest!=null)
     {
       for(c<-clients)
+        if (c!=0)
         breakable{for (b<-bcMatrix(c))
           if (dest.exists { p:List[Int] => p.contains(b._1) })
           {
@@ -41,22 +43,27 @@ object BestCostMatrix {
     }
   }
   
-  def build(distanceMatrix:Array[Array[Double]],clients:Map[Int,Customer],margin:Int):Array[List[(Int,Double)]]=
+  def build(distanceMatrix:Array[Array[Double]],clients:Map[Int,Customer]):Array[List[(Int,Double)]]=
   {
     var salida= Array.ofDim[List[(Int,Double)]](distanceMatrix.length)
     for(i<-0 to distanceMatrix.length-1){
-      val temp:List[(Int,Double)]=List()
+      var temp:List[(Int,Double)]=List()
       for(j<-0 to distanceMatrix.length-1){
+        if (i!=j && i!=0 && j!=0)
         if (clients.get(i).get.isInstanceOf[CartesianCustomer]) 
-          temp.::(j,distanceMatrix(i)(j)+clients.get(i).get.asInstanceOf[CartesianCustomer].minGap(clients.get(j).get.asInstanceOf[CartesianCustomer], margin,distanceMatrix(i)(j)))
+          temp=temp.::(j,distanceMatrix(i)(j)+clients.get(i).get.asInstanceOf[CartesianCustomer].minGap(clients.get(j).get.asInstanceOf[CartesianCustomer], CARTESIAN_MARGIN,distanceMatrix(i)(j)))
         else
-        {
-          if (clients.get(i).get.asInstanceOf[GeodesicalCustomer].getTimeWindow().intersects(clients.get(j).get.asInstanceOf[GeodesicalCustomer].getTimeWindow(), clients.get(j).get.asInstanceOf[GeodesicalCustomer].getSoftTimeWindowMargin(), margin, clients.get(j).get.asInstanceOf[GeodesicalCustomer].getServiceDuration()))
-            temp.::(j,distanceMatrix(i)(j)+10*distanceMatrix(i)(j)/PROM_VEL_M_MIN)
+        {          
+//          println(clients.get(i).get.asInstanceOf[GeodesicalCustomer].getTimeWindow())
+//          println(clients.get(j).get.asInstanceOf[GeodesicalCustomer].getTimeWindow())
+//          println(clients.get(j).get.asInstanceOf[GeodesicalCustomer].getServiceDuration())
+//          println(clients.get(j).get.asInstanceOf[GeodesicalCustomer].getSoftTimeWindowMargin())
+          if (clients.get(i).get.asInstanceOf[GeodesicalCustomer].getTimeWindow().intersects(clients.get(j).get.asInstanceOf[GeodesicalCustomer].getTimeWindow(), clients.get(j).get.asInstanceOf[GeodesicalCustomer].getSoftTimeWindowMargin(), CARTESIAN_MARGIN, clients.get(j).get.asInstanceOf[GeodesicalCustomer].getServiceDuration()))
+            temp=temp.::(j,distanceMatrix(i)(j)+10*distanceMatrix(i)(j)/PROM_VEL_M_MIN)
           else
           {
             val minG=calcMinGap(clients.get(i).get.asInstanceOf[GeodesicalCustomer], clients.get(j).get.asInstanceOf[GeodesicalCustomer], distanceMatrix(i)(j))
-            temp.::(j,distanceMatrix(i)(j)+ (if (minG<=UMBRAL_MIN) 40*distanceMatrix(i)(j)/PROM_VEL_M_MIN else math.pow(40*distanceMatrix(i)(j)/PROM_VEL_M_MIN,2)))
+            temp=temp.::(j,distanceMatrix(i)(j)+ (if (minG<=UMBRAL_MIN) 40*distanceMatrix(i)(j)/PROM_VEL_M_MIN else math.pow(40*distanceMatrix(i)(j)/PROM_VEL_M_MIN,2)))
           }
         }
       }

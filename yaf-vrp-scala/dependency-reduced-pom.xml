@@ -125,6 +125,24 @@
       <version>2.2.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>ar.edu.ungs.yamiko</groupId>
+      <artifactId>yaf-workflow-controller-scala</artifactId>
+      <version>1.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>ar.edu.ungs.yamiko</groupId>
+      <artifactId>yaf-gadomain-scala</artifactId>
+      <version>1.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.assembla.scala-incubator</groupId>
+      <artifactId>graph-core_2.11</artifactId>
+      <version>1.10.1</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <properties>
     <scala.compat.version>2.11</scala.compat.version>
