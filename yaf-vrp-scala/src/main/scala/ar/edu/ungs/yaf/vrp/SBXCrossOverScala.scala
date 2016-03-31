@@ -62,8 +62,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  for (r<-p2) if(r!=p2.get(randomRoute2)) d2+=r.diff(sNew2)
 
     //9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.	  
-	  BestCostMatrix.insertBC(p1.get(randomRoute1).diff(sNew1), bcMatrix, d1.toList)
-	  BestCostMatrix.insertBC(p2.get(randomRoute1).diff(sNew2), bcMatrix, d2.toList)
+	  BestCostMatrix.insertBC(p1.get(randomRoute1).diff(sNew1), bcMatrix, d1)
+	  BestCostMatrix.insertBC(p2.get(randomRoute1).diff(sNew2), bcMatrix, d2)
 	  
 	  //8) Se agrega todo Snew a D1.
     //10) Se crea el descendiente D2 de manera recíproca analogando los puntos 3-9.

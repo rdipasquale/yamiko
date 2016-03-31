@@ -6,6 +6,7 @@ import ar.edu.ungs.yamiko.problems.vrp.Customer
 import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer
 import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer
 import scala.util.control.Breaks._
+import scala.collection.mutable.ListBuffer
 
 /**
  * Construye una matrix que representa un costo ponderado de insertar un cliente a continuación de otro. En particular, se construye
@@ -24,7 +25,7 @@ object BestCostMatrix {
   
   def calcMinGap(c1:GeodesicalCustomer,c2:GeodesicalCustomer,timeTravel:Double):Double ={return c1.getTimeWindow.minGap(c2.getTimeWindow, c2.getSoftTimeWindowMargin, timeTravel, c2.getServiceDuration)}
   
-  def insertBC(clients:List[Int],bcMatrix:Array[List[(Int,Double)]],dest:List[List[Int]])={
+  def insertBC(clients:List[Int],bcMatrix:Array[List[(Int,Double)]],dest:ListBuffer[List[Int]])={
     if (clients!=null && bcMatrix!=null && dest!=null)
     {
       for(c<-clients)
@@ -33,14 +34,16 @@ object BestCostMatrix {
           if (dest.exists { p:List[Int] => p.contains(b._1) })
           {
               val rep=dest.filter { p:List[Int] => p.contains(b._1) }
-              val rep2=rep.get(0)
-              dest.remove(rep2)
-              rep2.add(rep.indexOf(b._1), c)
-              dest.add(rep2)
+              var rep2=rep.get(0).to[ListBuffer]
+              dest-=rep2.toList
+              //rep2.add(rep2.indexOf(b._1)+1,c)
+              rep2=rep2.take(rep2.indexOf(b._1)+1)++ListBuffer(c)++rep2.takeRight(rep2.length-rep2.indexOf(b._1)+1)
+              dest.add(rep2.toList)
               break
           }
         }
     }
+    
   }
   
   def build(distanceMatrix:Array[Array[Double]],clients:Map[Int,Customer]):Array[List[(Int,Double)]]=
