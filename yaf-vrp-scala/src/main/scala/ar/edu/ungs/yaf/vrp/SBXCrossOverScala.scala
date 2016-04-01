@@ -43,8 +43,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  //1) A partir de 2 padres P1 y P2 Se hace una copia (deep) de cada uno (D1 y D2) .
 	  val p1=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals.get(0)));
 	  val p2=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals.get(1)));
-	  val d1:ListBuffer[List[Int]]=ListBuffer(List());
-	  val d2:ListBuffer[List[Int]]=ListBuffer(List());
+	  val d1:ListBuffer[List[Int]]=ListBuffer()
+	  val d2:ListBuffer[List[Int]]=ListBuffer()
 	  
 	  //2) Se toma una ruta (Random) completa R1 del individuo P1 y R2 del individuo P2.
 	  val r = Random
@@ -52,27 +52,34 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  var randomRoute2=r.nextInt(p2.length);
 	  while (p1.get(randomRoute1).size==0) randomRoute1=r.nextInt(p1.length);
 	  while (p2.get(randomRoute2).size==0) randomRoute2=r.nextInt(p2.length);
+	  val rr1=p1.get(randomRoute1)
+	  val rr2=p2.get(randomRoute2)
 	  
     //3) Se crea una nueva ruta Snew agregando todas las visitas de R1 desde el principio hasta un punto aleatorio de corte.
 	  //4) Se agregan a Snew las visitas de R2 desde el puntod e corte seleccionado en "3" hasta el final.
     //5) Se remueven duplicados de Snew
-	  val sNew1=p1.get(randomRoute1).take(r.nextInt(p1.get(randomRoute1).size))++p2.get(randomRoute2).takeRight(r.nextInt(p2.get(randomRoute2).size)).distinct
-	  val sNew2=p2.get(randomRoute2).take(r.nextInt(p2.get(randomRoute2).size))++p1.get(randomRoute1).takeRight(r.nextInt(p1.get(randomRoute1).size)).distinct
+	  var sNew1:List[Int]=List()
+	  var sNew2:List[Int]=List()
+	  while (sNew1.size==0) sNew1=rr1.take(r.nextInt(rr1.size))++rr2.takeRight(r.nextInt(rr2.size)).distinct
+	  while (sNew2.size==0) sNew2=rr2.take(r.nextInt(rr2.size))++rr1.takeRight(r.nextInt(rr1.size)).distinct
 	  
     //6) Se remueven de D1 todas las visitas que están en Snew.
     //7) Se remueven de D1 todas las visitas que están en R1. Se define Ttemp con todas las visitas de R1.
-	  for (r<-p1) if(r!=p1.get(randomRoute1)) d1+=r.diff(sNew1)
-	  for (r<-p2) if(r!=p2.get(randomRoute2)) d2+=r.diff(sNew2)
+	  for (r<-p1) if(r!=rr1) d1+=r.diff(sNew1)
+	  for (r<-p2) if(r!=rr2) d2+=r.diff(sNew2)
 
     //9) Se agrega cada visita de Ttemp a D1 según criterio de mejor costo.	  
-	  BestCostMatrix.insertBC(p1.get(randomRoute1).diff(sNew1), bcMatrix, d1)
-	  BestCostMatrix.insertBC(p2.get(randomRoute1).diff(sNew2), bcMatrix, d2)
+	  BestCostMatrix.insertBC(rr1.diff(sNew1), bcMatrix, d1)
+	  BestCostMatrix.insertBC(rr2.diff(sNew2), bcMatrix, d2)
 	  
 	  //8) Se agrega todo Snew a D1.
     //10) Se crea el descendiente D2 de manera recíproca analogando los puntos 3-9.
 	  d1+=sNew1;
 	  d2+=sNew2;
 
+	  if (!d1.exists{ p:List[Int] => p.size>0} || !d2.exists{ p:List[Int] => p.size>0})
+	    println("Aca")
+	    
 	  return List(IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Integer(_)).toArray),
 	      IntegerStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Integer(_)).toArray))
 	}

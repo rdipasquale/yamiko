@@ -13,6 +13,7 @@ object ScalaAdaptor {
   {
     if (m==null) return null;
     var salida:Map[Int,Customer]=Map()
+    salida.clear()
     m.keySet().foreach { f:Integer => salida+= f.toInt -> m.get(f) }
     val salida2:Map[Int,Customer]=salida
     return salida2;
@@ -22,6 +23,7 @@ object ScalaAdaptor {
   {    
     if (m==null) return null;
     var salida:ListBuffer[Int]=ListBuffer()
+    salida.clear()
     m.foreach { f:Integer => salida.add(f)}
     return salida.toList;
   }

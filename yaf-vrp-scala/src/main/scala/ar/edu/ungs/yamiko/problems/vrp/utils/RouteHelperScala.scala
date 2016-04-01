@@ -14,7 +14,7 @@ object RouteHelperScala {
     if (i.getPhenotype()==null) throw new IndividualNotDeveloped();
 		val rutas:java.util.Collection[Object]=i.getPhenotype().getAlleleMap().get(i.getPhenotype().getAlleleMap().keySet().iterator().next()).values();
 		
-		val rutasL:List[Route]= List();
+		//val rutasL:List[Route]= List();
 		val lista:java.util.List[Route]=rutas.iterator().next().asInstanceOf[java.util.List[Route]]
 		return lista.toList
   }
@@ -23,6 +23,7 @@ object RouteHelperScala {
   {
     if (i==null) return null;
     val salida:ListBuffer[List[Int]]=ListBuffer(List());
+    salida.clear()
     for (r:Route<-i)
       salida+=ScalaAdaptor.toScala(r.getRouteModel())
     return salida.toList;
@@ -32,6 +33,7 @@ object RouteHelperScala {
   {
     if (i==null) return null;
     var salida:ListBuffer[Int]=ListBuffer();
+    salida.clear()
     for (ii<-i.filter { p:List[Int] => p.size>0 })
     {
       if (ii.get(0)!=0) salida+=0

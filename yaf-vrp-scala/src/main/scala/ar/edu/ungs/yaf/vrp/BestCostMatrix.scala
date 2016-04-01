@@ -31,17 +31,18 @@ object BestCostMatrix {
       for(c<-clients)
         if (c!=0)
         breakable{for (b<-bcMatrix(c))
-          if (dest.exists { p:List[Int] => p.contains(b._1) })
+        {
+          val rep=dest.filter { p:List[Int] => p.contains(b._1) }
+          if (!rep.isEmpty)
           {
-              val rep=dest.filter { p:List[Int] => p.contains(b._1) }
               var rep2=rep.get(0).to[ListBuffer]
               dest-=rep2.toList
-              //rep2.add(rep2.indexOf(b._1)+1,c)
-              rep2=rep2.take(rep2.indexOf(b._1)+1)++ListBuffer(c)++rep2.takeRight(rep2.length-rep2.indexOf(b._1)+1)
+              rep2=rep2.take(rep2.indexOf(b._1)+1)++ListBuffer(c)++rep2.takeRight(rep2.length-rep2.indexOf(b._1)-1)
               dest.add(rep2.toList)
               break
           }
         }
+     }
     }
     
   }

@@ -193,7 +193,14 @@ public class TestSBXCrossOverComparativaScala {
 	public void testSBXCrossOverStressCompScala() {
 		long t=System.currentTimeMillis();
 		for (int i=0;i<CROSSOVERS;i++)
+		{
+			if (i%100==0)
+			{
+				long t2=System.currentTimeMillis();
+				System.out.println(i + " SBX crossovers in " + (t2-t) + "ms");
+			}
 			cross.execute(population.getAll());
+		}
 		long t2=System.currentTimeMillis();
 		System.out.println(CROSSOVERS + " SBX crossovers in " + (t2-t) + "ms"); 
 	}
