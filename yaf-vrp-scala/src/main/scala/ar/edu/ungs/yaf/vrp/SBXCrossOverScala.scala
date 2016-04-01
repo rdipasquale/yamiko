@@ -9,6 +9,9 @@ import scala.util.Random
 import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper
 import scala.collection.mutable.ListBuffer
+import java.util.Arrays.ArrayList
+import java.util.Arrays.ArrayList
+import java.util.ArrayList
 
 /**
  * Sequence Based Crossover. Operador de Crossover implementado de manera similar a lo publicado en "The Vehicle Routing Problem with Time Windows Part II: Genetic Search"
@@ -69,8 +72,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
     //10) Se crea el descendiente D2 de manera recíproca analogando los puntos 3-9.
 	  d1+=sNew1;
 	  d2+=sNew2;
-	  
-	  return List(IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).asInstanceOf[Array[Integer]]),
-	              IntegerStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(1).name(), RouteHelperScala.getRoutesInOneList(d2.toList).asInstanceOf[Array[Integer]]))
+
+	  return List(IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Integer(_)).toArray),
+	      IntegerStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Integer(_)).toArray))
 	}
 }

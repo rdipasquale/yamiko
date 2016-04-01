@@ -31,11 +31,11 @@ object RouteHelperScala {
   def getRoutesInOneList(i : List[List[Int]]):List[Int] =
   {
     if (i==null) return null;
-    var salida:List[Int]=List();
-    for (ii<-i)
+    var salida:ListBuffer[Int]=ListBuffer();
+    for (ii<-i.filter { p:List[Int] => p.size>0 })
     {
-      if (ii.get(0)!=0) salida.::(0)
-      salida.:::(ii)
+      if (ii.get(0)!=0) salida+=0
+      ii.foreach { f:Int => salida+=f }      
     }
     return salida.toList;
   }  
