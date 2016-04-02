@@ -60,8 +60,16 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
     //5) Se remueven duplicados de Snew
 	  var sNew1:List[Int]=List()
 	  var sNew2:List[Int]=List()
-	  while (sNew1.size==0) sNew1=rr1.take(r.nextInt(rr1.size))++rr2.takeRight(r.nextInt(rr2.size)).distinct
-	  while (sNew2.size==0) sNew2=rr2.take(r.nextInt(rr2.size))++rr1.takeRight(r.nextInt(rr1.size)).distinct
+	  if (rr1.size==1 && rr2.size==1)
+	  {
+	    sNew1=rr1++rr2.distinct
+	    sNew2=rr2++rr1.distinct
+	  }
+	  else
+	  {
+  	  while (sNew1.size==0) sNew1=rr1.take(r.nextInt(rr1.size))++rr2.takeRight(r.nextInt(rr2.size)).distinct
+  	  while (sNew2.size==0) sNew2=rr2.take(r.nextInt(rr2.size))++rr1.takeRight(r.nextInt(rr1.size)).distinct	    
+	  }
 	  
     //6) Se remueven de D1 todas las visitas que están en Snew.
     //7) Se remueven de D1 todas las visitas que están en R1. Se define Ttemp con todas las visitas de R1.

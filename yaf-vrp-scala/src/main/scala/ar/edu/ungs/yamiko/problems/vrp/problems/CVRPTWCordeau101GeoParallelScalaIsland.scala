@@ -54,7 +54,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 	val URI_SPARK="local[8]"
   val MAX_NODES=8
   val MIGRATION_RATIO=0.05
-  val ISOLATED_GENERATIONS=10
+  val ISOLATED_GENERATIONS=100
 	val lat01Ini= -34.481013
 	val lat02Ini= -34.930460
 	val lon01Ini= -58.325518
