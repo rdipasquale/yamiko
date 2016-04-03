@@ -51,10 +51,11 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 	val INDIVIDUALS=200
 	val MAX_GENERATIONS=10000	
 	//private static final String URI_SPARK="spark://192.168.1.40:7077";
-	val URI_SPARK="local[8]"
-  val MAX_NODES=8
+	val URI_SPARK="local[1]"
+  val MAX_NODES=1
   val MIGRATION_RATIO=0.05
-  val ISOLATED_GENERATIONS=100
+  val ISOLATED_GENERATIONS=50
+  val MAX_TIME_ISOLATED=50000
 	val lat01Ini= -34.481013
 	val lat02Ini= -34.930460
 	val lon01Ini= -58.325518
@@ -143,7 +144,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 1, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
     					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelector(), 
-    					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO)
+    					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED)
 
 			    val ga=new SparkParallelIslandsGA[Array[Integer]](par,ISOLATED_GENERATIONS)
 					

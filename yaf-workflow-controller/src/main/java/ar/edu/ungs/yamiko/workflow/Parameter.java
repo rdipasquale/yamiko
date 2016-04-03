@@ -43,6 +43,7 @@ public class Parameter<T> implements Serializable{
 	private Genome<T> genome;
 	private int maxNodes;
 	private Double migrationRatio;
+	private int maxTimeIsolatedMs;
 
 	
 	public double getMutationProbability() {
@@ -338,7 +339,7 @@ public class Parameter<T> implements Serializable{
 			Mutator<T> mutator, IndividualValidator<T> individualValidator,
 			PopulationInitializer<T> populationInitializer, Repair<T> repair,
 			Selector<T> selector, Population<T> populationInstance,
-			long maxGenerations, double optimalFitness,MorphogenesisAgent<T> morp,Genome<T> genome,int maxNodes_,Double _migrationRatio) {
+			long maxGenerations, double optimalFitness,MorphogenesisAgent<T> morp,Genome<T> genome,int maxNodes_,Double _migrationRatio,Integer maxTimeIsolatedInMs) {
 		super();
 		this.mutationProbability = mutationProbability;
 		this.crossoverProbability = crossoverProbability;
@@ -359,6 +360,7 @@ public class Parameter<T> implements Serializable{
 		this.genome=genome;
 		this.maxNodes=maxNodes_;
 		this.migrationRatio=_migrationRatio;
+		this.maxTimeIsolatedMs=maxTimeIsolatedInMs;
 	}
 
 	public Double getMigrationRatio() {
@@ -369,6 +371,15 @@ public class Parameter<T> implements Serializable{
 		this.migrationRatio = migrationRatio;
 	}
 
+	public int getMaxTimeIsolatedMs() {
+		return maxTimeIsolatedMs;
+	}
+
+	public void setMaxTimeIsolatedMs(int maxTimeIsolatedMs) {
+		this.maxTimeIsolatedMs = maxTimeIsolatedMs;
+	}
+
+	
 	
 	
 	

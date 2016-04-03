@@ -67,6 +67,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			val bcDesc:Broadcast[AcceptEvaluator[T]]=sc.broadcast(parameter.getAcceptEvaluator());
 			val bcPopI:Broadcast[PopulationInitializer[T]]=sc.broadcast(parameter.getPopulationInitializer());
 			val bcMR:Broadcast[Int]=sc.broadcast((parameter.getMigrationRatio()*parameter.getPopulationSize).toInt);			
+			val bcMaxTimeIso:Broadcast[Int]=sc.broadcast((parameter.getMaxTimeIsolatedMs).toInt);			
 		
 			var pops:ArrayList[DistributedPopulation[T]]=new ArrayList[DistributedPopulation[T]];
 			for(i <- 1 to parameter.getMaxNodes) {
@@ -77,6 +78,8 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			
 			val populations0:RDD[DistributedPopulation[T]]=sc.parallelize(pops,parameter.getMaxNodes)
 			var populations:RDD[DistributedPopulation[T]]=populations0.map{p:DistributedPopulation[T] =>  bcPopI.value.execute(p); p}
+
+			val startTime=System.currentTimeMillis()
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
@@ -85,8 +88,11 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  
 			  populations=populations.map { dp:DistributedPopulation[T] => 
 			        val descendants=new ListBuffer[Individual[T]]
-    			    for(g <- 1 to isolatedGenerations) 
+			        var g=0
+			        val t1=System.currentTimeMillis()
+    			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
+    			      g+=1
     			        dp.getAll().foreach { i:Individual[T] => 
         			        if (i.getFitness()==null)
         				      {
@@ -96,10 +102,9 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                     }
     			        
     			        //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
-    
     			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
 
-    			        //if (g%100==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
     				      parameter.getSelector().setPopulation(dp)				
     				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue())).asInstanceOf[List[Individual[T]]];
@@ -136,12 +141,15 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
           				}
     
     			    }
+			        if (g<isolatedGenerations) Logger.getLogger("file").warn("En la población " + dp.getId() + " - se cortó en la Generación " + g + " por time out (" + bcMaxTimeIso.value + ")" )
 			       
 			    dp.replacePopulation(descendants);
 			    dp
 			   }.cache()
 			  
 			  generationNumber+=isolatedGenerations
+			  
+			  Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
 			  
 			  // Ordenar por fitness
 			  populations.foreach {  dp:DistributedPopulation[T] =>dp.replacePopulation(dp.getAll().sortBy(_.getFitness).reverse)}
@@ -150,7 +158,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  val topInds=populations.map {  dp:DistributedPopulation[T] => (dp.getId(),dp.getAll().take(bcMR.value))}			  
 			  val topIndsArray=topInds.collect()
 			  
-			  for(ti <- topIndsArray)  { println("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0)) }
+			  for(ti <- topIndsArray)  { Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0)) }
 			  
 			  val bestOfGeneration=topIndsArray.maxBy(_._2.get(0).getFitness)._2.get(0)
 				BestIndHolder.holdBestInd(bestOfGeneration);				
