@@ -36,6 +36,9 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	
    override def execute(individuals:java.util.List[Individual[Array[Integer]]]):java.util.List[Individual[Array[Integer]]] = {
 
+    // Debug
+    val t=System.currentTimeMillis()
+    
 	  // Condicion de guarda
 	  if (individuals==null) return null;
 	  if (individuals.length!=2) return null;
@@ -85,8 +88,13 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  d1+=sNew1;
 	  d2+=sNew2;
 
-	  if (!d1.exists{ p:List[Int] => p.size>0} || !d2.exists{ p:List[Int] => p.size>0})
-	    println("Aca")
+	  // Debug
+//	  if (!d1.exists{ p:List[Int] => p.size>0} || !d2.exists{ p:List[Int] => p.size>0})
+//	    println("Aca")
+    if (System.currentTimeMillis()-t>20) 
+      println("Timeout " + (System.currentTimeMillis()-t))
+
+    	    
 	    
 	  return List(IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Integer(_)).toArray),
 	      IntegerStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Integer(_)).toArray))
