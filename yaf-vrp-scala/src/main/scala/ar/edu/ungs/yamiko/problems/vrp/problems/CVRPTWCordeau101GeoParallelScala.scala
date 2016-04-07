@@ -1,42 +1,46 @@
 package ar.edu.ungs.yamiko.problems.vrp.problems
 
-import org.apache.log4j.Logger
 import java.io.File
+import java.util.ArrayList
+import java.util.Calendar
+import java.util.Collection
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.collectionAsScalaIterable
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.collection.mutable.HashMap
+
+import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence
-import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser
+
+import ar.edu.ungs.yamiko.ga.domain.Gene
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.domain.Ribosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene
 import ar.edu.ungs.yamiko.ga.domain.impl.ByPassRibosome
-import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializer
-import scala.collection.JavaConversions._
-import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent
-import scala.collection.mutable.HashMap
-import ar.edu.ungs.yamiko.ga.domain.Gene
-import ar.edu.ungs.yamiko.ga.domain.Ribosome
 import ar.edu.ungs.yamiko.ga.domain.impl.DynamicLengthGenome
-import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix
-import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
-import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator
-import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover
-import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
-import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
-import ar.edu.ungs.yamiko.workflow.Parameter
-import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom
-import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
-import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelGA
-import java.util.Calendar
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence
-import ar.edu.ungs.yamiko.workflow.BestIndHolder
-import ar.edu.ungs.yamiko.ga.domain.Individual
-import java.util.ArrayList
-import java.util.Collection
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializerScala
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
+import ar.edu.ungs.yamiko.ga.operators.impl.ParallelUniqueIntegerPopulationInitializerScala
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
+import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
+import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator
+import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix
+import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom
+import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent
+import ar.edu.ungs.yamiko.problems.vrp.SBXCrossover
+import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
+import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser
+import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser
+import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence
+import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence
+import ar.edu.ungs.yamiko.workflow.BestIndHolder
+import ar.edu.ungs.yamiko.workflow.Parameter
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelGA
 
 object CVRPTWCordeau101GeoParallelScala {
   
@@ -137,7 +141,7 @@ object CVRPTWCordeau101GeoParallelScala {
 			    
 			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 1, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
-    					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelector(), 
+    					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelectorScala(), 
     					pop, maxGenerations, fitnesOptInd,rma,genome)
 
 			    val ga=new SparkParallelGA[Array[Integer]](par)
