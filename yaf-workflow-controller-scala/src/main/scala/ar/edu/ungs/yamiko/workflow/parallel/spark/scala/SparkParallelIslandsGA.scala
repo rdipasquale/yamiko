@@ -90,8 +90,15 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			        val descendants=new ListBuffer[Individual[T]]
 			        var g=0
 			        val t1=System.currentTimeMillis()
+      			  // Profiling
+			        var startTime2=System.currentTimeMillis()
+
     			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
+	      			  //Profiling
+        			  Logger.getLogger("file").warn("Profiling - Generation " + generationNumber + "/" + g + " -> Inicio vuelta - " + (System.currentTimeMillis()-startTime2)+"ms por generación");
+        			  startTime2=System.currentTimeMillis()
+
     			      g+=1
     			        dp.getAll().foreach { i:Individual[T] => 
         			        if (i.getFitness()==null)
