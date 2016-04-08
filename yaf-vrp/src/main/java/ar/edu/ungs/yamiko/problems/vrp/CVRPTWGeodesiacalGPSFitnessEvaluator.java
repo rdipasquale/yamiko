@@ -145,7 +145,9 @@ public class CVRPTWGeodesiacalGPSFitnessEvaluator extends VRPFitnessEvaluator{
 		
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 
-		return maxFitness-calcFullPenalties(rutas);
+		double ccc=maxFitness-calcFullPenalties(rutas);
+		if (ccc<0) return 0;		
+		return ccc;
 	}
 	
 	public CVRPTWGeodesiacalGPSFitnessEvaluator(Map<Short, Map<Short, Map<Integer, Tuple2<Double, Double>>>> _map,double maxFITNESS,DistanceMatrix dm,int _vehicles,int _clients,int minRoutesV) {

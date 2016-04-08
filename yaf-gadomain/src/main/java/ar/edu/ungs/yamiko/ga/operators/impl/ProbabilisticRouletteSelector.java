@@ -21,27 +21,22 @@ public class ProbabilisticRouletteSelector<T> implements Selector<T>,Serializabl
 	 * 
 	 */
 	private static final long serialVersionUID = -1021721399295562069L;
-	private Population<T> p;
 
 	public ProbabilisticRouletteSelector() {
 		
 	}
 	
-	public void setPopulation(Population<T> p) {
-		this.p = p;
-	}
-	
 	@Override
-	public Individual<T> execute() {
-		double roulette[]=buildRoulette();
+	public Individual<T> execute(Population<T> p) {
+		double roulette[]=buildRoulette(p);
 		double rou=StaticHelper.randomDouble(roulette[roulette.length-1]);
 		int selected=SearchHelper.binaryRangeSearch(roulette, rou);
 		return (Individual<T>)p.getAll().get(selected);
 	}	
 	
 	@Override
-	public List<Individual<T>> executeN(int n) {
-		double roulette[]=buildRoulette();
+	public List<Individual<T>> executeN(int n,Population<T> p) {
+		double roulette[]=buildRoulette(p);
 		List<Individual<T>> salida=new ArrayList<Individual<T>>();
 		for (int i=0;i<n;i++)
 		{
@@ -52,7 +47,7 @@ public class ProbabilisticRouletteSelector<T> implements Selector<T>,Serializabl
 		return salida;
 	}
 	
-	private double[] buildRoulette()
+	private double[] buildRoulette(Population<T> p)
 	{
 		double[] salida=new double[p.getAll().size()];
 		double suma=0;

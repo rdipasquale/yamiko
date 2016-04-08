@@ -91,8 +91,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  // Debug
 //	  if (!d1.exists{ p:List[Int] => p.size>0} || !d2.exists{ p:List[Int] => p.size>0})
 //	    println("Aca")
-    if (System.currentTimeMillis()-t>20) 
-      println("Timeout " + (System.currentTimeMillis()-t))
+//    if (System.currentTimeMillis()-t>20) 
+//      println("Timeout " + (System.currentTimeMillis()-t))
 
     	    
 	    

@@ -88,8 +88,7 @@ public class ParallelFitnessEvaluationGA<T> {
 					}
 				}
 
-			parameter.getSelector().setPopulation(p);
-			List<Individual<T>> candidates=parameter.getSelector().executeN(p.size().intValue()*2);
+			List<Individual<T>> candidates=parameter.getSelector().executeN(p.size().intValue()*2,p);
 			
 			Iterator ite=candidates.iterator();
 			while (ite.hasNext()) {

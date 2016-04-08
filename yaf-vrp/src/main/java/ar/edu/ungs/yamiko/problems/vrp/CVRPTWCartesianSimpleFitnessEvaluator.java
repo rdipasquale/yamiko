@@ -91,7 +91,9 @@ public class CVRPTWCartesianSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 		if (rutas==null)
 			return 0;
-		return maxFitness-calcFullPenalties(rutas);
+		double ccc=maxFitness-calcFullPenalties(rutas);
+		if (ccc<0) return 0;		
+		return ccc;
 	}
 	
 	public CVRPTWCartesianSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles,DistanceMatrix dm,double maxFITNESS) {

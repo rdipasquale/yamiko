@@ -47,9 +47,8 @@ public class TestProbabilisticRouletteSelector {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	public void testSelectBestInd() {
-		Selector sel=new ProbabilisticRouletteSelector();
-		((ProbabilisticRouletteSelector)sel).setPopulation(population);
-		List<Individual> lista=sel.executeN(1000);
+		Selector sel=new ProbabilisticRouletteSelector<Integer[]>();
+		List<Individual> lista=sel.executeN(1000,population);
 		int iguales=0;
 		for (Individual individual : lista) {
 			Individual<BitSet> iin=(Individual<BitSet>)individual;

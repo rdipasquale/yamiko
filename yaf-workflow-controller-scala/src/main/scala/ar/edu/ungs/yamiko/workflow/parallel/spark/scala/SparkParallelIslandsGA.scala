@@ -31,6 +31,7 @@ import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 
 
 
@@ -87,17 +88,18 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  if (generationNumber%10==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
 			  populations=populations.map { dp:DistributedPopulation[T] => 
-			        val descendants=new ListBuffer[Individual[T]]
 			        var g=0
 			        val t1=System.currentTimeMillis()
       			  // Profiling
-			        var startTime2=System.currentTimeMillis()
+//			        var startTime2=System.currentTimeMillis()
 
     			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
+		          val descendants=new ListBuffer[Individual[T]]
 	      			  //Profiling
-        			  Logger.getLogger("file").warn("Profiling - Generation " + generationNumber + "/" + g + " -> Inicio vuelta - " + (System.currentTimeMillis()-startTime2)+"ms por generación");
-        			  startTime2=System.currentTimeMillis()
+//        			  if (g%100==0) Logger.getLogger("file").warn("Profiling - Generation " + generationNumber + "/" + g + " -> Inicio vuelta - " + (System.currentTimeMillis()-startTime2)+"ms por generación");
+//        			  if (dp.getAll().size()>200) Logger.getLogger("file").warn("Size Poblacion = " + dp.getAll().size() + " Generation " + generationNumber + "/" + g );
+//        			  startTime2=System.currentTimeMillis()
 
     			      g+=1
     			        dp.getAll().foreach { i:Individual[T] => 
@@ -111,10 +113,9 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     			        //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
     			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
 
-    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+//    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
-    				      parameter.getSelector().setPopulation(dp)				
-    				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue())).asInstanceOf[List[Individual[T]]];
+    				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue(),dp)).asInstanceOf[List[Individual[T]]];
           				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 
           				for (t <- tuplasSer)
@@ -144,20 +145,20 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
           				if (!descendants.contains(bestOfGeneration))
           				{
     			          //Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> No contenía al mejor de la generación " + bestOfGeneration.getId + " - " + bestOfGeneration.getFitness);
+          				  descendants.dropRight(1)
           				  descendants+=(bestOfGeneration)
           				}
     
+          		dp.replacePopulation(descendants);
     			    }
 			        if (g<isolatedGenerations) Logger.getLogger("file").warn("En la población " + dp.getId() + " - se cortó en la Generación " + g + " por time out (" + bcMaxTimeIso.value + ")" )
 			       
-			    dp.replacePopulation(descendants);
+			    
 			    dp
 			   }.cache()
 			  
 			  generationNumber+=isolatedGenerations
-			  
-			  Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
-			  
+			  			  
 			  // Ordenar por fitness
 			  populations.foreach {  dp:DistributedPopulation[T] =>dp.replacePopulation(dp.getAll().sortBy(_.getFitness).reverse)}
 
@@ -193,13 +194,18 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 
 			  // Migracion de individuos
 			  val bcTopInds=sc.broadcast(topIndsArray);
+
 			  populations.foreach { dp:DistributedPopulation[T] => dp.replacePopulation(dp.getAll().dropRight(bcMR.value)++bcTopInds.value.find(_._1 == dp.getId()).get._2 ) }
+
+			  // Debug
+//			  populations.foreach { dp:DistributedPopulation[T] => println("Poblacion " + dp.getId() + " - " + dp.getAll().size()) }
 			  
 			  // Debug
 //			  populations.foreach { dp:DistributedPopulation[T] => 
 //			    dp.getAll().foreach { i:Individual[T] => println("Población " + dp.getId() + " - Invidivido " + i.getId + " - " + i.getFitness)}  
 //			  }			   			  
 
+			  Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
 			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness)
 			}
 

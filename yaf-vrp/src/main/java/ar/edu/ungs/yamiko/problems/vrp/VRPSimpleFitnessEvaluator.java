@@ -66,7 +66,11 @@ public class VRPSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		if (ind==null) return 0d;
 		if (ind.getPhenotype()==null) return 0d;
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
-		return MAX_FITNESS-calcFullPenalties(rutas);
+
+		double ccc=MAX_FITNESS-calcFullPenalties(rutas);
+		if (ccc<0) return 0;		
+		return ccc;
+
 	}
 	
 	public VRPSimpleFitnessEvaluator(double vel,int maxVehicles,DistanceMatrix dm) {

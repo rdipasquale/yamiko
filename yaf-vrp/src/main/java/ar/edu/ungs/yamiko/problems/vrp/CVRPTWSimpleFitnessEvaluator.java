@@ -99,13 +99,15 @@ public class CVRPTWSimpleFitnessEvaluator extends VRPFitnessEvaluator{
 		
 		List<List<Integer>> rutas=RouteHelper.getRoutesFromInd(ind);
 
-		if (rutas==null) 
-		{
-			System.out.println("Rutas nulas en SimpleFitness Evaluator " + ind);
-			RouteHelper.getRoutesFromInd(ind);
-			return 0d;
-		}
-		return maxFitness-calcFullPenalties(rutas);
+//		if (rutas==null) 
+//		{
+//			System.out.println("Rutas nulas en SimpleFitness Evaluator " + ind);
+//			RouteHelper.getRoutesFromInd(ind);
+//			return 0d;
+//		}
+		double ccc=maxFitness-calcFullPenalties(rutas);
+		if (ccc<0) return 0;		
+		return ccc;
 	}
 	
 //	public CVRPTWSimpleFitnessEvaluator(Double _capacity,Double _velocity,int maxVehicles) {

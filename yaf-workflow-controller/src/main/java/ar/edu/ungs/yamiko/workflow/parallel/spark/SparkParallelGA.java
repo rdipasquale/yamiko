@@ -93,8 +93,7 @@ public class SparkParallelGA<T> implements Serializable{
 				//if ((generationNumber % 100)==0) 
 					Logger.getLogger("file").warn("Generation " + generationNumber + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
 
-				parameter.getSelector().setPopulation(p);
-				final List<Individual<T>> candidates=parameter.getSelector().executeN(p.size().intValue()*2);
+				final List<Individual<T>> candidates=parameter.getSelector().executeN(p.size().intValue()*2,p);
 				
 				List<List<Individual<T>>> tuplas=new ArrayList<List<Individual<T>>>(candidates.size()/2);
 				for (int i=0;i<candidates.size();i=i+2)

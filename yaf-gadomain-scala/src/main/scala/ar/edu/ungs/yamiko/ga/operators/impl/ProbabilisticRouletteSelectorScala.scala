@@ -14,20 +14,22 @@ import scala.util.Random
 @SerialVersionUID(129L)
 class ProbabilisticRouletteSelectorScala[T] extends Selector[T] {
 
- private var p:Population[T]=null
+ val DEFAULT_FACTOR=10000d
+ def execute(p:Population[T]):Individual[T]=null
  
- def execute():Individual[T]=null
- 
- def executeN(n:Int):java.util.List[Individual[T]] =
+ def executeN(n:Int,p:Population[T]):java.util.List[Individual[T]] =
  {
    val iNil:Individual[T]=null
-   //val t=p.getAll.map(_.getFitness.doubleValue()).sum
-   val accum=p.getAll.scanLeft((0d,iNil)) { (a, i) => (a._1+ i.getFitness,i) }.drop(1)
+   val div:Double=if (p.getAll.get(0).getFitness==0d) DEFAULT_FACTOR else p.getAll.get(0).getFitness
+   val accum=p.getAll.scanLeft((0d,0d,iNil)) { (a, i) => (a._1+ i.getFitness()/div,i.getFitness()/div,i) }.drop(1)
    val r=Random
    val max=accum.takeRight(1).get(0)._1
-   val salida=(1 to n).par.map { x => accum.find(s=>s._1<r.nextDouble()*max).get._2}.toList
+   val salida=(1 to n).par.map { x => 
+     val dRandom=r.nextDouble()*max 
+     val sal=accum.find{s=>(s._1-s._2)<=dRandom && s._1>=dRandom}
+     sal.get._3
+     }.toList
 	 return salida;   
  }
  
- def setPopulation(pp:Population[T])={p=pp}
 }
