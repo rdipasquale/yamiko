@@ -2,8 +2,6 @@ package ar.edu.ungs.yamiko.ga.operators.impl
 
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.Population
-import org.apache.spark.SparkContext
-import org.apache.spark.broadcast.Broadcast
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import scala.collection.mutable.Seq
@@ -11,24 +9,25 @@ import scala.collection.mutable.IndexedSeq
 import scala.collection.mutable.ArraySeq
 import scala.reflect.internal.util.HashSet
 import scala.reflect.internal.util.Set
-import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper
-import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
 import scala.collection.JavaConversions._
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
+import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 
-class UniqueIntegerPopulationInitializerScala(isStartWithZero:Boolean,maxValue:Int,maxZeros:Int) extends PopulationInitializer[Array[Integer]]{
+class UniqueIntPopulationInitializerScala(isStartWithZero:Boolean,maxValue:Int,maxZeros:Int) extends PopulationInitializer[Array[Int]]{
   
-  def isOuterInitialized()=true;
+  override def isOuterInitialized()=true;
 		
-  def execute(p:Population[Array[Integer]])=
+  override def execute(p:Population[Array[Int]])=
   {
-      val pop:ArrayBuffer[Individual[Array[Integer]]]=new ArrayBuffer[Individual[Array[Integer]]]();
+      val r:Random=new Random(System.currentTimeMillis())
+      val pop:ArrayBuffer[Individual[Array[Int]]]=new ArrayBuffer[Individual[Array[Int]]]();
       for( i <- 1 to p.size().intValue()){
 				var zeros:Int=0;
-				var verificador:Set[Integer]=new HashSet[Integer]("verificador",p.getGenome.size());
-				val numeros:Array[Integer]=new Array[Integer](p.getGenome.size());
+				var verificador:scala.collection.mutable.Set[Int]=scala.collection.mutable.Set(1);
+				verificador.clear()
+				val numeros:Array[Int]=new Array[Int](p.getGenome.size());
 				if (isStartWithZero)
 				{
 					zeros+=1;
@@ -38,22 +37,20 @@ class UniqueIntegerPopulationInitializerScala(isStartWithZero:Boolean,maxValue:I
 				if (maxValue>0) maxNum=maxValue;
 				for ( j <- zeros until p.getGenome.size().intValue())
 				{
-  					var rand:Int=StaticHelper.randomInt(maxNum)
+  					var rand:Int=r.nextInt(maxNum)
   					var count:Int=0
   					while ((zeros>=maxZeros && rand==0) || verificador.contains(rand))
   					{
-  						rand=StaticHelper.randomInt(maxNum+1);
+  						rand=r.nextInt(maxNum)
   						count+=1;
   						if (Math.IEEEremainder(count, maxNum*100)==0) System.out.println("Se ha llegado a " +maxNum*100 + " intentos sin poder incluir un elemento más a la lista");						
   					}
   					if (rand!=0)
-  						verificador.addEntry(rand);
+  						verificador.add(rand);
   					numeros(j)=rand;
   					if (rand==0) zeros+=1;
-				}
-				var ind:Individual[Array[Integer]] = IntegerStaticHelper.create(p.getGenome.getStructure().keySet().iterator().next(),numeros)
-				ind.setId(numeros.hashCode());
-				pop+=ind
+				}				
+				pop+=IndividualArrIntFactory.create(p.getGenome.getStructure.keysIterator.nextElement(),numeros)
 			}
       pop.foreach { x => p.addIndividual(x) }
   }
