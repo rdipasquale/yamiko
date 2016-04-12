@@ -61,11 +61,6 @@
 <!-- 	  <artifactId>yaf-workflow-controller-scala</artifactId> -->
 <!-- 	  <version>1.0.0</version> -->
 <!--     </dependency> -->
-    <dependency>
-	  <groupId>ar.edu.ungs.yamiko</groupId>
-	  <artifactId>yaf-gadomain</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>	    
-    </dependency>
   </dependencies>
 
   <build>

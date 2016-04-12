@@ -51,8 +51,8 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 	val INDIVIDUALS=200
 	val MAX_GENERATIONS=10000	
 	//private static final String URI_SPARK="spark://192.168.1.40:7077";
-	val URI_SPARK="local[8]"
-  val MAX_NODES=8
+	val URI_SPARK="local[4]"
+  val MAX_NODES=4
   val MIGRATION_RATIO=0.05
   val ISOLATED_GENERATIONS=200
   val MAX_TIME_ISOLATED=200000
