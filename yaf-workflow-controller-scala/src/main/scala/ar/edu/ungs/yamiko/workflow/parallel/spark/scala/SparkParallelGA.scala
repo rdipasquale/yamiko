@@ -39,6 +39,7 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
     def compare(a:Individual[T], b:Individual[T]) = a.getFitness() compareTo (b.getFitness())
   }
   
+  @throws(classOf[YamikoException])
   private def validateParameters() = {
 			if (parameter.getAcceptEvaluator()==null) throw new NullAcceptEvaluator();
 			if (parameter.getCrossover()==null) throw new NullCrossover() ;
@@ -49,6 +50,7 @@ class SparkParallelGA[T] (parameter: Parameter[T]) extends Serializable{
 			if (parameter.getSelector()==null) throw new NullSelector() ;
   }
   
+  @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
       validateParameters();

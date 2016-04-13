@@ -32,6 +32,7 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 
 
 
@@ -40,7 +41,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
 
-  
+  @throws(classOf[YamikoException])
   private def validateParameters() = {
 			if (parameter.getAcceptEvaluator()==null) throw new NullAcceptEvaluator();
 			if (parameter.getCrossover()==null) throw new NullCrossover() ;
@@ -51,6 +52,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			if (parameter.getSelector()==null) throw new NullSelector() ;
   }
   
+  @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
       validateParameters();
