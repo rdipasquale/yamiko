@@ -10,7 +10,7 @@ import ar.edu.ungs.yamiko.ga.domain.Individual
 class DistributedPopulation[T](genome:Genome[T]) extends Population[T]{
   
   private val pop:ListBuffer[Individual[T]]=new ListBuffer[Individual[T]]();
-  private var auxSize=0l;
+  private var auxSize=0;
   private val id=(Math.random()*100000).asInstanceOf[Int];
 
   override def addIndividual(i: Individual[T])= {pop+=i}
@@ -27,11 +27,11 @@ class DistributedPopulation[T](genome:Genome[T]) extends Population[T]{
   override def replacePopulation(col: List[Individual[T]])={pop.clear();pop++=col}
   override def replacePopulation(col: ListBuffer[Individual[T]])={pop.clear();pop++=col}
   
-  override def setSize(l: Long)= {auxSize=l}
-  override def size(): Long= {return auxSize}  
+  override def setSize(l: Int)= {auxSize=l}
+  override def size(): Int= {return auxSize}  
   override def getId():Int= {return id}  
 
-  override def iterator(): Iterator[Individual[T]] = {return pop.iterator}
+  def iterator(): Iterator[Individual[T]] = {return pop.iterator}
 
   def canEqual(a: Any) = a.isInstanceOf[DistributedPopulation[T]]
 

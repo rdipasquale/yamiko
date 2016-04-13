@@ -20,7 +20,5 @@ class DescendantModifiedAcceptLigthEvaluator[T] extends AcceptEvaluator[T] {
      parents2.sortBy { x => x.getFitness() }
     return parents2.toList.drop(parents.length-2).toList;
  }
- 
- override def isDevelopsIndividuals():Boolean=false
- 
+
 }

@@ -1,5 +1,7 @@
 package ar.edu.ungs.yamiko.ga.domain
 
+import scala.collection.mutable.ListBuffer
+
 /**
  * Representa un cromosoma en el dominio de los algoritmos genéticos. En términos clásicos, los individuos son análogos a los cromosomas. En nuestro caso vamos a diferenciar ambas nociones. En términos clásicos, un cromosoma es una tira de bits de una longitud determinada. Dado que podemos utilizar estructuras más complejas, dejamos implementada con Generics esta interfaz. 
  * 
@@ -122,14 +124,16 @@ trait Ribosome[T]  extends Serializable{
 @SerialVersionUID(10001L)
 trait Population[T] extends Serializable{
 	
-	def size():Long 
-	def setSize(_size:Long)
+	def getId():Int 
+	def size():Int 
+	def setSize(_size:Int)
 	def getGenome():Genome[T]
 	def addIndividual(i:Individual[T])
 	def removeIndividual(i:Individual[T])
 	def replaceIndividual(i1:Individual[T],i2:Individual[T])
 	def getAll():List[Individual[T]]
 	def replacePopulation(i2:List[Individual[T]])
+	def replacePopulation(i2:ListBuffer[Individual[T]])
 
 }
 
