@@ -56,11 +56,11 @@
       <version>2.2.4</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      	<groupId>ar.edu.ungs.yamiko</groupId>
-	  	<artifactId>yaf-workflow-controller</artifactId>
-  		<version>1.0.0</version>
-  	</dependency>
+<!--     <dependency> -->
+<!--       	<groupId>ar.edu.ungs.yamiko</groupId> -->
+<!-- 	  	<artifactId>yaf-workflow-controller</artifactId> -->
+<!--   		<version>1.0.0</version> -->
+<!--   	</dependency> -->
     <dependency>
      	<groupId>ar.edu.ungs.yamiko</groupId>
 	  	<artifactId>yaf-gadomain-scala</artifactId>
