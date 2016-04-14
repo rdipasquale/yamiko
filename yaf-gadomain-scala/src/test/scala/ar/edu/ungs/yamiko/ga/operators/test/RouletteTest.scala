@@ -1,13 +1,12 @@
 package ar.edu.ungs.yamiko.ga.operators.test
 
-import scala.collection.JavaConversions._
 import org.junit._
 import org.junit.Assert._
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSinglePopulation
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
 import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 
 @Test
 class RouletteTest {
@@ -15,19 +14,16 @@ class RouletteTest {
     @Test
     def testRoulette() = 
     {
-      val i1:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]]()
-      val i2:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]]()
-      val i3:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]]()
-      i1.setId(1);
+      val i1:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]](null,1)
+      val i2:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]](null,2)
+      val i3:Individual[Array[Integer]]=new BasicIndividual[Array[Integer]](null,3)
       i1.setFitness(100d)
-      i2.setId(2);
       i2.setFitness(10d)
-      i3.setId(3);
       i3.setFitness(1d)
       
       val p=new ProbabilisticRouletteSelectorScala[Array[Integer]]();
       
-      val pop:Population[Array[Integer]]=new GlobalSinglePopulation[Array[Integer]](null)
+      val pop:Population[Array[Integer]]=new DistributedPopulation[Array[Integer]](null)
       pop.addIndividual(i1);
       pop.addIndividual(i2);
       pop.addIndividual(i3);

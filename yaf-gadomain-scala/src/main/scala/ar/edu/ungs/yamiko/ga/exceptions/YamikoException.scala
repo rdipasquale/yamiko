@@ -13,6 +13,7 @@ class NullGenotypeException(message:String) extends YamikoException(message:Stri
 class NullIndividualException(message:String) extends YamikoException(message:String){}
 class NullPopulationInitializer(message:String) extends YamikoException(message:String){}
 class NullSelector(message:String) extends YamikoException(message:String){}
+class InvalidProbability(message:String) extends YamikoException(message:String){}
 
 
 

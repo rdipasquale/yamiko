@@ -62,9 +62,9 @@
 	  <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>ar.edu.ungs.yamiko.problems</groupId>
-	  <artifactId>yaf-vrp</artifactId>
-	  <version>1.0.0</version>
+	  <groupId>org.gavahan.geodesy</groupId>
+	  <artifactId>gavahanGeodesy</artifactId>
+	  <version>1.1.2</version>
 	</dependency>
     <dependency>
        <groupId>ar.edu.ungs.yamiko</groupId>

@@ -1,17 +1,11 @@
 package ar.edu.ungs.yaf.vrp
 
-import ar.edu.ungs.yamiko.problems.vrp.VRPCrossover
-import scala.collection.JavaConversions._
-import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelperScala
 import scala.util.Random
-import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
+import ar.edu.ungs.yamiko.ga.toolkit.IntStaticHelper
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper
 import scala.collection.mutable.ListBuffer
-import java.util.Arrays.ArrayList
-import java.util.Arrays.ArrayList
-import java.util.ArrayList
 
 /**
  * Sequence Based Crossover. Operador de Crossover implementado de manera similar a lo publicado en "The Vehicle Routing Problem with Time Windows Part II: Genetic Search"
@@ -30,11 +24,11 @@ import java.util.ArrayList
  * @author ricardo
  *
  */
-class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicles:Int,vrp:VRPFitnessEvaluator,distanceMatrix:Array[Array[Double]],bcMatrix:Array[List[(Int,Double)]]) extends VRPCrossover{
+class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicles:Int,vrp:VRPFitnessEvaluator,distanceMatrix:Array[Array[Double]],bcMatrix:Array[List[(Int,Double)]]) extends VRPCrossOver{
   
 	val PROB_DESC_VEHICLES:Double=0.3d;
 	
-   override def execute(individuals:java.util.List[Individual[Array[Integer]]]):java.util.List[Individual[Array[Integer]]] = {
+   override def execute(individuals:List[Individual[Array[Int]]]):List[Individual[Array[Int]]] = {
 
     // Debug
     val t=System.currentTimeMillis()
@@ -44,8 +38,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  if (individuals.length!=2) return null;
 	  
 	  //1) A partir de 2 padres P1 y P2 Se hace una copia (deep) de cada uno (D1 y D2) .
-	  val p1=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals.get(0)));
-	  val p2=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals.get(1)));
+	  val p1=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals(0)));
+	  val p2=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals(1)));
 	  val d1:ListBuffer[List[Int]]=ListBuffer()
 	  val d2:ListBuffer[List[Int]]=ListBuffer()
 	  
@@ -96,7 +90,7 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 
     	    
 	    
-	  return List(IntegerStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Integer(_)).toArray),
-	      IntegerStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Integer(_)).toArray))
+	  return List(IntStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Int(_)).toArray),
+	      IntStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Int(_)).toArray))
 	}
 }

@@ -1,12 +1,11 @@
 package ar.edu.ungs.yaf.vrp
 
-import scala.collection.JavaConversions._
 import scala.collection.immutable.Map
-import ar.edu.ungs.yamiko.problems.vrp.Customer
-import ar.edu.ungs.yamiko.problems.vrp.CartesianCustomer
-import ar.edu.ungs.yamiko.problems.vrp.GeodesicalCustomer
 import scala.util.control.Breaks._
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yaf.vrp.entities.GeodesicalCustomer
+import ar.edu.ungs.yaf.vrp.entities.Customer
+import ar.edu.ungs.yaf.vrp.entities.CartesianCustomer
 
 /**
  * Construye una matrix que representa un costo ponderado de insertar un cliente a continuación de otro. En particular, se construye
@@ -35,10 +34,10 @@ object BestCostMatrix {
           val rep=dest.filter { p:List[Int] => p.contains(b._1) }
           if (!rep.isEmpty)
           {
-              var rep2=rep.get(0).to[ListBuffer]
+              var rep2=rep(0).to[ListBuffer]
               dest-=rep2.toList
               rep2=rep2.take(rep2.indexOf(b._1)+1)++ListBuffer(c)++rep2.takeRight(rep2.length-rep2.indexOf(b._1)-1)
-              dest.add(rep2.toList)
+              dest+=rep2.toList
               break
           }
         }

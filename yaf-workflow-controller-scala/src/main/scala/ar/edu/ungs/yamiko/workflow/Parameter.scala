@@ -18,7 +18,6 @@ class Parameter[T](mutationProbability:Double,
                     fitnessEvaluator:FitnessEvaluator[T] ,
                     crossover:Crossover[T],
                     mutator:Mutator[T],
-                    individualValidator:individualValidator[T],
                     populationInitializer:PopulationInitializer[T] ,
                     selector:Selector[T],
                     populationInstance:Population[T],
@@ -30,5 +29,23 @@ class Parameter[T](mutationProbability:Double,
                     migrationRatio:Double ,
                     maxTimeIsolatedMs:Int
                     ) extends Serializable{
+  
+  def getMutationProbability():Double=mutationProbability
+  def getCrossoverProbability():Double=crossoverProbability
+  def getPopulationSize():Int=populationSize
+  def getAcceptEvaluator():AcceptEvaluator[T]=acceptEvaluator
+  def getFitnessEvaluator():FitnessEvaluator[T]=fitnessEvaluator
+  def getCrossover():Crossover[T]=crossover
+  def getMutator():Mutator[T]=mutator
+  def getPopulationInitializer():PopulationInitializer[T]=populationInitializer
+  def getSelector():Selector[T]=selector
+  def getPopulationInstance():Population[T]=populationInstance
+  def getMaxGenerations():Int=maxGenerations
+  def getOptimalFitness():Double=optimalFitness
+  def getMorphogenesisAgent():MorphogenesisAgent[T]=morphogenesisAgent
+  def getGenome():Genome[T]=genome
+  def getMaxNodes():Int=maxNodes
+  def getMigrationRatio():Double=migrationRatio
+  def getMaxTimeIsolatedMs():Int=maxTimeIsolatedMs
   
 }

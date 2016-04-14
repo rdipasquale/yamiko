@@ -20,7 +20,8 @@
     <encoding>UTF-8</encoding>
     <scala.version>2.11.7</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
-    <hadoop.version>2.7.1</hadoop.version>    
+    <hadoop.version>2.7.1</hadoop.version>   
+	<spark.version>1.6.1</spark.version>    
   </properties>
 
   <dependencies>
@@ -56,16 +57,36 @@
       <version>2.2.4</version>
       <scope>test</scope>
     </dependency>
-<!--     <dependency> -->
-<!--       	<groupId>ar.edu.ungs.yamiko</groupId> -->
-<!-- 	  	<artifactId>yaf-workflow-controller</artifactId> -->
-<!--   		<version>1.0.0</version> -->
-<!--   	</dependency> -->
     <dependency>
      	<groupId>ar.edu.ungs.yamiko</groupId>
 	  	<artifactId>yaf-gadomain-scala</artifactId>
 	  	<version>1.0.0</version>
   	</dependency>
+    <dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-lang3</artifactId>
+    	<version>3.1</version>
+    </dependency>
+    
+   <dependency> <!-- Spark dependency -->
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.11</artifactId>
+      <version>${spark.version}</version>
+    </dependency> 
+    
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-sql_2.11</artifactId>
+		<version>${spark.version}</version>
+	</dependency>       
+    
+	 <dependency>
+		<groupId>com.google.guava</groupId>
+		<artifactId>guava</artifactId>
+		<version>18.0</version>
+	</dependency>   
+  	
+  	
   </dependencies>
 
   <build>

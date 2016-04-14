@@ -1,9 +1,5 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark.scala
 
-import java.util.ArrayList
-import java.util.List
-import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.JavaConversions.seqAsJavaList
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD.fromRDD
@@ -12,50 +8,32 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
-import ar.edu.ungs.yamiko.ga.domain.impl.GlobalSingleSparkPopulation
-import ar.edu.ungs.yamiko.ga.exceptions.InvalidProbability
-import ar.edu.ungs.yamiko.ga.exceptions.NullAcceptEvaluator
-import ar.edu.ungs.yamiko.ga.exceptions.NullCrossover
-import ar.edu.ungs.yamiko.ga.exceptions.NullFitnessEvaluator
-import ar.edu.ungs.yamiko.ga.exceptions.NullPopulationInitializer
-import ar.edu.ungs.yamiko.ga.exceptions.NullSelector
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.Crossover
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.operators.Mutator
-import ar.edu.ungs.yamiko.ga.toolkit.StaticHelper
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
-import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
+import scala.util.Random
 
 
 
 class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int) extends Serializable{
   
-  var _finalPop:RDD[Individual[T]] = null
+  private var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
-
-  @throws(classOf[YamikoException])
-  private def validateParameters() = {
-			if (parameter.getAcceptEvaluator()==null) throw new NullAcceptEvaluator();
-			if (parameter.getCrossover()==null) throw new NullCrossover() ;
-			if (parameter.getCrossoverProbability()<=0 || parameter.getCrossoverProbability()>1) throw new InvalidProbability() ;
-			if (parameter.getMutationProbability()<=0 || parameter.getMutationProbability()>1) throw new InvalidProbability() ;
-			if (parameter.getFitnessEvaluator()==null) throw new NullFitnessEvaluator() ;
-			if (parameter.getPopulationInitializer()==null) throw new NullPopulationInitializer() ;
-			if (parameter.getSelector()==null) throw new NullSelector() ;
-  }
+  private val r:Random=new Random(System.currentTimeMillis()) 
   
   @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
-      validateParameters();
+      ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
 		  var bestInd:Individual[T]=null;
@@ -72,11 +50,12 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			val bcMR:Broadcast[Int]=sc.broadcast((parameter.getMigrationRatio()*parameter.getPopulationSize).toInt);			
 			val bcMaxTimeIso:Broadcast[Int]=sc.broadcast((parameter.getMaxTimeIsolatedMs).toInt);			
 		
-			var pops:ArrayList[DistributedPopulation[T]]=new ArrayList[DistributedPopulation[T]];
+			var pops:ListBuffer[DistributedPopulation[T]]=ListBuffer[DistributedPopulation[T]]()
+			pops.clear()
 			for(i <- 1 to parameter.getMaxNodes) {
 			    val popAux:DistributedPopulation[T]=new DistributedPopulation[T](parameter.getGenome);
 			    popAux.setSize(parameter.getPopulationInstance.size())
-			    pops.add(popAux); 
+			    pops+=popAux 
 			} 			
 			
 			val populations0:RDD[DistributedPopulation[T]]=sc.parallelize(pops,parameter.getMaxNodes)
@@ -122,13 +101,11 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 
           				for (t <- tuplasSer)
           				{
-            				  val parentsJ: java.util.List[Individual[T]] = new ArrayList[Individual[T]]();
     			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
     			            if (t._1.getFitness==null) t._1.setFitness(bcFE.value.execute(t._1))
     			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
     			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
-            				  parentsJ.add(t._1);
-            				  parentsJ.add(t._2);
+    			            val parentsJ=List(t._1,t._2)
             				  val desc=bcCross.value.execute(parentsJ);
             				  for (d <- desc)
             				  {
@@ -137,7 +114,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
             				  }
             				  for (d <- bcDesc.value.execute(desc,parentsJ))
             				  {
-            				    if (StaticHelper.randomDouble(1d)<=bcMutProb.value) bcMut.value.execute(d);
+            				    if (r.nextDouble()<=bcMutProb.value) bcMut.value.execute(d);
     				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
     				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
     				            descendants+=d
@@ -154,8 +131,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
           		dp.replacePopulation(descendants);
     			    }
 			        if (g<isolatedGenerations) Logger.getLogger("file").warn("En la población " + dp.getId() + " - se cortó en la Generación " + g + " por time out (" + bcMaxTimeIso.value + ")" )
-			       
-			    
 			    dp
 			   }.cache()
 			  
@@ -168,9 +143,9 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  val topInds=populations.map {  dp:DistributedPopulation[T] => (dp.getId(),dp.getAll().take(bcMR.value))}			  
 			  val topIndsArray=topInds.collect()
 			  
-			  for(ti <- topIndsArray)  { Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2.get(0)) }
+			  for(ti <- topIndsArray)  { Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2(0)) }
 			  
-			  val bestOfGeneration=topIndsArray.maxBy(_._2.get(0).getFitness)._2.get(0)
+			  val bestOfGeneration=topIndsArray.maxBy(_._2(0).getFitness)._2(0)
 				BestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
 				{
