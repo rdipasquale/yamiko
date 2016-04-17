@@ -1,22 +1,24 @@
 package ar.edu.ungs.yamiko.problems.vrp.utils
 
-import scala.collection.JavaConversions._
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped
-import ar.edu.ungs.yamiko.problems.vrp.Route
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yaf.vrp.entities.Route
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 
-object RouteHelperScala {
+object RouteHelper {
   
-  def getRoutesFromIndividual(i : Individual[Array[Integer]]):List[Route] =
+  @throws(classOf[YamikoException])
+  def getRoutesFromIndividual(i : Individual[Array[Int]]):List[Route] =
   {
     if (i==null) return null;
-    if (i.getPhenotype()==null) throw new IndividualNotDeveloped();
-		val rutas:java.util.Collection[Object]=i.getPhenotype().getAlleleMap().get(i.getPhenotype().getAlleleMap().keySet().iterator().next()).values();
-		
+    if (i.getPhenotype()==null) throw new IndividualNotDeveloped("IndividualNotDeveloped en getRoutesFromIndividual():" +  i);
+		val rutas=i.getPhenotype().getAlleles().head.values.head.asInstanceOf[List[Route]]
+		  //i.getPhenotype().getAlleleMap().get(i.getPhenotype().getAlleleMap().keySet().iterator().next()).values();
+		//Map[Chromosome[Any], Map[Gene,Any]]
 		//val rutasL:List[Route]= List();
-		val lista:java.util.List[Route]=rutas.iterator().next().asInstanceOf[java.util.List[Route]]
-		return lista.toList
+		//val lista:java.util.List[Route]=rutas.iterator().next().asInstanceOf[java.util.List[Route]]
+		return rutas
   }
   
   def getRoutesModelFromRoute(i : List[Route]):List[List[Int]] =
@@ -25,7 +27,7 @@ object RouteHelperScala {
     val salida:ListBuffer[List[Int]]=ListBuffer(List());
     salida.clear()
     for (r:Route<-i)
-      salida+=ScalaAdaptor.toScala(r.getRouteModel())
+      salida+=r.getRouteModel().toList
     return salida.toList;
   }
   
@@ -36,7 +38,7 @@ object RouteHelperScala {
     salida.clear()
     for (ii<-i.filter { p:List[Int] => p.size>0 })
     {
-      if (ii.get(0)!=0) salida+=0
+      if (ii(0)!=0) salida+=0
       ii.foreach { f:Int => salida+=f }      
     }
     return salida.toList;

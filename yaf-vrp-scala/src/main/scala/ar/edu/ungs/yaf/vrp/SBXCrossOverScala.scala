@@ -1,11 +1,10 @@
 package ar.edu.ungs.yaf.vrp
 
 import ar.edu.ungs.yamiko.ga.domain.Individual
-import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelperScala
-import scala.util.Random
-import ar.edu.ungs.yamiko.ga.toolkit.IntStaticHelper
 import ar.edu.ungs.yamiko.problems.vrp.utils.RouteHelper
+import scala.util.Random
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 
 /**
  * Sequence Based Crossover. Operador de Crossover implementado de manera similar a lo publicado en "The Vehicle Routing Problem with Time Windows Part II: Genetic Search"
@@ -38,8 +37,8 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  if (individuals.length!=2) return null;
 	  
 	  //1) A partir de 2 padres P1 y P2 Se hace una copia (deep) de cada uno (D1 y D2) .
-	  val p1=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals(0)));
-	  val p2=RouteHelperScala.getRoutesModelFromRoute(RouteHelperScala.getRoutesFromIndividual(individuals(1)));
+	  val p1=RouteHelper.getRoutesModelFromRoute(RouteHelper.getRoutesFromIndividual(individuals(0)));
+	  val p2=RouteHelper.getRoutesModelFromRoute(RouteHelper.getRoutesFromIndividual(individuals(1)));
 	  val d1:ListBuffer[List[Int]]=ListBuffer()
 	  val d2:ListBuffer[List[Int]]=ListBuffer()
 	  
@@ -47,10 +46,10 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 	  val r = Random
 	  var randomRoute1=r.nextInt(p1.length);
 	  var randomRoute2=r.nextInt(p2.length);
-	  while (p1.get(randomRoute1).size==0) randomRoute1=r.nextInt(p1.length);
-	  while (p2.get(randomRoute2).size==0) randomRoute2=r.nextInt(p2.length);
-	  val rr1=p1.get(randomRoute1)
-	  val rr2=p2.get(randomRoute2)
+	  while (p1(randomRoute1).size==0) randomRoute1=r.nextInt(p1.length);
+	  while (p2(randomRoute2).size==0) randomRoute2=r.nextInt(p2.length);
+	  val rr1=p1(randomRoute1)
+	  val rr2=p2(randomRoute2)
 	  
     //3) Se crea una nueva ruta Snew agregando todas las visitas de R1 desde el principio hasta un punto aleatorio de corte.
 	  //4) Se agregan a Snew las visitas de R2 desde el puntod e corte seleccionado en "3" hasta el final.
@@ -90,7 +89,7 @@ class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicle
 
     	    
 	    
-	  return List(IntStaticHelper.create(individuals.get(0).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d1.toList).map(new Int(_)).toArray),
-	      IntStaticHelper.create(individuals.get(1).getGenotype().getChromosomes().get(0).name(), RouteHelperScala.getRoutesInOneList(d2.toList).map(new Int(_)).toArray))
+	  return List(IndividualArrIntFactory.create(individuals(0).getGenotype().getChromosomes()(0).name(), RouteHelper.getRoutesInOneList(d1.toList).toArray),
+	      IndividualArrIntFactory.create(individuals(1).getGenotype().getChromosomes()(0).name(), RouteHelper.getRoutesInOneList(d2.toList).toArray))
 	}
 }
