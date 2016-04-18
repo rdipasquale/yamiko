@@ -8,6 +8,10 @@ import java.util.StringTokenizer
 import ar.edu.ungs.yaf.vrp.entities.TimeWindow
 import ar.edu.ungs.yaf.vrp.entities.Customer
 import ar.edu.ungs.yaf.vrp.entities.GeodesicalCustomer
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import java.io.File
+import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 
 /**
  * Description for files of Cordeau’s Instances
@@ -72,22 +76,22 @@ object CordeauGeodesicParser {
 		var l:String = br.readLine();
 		var st=new StringTokenizer(l, " ");
 		st.nextToken(); // Debe ser 4
-		val m=Integer.parseInt(st.nextToken());
-		val n=Integer.parseInt(st.nextToken());
+		val m=(st.nextToken()).toInt
+		val n=(st.nextToken()).toInt
 		
 		l = br.readLine();
 		st=new StringTokenizer(l, " ");
 		st.nextToken(); // Debe ser 0
-		val c=Integer.parseInt(st.nextToken());
+		val c=(st.nextToken()).toInt
 		
 		var maxt=0;
 		
-		var salida=Map[Integer, Customer]();
+		var salida=Map[Int, Customer]();
 
 		//Read File Line By Line
 		while ((l = br.readLine()) != null)   {
 			st=new StringTokenizer(l, " ");
-			var i=Integer.parseInt(st.nextToken());
+			var i=st.nextToken().toInt
 			val x=(st.nextToken()).toDouble;
 			val y=(st.nextToken()).toDouble;
 			val d=(st.nextToken()).toInt;
@@ -99,15 +103,15 @@ object CordeauGeodesicParser {
 			var to=0;
 			if (st.hasMoreTokens() && i>0)
 			{
-				from=Integer.parseInt(st.nextToken());
-				to=Integer.parseInt(st.nextToken());
+				from=st.nextToken().toInt
+				to=st.nextToken().toInt
 				if (from>to) System.out.println("En el cliente " + i + " El tw está mal: " + from + " - " + to);
 									
 				from=mintw+from;
 				to=mintw+to;
 			}
 			else
-				if (maxt==0) maxt=Integer.parseInt(st.nextToken());
+				if (maxt==0) maxt=st.nextToken().toInt
 
 			
 			val tw1=new TimeWindow(from/60, from % 60, to/60, to % 60);
@@ -121,29 +125,24 @@ object CordeauGeodesicParser {
 			}
 				
 			
-			val c1=new GeodesicalCustomer(i, String.valueOf(i),null,lat, lon, i==0?null:tw1,q,d,0);
-			salida+=(i, c1);
+			val c1=if (i==0) new GeodesicalCustomer(i,i.toString(),null,lat, lon,q, null,d,0)
+			        else
+			          new GeodesicalCustomer(i,i.toString(),null,lat, lon, q,tw1,d,0)
+		//	(id:Int, name:String, address:String, latitude:Double, longitude:Double,demand:Double, timeWindow:TimeWindow,serviceDuration:Int,softTimeWindowMargin:Int)
+			salida=salida + (i -> c1)
 		}
 
 		//Close the input stream
 		br.close();
-		holder[0]=m;
-		holder[1]=n;
-		holder[2]=c;
+		holder(0)=m;
+		holder(1)=n;
+		holder(2)=c;
 		
 		return salida;
 	}
+
   
-  
-}
-
-
-
-
-
-
-	
-	/**
+  	/**
 	 * 	
 		The first line contains the cost of the solution (total duration excluding service time).
 
@@ -159,43 +158,52 @@ object CordeauGeodesicParser {
 	 * @param fileName
 	 * @return
 	 */
-	public static Individual<Integer[]> parseSolution(String fileName)  throws Exception
+  @throws(classOf[Exception])
+	def parseSolution(fileName:String):Individual[Array[Int]]=
 	{
 		if (!new File(fileName).exists()) return null;
-		List<Integer> cust=new ArrayList<Integer>();
-		FileInputStream fstream = new FileInputStream(fileName);
-		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-		String l = br.readLine();
+		var cust=ListBuffer[Int]()
+		var fstream = new FileInputStream(fileName);
+		val br = new BufferedReader(new InputStreamReader(fstream));
+		var l = br.readLine();
 		while ((l = br.readLine()) != null)   {
 			if (l.trim().length()>0)
 			{
-				StringTokenizer st=new StringTokenizer(l, " ");
+				var st=new StringTokenizer(l, " ");
 				st.nextToken(); // Debe ser 1
 				st.nextToken(); // Debe ser Nro de Vehiculo
 				st.nextToken(); // Debe ser Duracion
 				st.nextToken(); // Debe ser Carga
 				while (st.hasMoreTokens())
 				{
-					int i=Integer.parseInt(st.nextToken());
+					val i=(st.nextToken()).toInt
 					st.nextToken(); // Debe ser TW
 					if (i==0)
 					{
-						if (cust.size()>0)
+						if (cust.size>0)
 						{
-							if (cust.get(cust.size()-1)>0)
-								cust.add(i);
+							if (cust(cust.size-1)>0)
+								cust+=i
 						}
 						else
-							cust.add(i);
+								cust+=i
 					}	
 					else
-						cust.add(i);
+							cust+=i
 				}
 			}
 		}
-		if (cust.get(cust.size()-1)==0) cust.remove(cust.size()-1);
+		if (cust(cust.size-1)==0) cust.remove(cust.size-1);
 		br.close();
-		return IntegerStaticHelper.create("X", cust.toArray(new Integer[0]));
+		return IndividualArrIntFactory.create("X", cust.toArray);
 	}
-	
+
+  
 }
+
+
+
+
+
+
+	

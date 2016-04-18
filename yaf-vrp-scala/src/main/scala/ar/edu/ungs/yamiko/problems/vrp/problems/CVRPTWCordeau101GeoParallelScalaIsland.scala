@@ -28,16 +28,14 @@ import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntegerPopulationInitializerScala
-import ar.edu.ungs.yamiko.ga.toolkit.IntegerStaticHelper
+import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntPopulationInitializerScala
+import ar.edu.ungs.yamiko.ga.toolkit.IntStaticHelper
 import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator
 import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix
 import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom
 import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent
 import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser
-import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauParser
-import ar.edu.ungs.yamiko.problems.vrp.utils.ScalaAdaptor
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence
 import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
@@ -76,21 +74,21 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
   				if (args.length==2)
   				{
   					wPath=args(0);
-  					individuals=Integer.parseInt(args(1));
+  					individuals=args(1).toInt
   				}
   				else
   					if (args.length>2)
   					{
   						wPath=args(0);
-  						individuals=Integer.parseInt(args(1));
-  						maxGenerations=Integer.parseInt(args(2));
+  					  individuals=args(1).toInt
+  						maxGenerations=args(2).toInt
   					}
   				else
   					if (args.length>3)
   					{
   						wPath=args(0);
-  						individuals=Integer.parseInt(args(1));
-  						maxGenerations=Integer.parseInt(args(2));
+  					  individuals=args(1).toInt
+  						maxGenerations=args(2).toInt
   						uriSpark=args(3);
   					} 
     	try {
@@ -105,23 +103,23 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val holder=new Array[Int](3)
 			    val customers=CordeauGeodesicParser.parse(wPath+"c101", holder,lat01Ini,lon01Ini,lat02Ini,lon02Ini,5*60)
 
-			    CustomersPersistence.writeCustomers(customers.values(), wPath+"customers101.txt");			
-			    val optInd=CordeauParser.parseSolution(wPath+"c101.res");
+			    //CustomersPersistence.writeCustomers(customers.values(), wPath+"customers101.txt");			
+			    val optInd=CordeauGeodesicParser.parseSolution(wPath+"c101.res");
 
 			    val m=holder(0) // Vehiculos
 			    val n=holder(1) // Customers
 			    val c=holder(2) // Capacidad (max)
 
 			    val gene=new BasicGene("Gene X", 0, n+m)			
-			    val ribosome:Ribosome[Array[Integer]]=new ByPassRibosome()
+			    val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()
 			    val chromosomeName="X"
-	    	  val popI =new UniqueIntegerPopulationInitializerScala(true, n, m);
+	    	  val popI =new UniqueIntPopulationInitializerScala(true, n, m);
 		
 
 			    val rma=new RoutesMorphogenesisAgent();
-			    val translators=new HashMap[Gene, Ribosome[Array[Integer]]]();
+			    val translators=new HashMap[Gene, Ribosome[Array[Int]]]();
 			    translators.put(gene, ribosome);
-			    val genome=new DynamicLengthGenome[Array[Integer]](chromosomeName, gene, ribosome,n+m)
+			    val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,n+m)
 
 			    val matrix=new DistanceMatrix(customers.values());
 			    val fit:VRPFitnessEvaluator= new CVRPTWSimpleFitnessEvaluator(c,30d,m,matrix,1000000000d,10);
@@ -132,21 +130,21 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
     			
 			    val cross=new SBXCrossOverScala(30d, c, m, m-1,fit,matrix.getMatrix,BestCostMatrix.build(matrix.getMatrix, ScalaAdaptor.toScala(customers)));	    
 
-			    val acceptEvaluator:AcceptEvaluator[Array[Integer]] =new DescendantModifiedAcceptLigthEvaluator()
+			    val acceptEvaluator:AcceptEvaluator[Array[Int]] =new DescendantModifiedAcceptLigthEvaluator()
 
 			    rma.develop(genome, optInd)
 			    val fitnesOptInd=fit.execute(optInd)
 			
-			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntegerStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
+			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
 
-			    val pop=new DistributedPopulation[Array[Integer]](genome);
+			    val pop=new DistributedPopulation[Array[Int]](genome);
 			    
-			    val par:Parameter[Array[Integer]]=	new Parameter[Array[Integer]](0.035, 1, individuals, acceptEvaluator, 
+			    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.035, 1, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
-    					null, popI.asInstanceOf[PopulationInitializer[Array[Integer]]], null, new ProbabilisticRouletteSelectorScala(), 
+    					null, popI.asInstanceOf[PopulationInitializer[Array[Int]]], null, new ProbabilisticRouletteSelectorScala(), 
     					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED)
 
-			    val ga=new SparkParallelIslandsGA[Array[Integer]](par,ISOLATED_GENERATIONS)
+			    val ga=new SparkParallelIslandsGA[Array[Int]](par,ISOLATED_GENERATIONS)
 					
 			    val t1=System.currentTimeMillis()
 			
@@ -157,7 +155,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val t2=System.currentTimeMillis();
 			    log.warn("Fin ga.run()");
 
-    			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntegerStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+    			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
     			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
     			log.warn("Promedio -> " + ((t2-t1)/(par.getMaxGenerations().toDouble))+ " ms/generacion");
 		
@@ -176,8 +174,8 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    VRPPopulationPersistence.writePopulation( finalPop,wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			    VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 	
-			    val bestIndSet:Collection[Individual[Array[Integer]]]=new ArrayList[Individual[Array[Integer]]]();
-			    BestIndHolder.getBest().foreach { x => bestIndSet.add(x.asInstanceOf[Individual[Array[Integer]]]) }
+			    val bestIndSet:Collection[Individual[Array[Int]]]=new ArrayList[Individual[Array[Int]]]();
+			    BestIndHolder.getBest().foreach { x => bestIndSet.add(x.asInstanceOf[Individual[Array[Int]]]) }
 			    VRPPopulationPersistence.writePopulation(bestIndSet,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
     			prom=0d;
