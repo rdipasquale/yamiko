@@ -24,18 +24,18 @@ class RoutesMorphogenesisAgent extends MorphogenesisAgent[Array[Int]]{
 
 		val chromosome= ind.getGenotype().getChromosomes()(0);
 		val allele=chromosome.getFullRawRepresentation()
-		var alleles=Map[Gene, Any]()
-		val g = genome.getStructure().values().iterator().next()(0)
-		alleles.put( g,translate(allele));
-		val phenotype=new BasicPhenotype(chromosome, alleles);
+		var alleles=Map[Gene, Array[Int]]()
+		val g = genome.getStructure().head._2(0)
+		alleles+=( g -> translate(allele))
+		val phenotype=new BasicPhenotype[Array[Int]]( chromosome , alleles);
 		ind.setPhenotype(phenotype);
 	}
 
-  override def translate(allele:Array[Int]):Any ={
+  override def translate(allele:Array[Int]):List[Route] ={
 		if (allele==null) return null;
 		if (allele.length==0) return null;
 		var salida=ListBuffer[Route]();
-		int i=0;
+		var i=0;
 		while (i<allele.length)
 		{
 			if (allele[i]==0) i++;

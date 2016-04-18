@@ -14,12 +14,12 @@ import ar.edu.ungs.yamiko.ga.domain.Phenotype
 @SerialVersionUID(1179L)
 class BasicIndividual[T](genotype:Genotype[T],id:Int) extends Individual[T]{
   
-	private var phenotype:Phenotype =null
+	private var phenotype:Phenotype[T] =null
 	private var fitness:Double=0d
 	
 	override def getGenotype()=genotype
-	override def getPhenotype():Phenotype={return phenotype}
-	override def setPhenotype(phe:Phenotype)={phenotype=phe}
+	override def getPhenotype():Phenotype[T]={return phenotype}
+	override def setPhenotype(phe:Phenotype[T])={phenotype=phe}
 	override def getFitness():Double={return fitness}
 	override def setFitness(v:Double)={fitness=v}
   override def getId():Int=id

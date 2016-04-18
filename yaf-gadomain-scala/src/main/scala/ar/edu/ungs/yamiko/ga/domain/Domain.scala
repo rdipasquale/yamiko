@@ -144,21 +144,21 @@ trait Population[T] extends Serializable{
  * @param [T]
  */
 @SerialVersionUID(10006L)
-trait Phenotype  extends Serializable{
+trait Phenotype[T]  extends Serializable{
 
 		/**
 		 * Devuelve el mapa completo de valores agrupado por cromosomas y genes.
 		 * 
 		 * @return -] Map[Chromosome, Map[Gene,Any]]
 		 */
-		def getAlleleMap():Map[Chromosome[Any], Map[Gene,Any]]
+		def getAlleleMap():Map[Chromosome[T], Map[Gene,T]]
 		
 		/**
 		 * Devuelve la lista de valores o alelos.
 		 * 
 		 * @return -] Collection[Map[Gene, Any]]
 		 */
-		def getAlleles():List[Map[Gene, Any]]
+		def getAlleles():List[Map[Gene, T]]
 }
 
 
@@ -173,8 +173,8 @@ trait Phenotype  extends Serializable{
 @SerialVersionUID(10007L)
 trait Individual[T]  extends Serializable{
 
-	def getPhenotype():Phenotype 
-	def setPhenotype(phenotype:Phenotype)
+	def getPhenotype():Phenotype[T] 
+	def setPhenotype(phenotype:Phenotype[T])
 	def getFitness():Double
 	def setFitness(fitness:Double) 	
 	def getId():Int
