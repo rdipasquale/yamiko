@@ -42,6 +42,8 @@ import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 import ar.edu.ungs.yaf.vrp.RoutesMorphogenesisAgent
+import ar.edu.ungs.yaf.vrp.DistanceMatrix
+import ar.edu.ungs.yaf.vrp.VRPFitnessEvaluator
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   
@@ -122,7 +124,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    translators.put(gene, ribosome);
 			    val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,n+m)
 
-			    val matrix=new DistanceMatrix(customers.values());
+			    val matrix=new DistanceMatrix(customers);
 			    val fit:VRPFitnessEvaluator= new CVRPTWSimpleFitnessEvaluator(c,30d,m,matrix,1000000000d,10);
 			
     			//cross=new GVRCrossover(); //1d, c, m, fit);
