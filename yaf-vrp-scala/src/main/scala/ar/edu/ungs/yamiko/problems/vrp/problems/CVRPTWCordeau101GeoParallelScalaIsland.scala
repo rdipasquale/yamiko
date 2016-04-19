@@ -41,6 +41,7 @@ import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
+import ar.edu.ungs.yaf.vrp.RoutesMorphogenesisAgent
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   

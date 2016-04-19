@@ -10,12 +10,12 @@ import ar.edu.ungs.yamiko.ga.domain.Chromosome
 import ar.edu.ungs.yamiko.ga.domain.Phenotype
 
 @SerialVersionUID(1199L)
-class BasicPhenotype[T](chromosome:Chromosome[T], alleles:Map[Gene, T] ) extends Phenotype[T]{
+class BasicPhenotype[T](chromosome:Chromosome[T], alleles:Map[Gene, Any] ) extends Phenotype[T]{
   
-  private val alleleMap:Map[Chromosome[T], Map[Gene, T]]=Map(chromosome -> alleles)
+  private val alleleMap=Map(chromosome -> alleles)
   
 	override def getAlleleMap()=alleleMap
-	override def getAlleles():List[Map[Gene, T]]=alleleMap.values.toList
+	override def getAlleles()=alleleMap.values.toList
 
   def canEqual(a:BasicPhenotype[T]) = a.isInstanceOf[BasicPhenotype[T]]
 

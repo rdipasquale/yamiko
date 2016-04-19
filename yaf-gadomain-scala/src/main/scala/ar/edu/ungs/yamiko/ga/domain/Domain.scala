@@ -56,7 +56,8 @@ trait Gene extends Serializable{
 	 * @return
 	 */
 	def getName():String 
-	
+	def setName(newName:String) 
+	def cloneIt():Gene
 }
 
 
@@ -151,14 +152,14 @@ trait Phenotype[T]  extends Serializable{
 		 * 
 		 * @return -] Map[Chromosome, Map[Gene,Any]]
 		 */
-		def getAlleleMap():Map[Chromosome[T], Map[Gene,T]]
+		def getAlleleMap():Map[Chromosome[T], Map[Gene,Any]]
 		
 		/**
 		 * Devuelve la lista de valores o alelos.
 		 * 
 		 * @return -] Collection[Map[Gene, Any]]
 		 */
-		def getAlleles():List[Map[Gene, T]]
+		def getAlleles():List[Map[Gene, Any]]
 }
 
 
