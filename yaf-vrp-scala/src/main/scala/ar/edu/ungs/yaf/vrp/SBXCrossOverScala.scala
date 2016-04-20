@@ -23,6 +23,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
  * @author ricardo
  *
  */
+@SerialVersionUID(71119L)
 class SBXCrossOverScala (avgVelocity:Double,capacity:Int,vehicles:Int,minVehicles:Int,vrp:VRPFitnessEvaluator,distanceMatrix:Array[Array[Double]],bcMatrix:Array[List[(Int,Double)]]) extends VRPCrossOver{
   
 	val PROB_DESC_VEHICLES:Double=0.3d;

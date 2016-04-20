@@ -29,21 +29,16 @@ import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
 import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntPopulationInitializerScala
-import ar.edu.ungs.yamiko.ga.toolkit.IntStaticHelper
-import ar.edu.ungs.yamiko.problems.vrp.CVRPTWSimpleFitnessEvaluator
-import ar.edu.ungs.yamiko.problems.vrp.DistanceMatrix
-import ar.edu.ungs.yamiko.problems.vrp.GVRMutatorRandom
-import ar.edu.ungs.yamiko.problems.vrp.RoutesMorphogenesisAgent
-import ar.edu.ungs.yamiko.problems.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.CustomersPersistence
-import ar.edu.ungs.yamiko.problems.vrp.utils.hdfs.VRPPopulationPersistence
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 import ar.edu.ungs.yaf.vrp.RoutesMorphogenesisAgent
 import ar.edu.ungs.yaf.vrp.DistanceMatrix
 import ar.edu.ungs.yaf.vrp.VRPFitnessEvaluator
+import ar.edu.ungs.yaf.vrp.CVRPTWSimpleFitnessEvaluator
+import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
+import ar.edu.ungs.yaf.vrp.GVRMutatorRandom
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   
@@ -125,26 +120,26 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,n+m)
 
 			    val matrix=new DistanceMatrix(customers);
-			    val fit:VRPFitnessEvaluator= new CVRPTWSimpleFitnessEvaluator(c,30d,m,matrix,1000000000d,10);
+			    val fit:VRPFitnessEvaluator= new CVRPTWSimpleFitnessEvaluator(c,30d,m,m-1,1000000000d,matrix.getMatrix(),customers);
 			
     			//cross=new GVRCrossover(); //1d, c, m, fit);
     			//val cross=new SBXCrossover(30d, c, m, fit);
     			//cross.setMatrix(matrix);
     			
-			    val cross=new SBXCrossOverScala(30d, c, m, m-1,fit,matrix.getMatrix,BestCostMatrix.build(matrix.getMatrix, ScalaAdaptor.toScala(customers)));	    
+			    val cross=new SBXCrossOverScala(30d, c, m, m-1,fit,matrix.getMatrix,BestCostMatrix.build(matrix.getMatrix, customers));	    
 
 			    val acceptEvaluator:AcceptEvaluator[Array[Int]] =new DescendantModifiedAcceptLigthEvaluator()
 
 			    rma.develop(genome, optInd)
 			    val fitnesOptInd=fit.execute(optInd)
 			
-			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntStaticHelper.toStringIntArray(optInd.getGenotype().getChromosomes().get(0).getFullRawRepresentation()))
+			    log.warn("Optimal Ind -> Fitness=" + fitnesOptInd + " - " + IntArrayHelper.toStringIntArray(optInd.getGenotype().getChromosomes()(0).getFullRawRepresentation()))
 
 			    val pop=new DistributedPopulation[Array[Int]](genome);
 			    
-			    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.035, 1, individuals, acceptEvaluator, 
+			    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.035d, 1d, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
-    					null, popI.asInstanceOf[PopulationInitializer[Array[Int]]], null, new ProbabilisticRouletteSelectorScala(), 
+    					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelectorScala(), 
     					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED)
 
 			    val ga=new SparkParallelIslandsGA[Array[Int]](par,ISOLATED_GENERATIONS)
@@ -158,7 +153,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val t2=System.currentTimeMillis();
 			    log.warn("Fin ga.run()");
 
-    			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntStaticHelper.toStringIntArray(winner.getGenotype().getChromosomes().get(0).getFullRawRepresentation()));
+    			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntArrayHelper.toStringIntArray(winner.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
     			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
     			log.warn("Promedio -> " + ((t2-t1)/(par.getMaxGenerations().toDouble))+ " ms/generacion");
 		
