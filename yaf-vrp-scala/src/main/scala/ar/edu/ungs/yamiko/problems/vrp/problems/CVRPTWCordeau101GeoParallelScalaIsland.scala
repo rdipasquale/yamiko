@@ -5,9 +5,6 @@ import java.util.ArrayList
 import java.util.Calendar
 import java.util.Collection
 
-import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.JavaConversions.collectionAsScalaIterable
-import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable.HashMap
 
 import org.apache.log4j.Logger
@@ -39,6 +36,8 @@ import ar.edu.ungs.yaf.vrp.VRPFitnessEvaluator
 import ar.edu.ungs.yaf.vrp.CVRPTWSimpleFitnessEvaluator
 import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 import ar.edu.ungs.yaf.vrp.GVRMutatorRandom
+import ar.edu.ungs.yamiko.problems.vrp.utils.VRPPopulationPersistence
+import scala.collection.mutable.ListBuffer
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   
@@ -172,13 +171,11 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    VRPPopulationPersistence.writePopulation( finalPop,wPath+"salida-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			    VRPPopulationPersistence.writePopulation( winner,wPath+"salidaBestInd-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 	
-			    val bestIndSet:Collection[Individual[Array[Int]]]=new ArrayList[Individual[Array[Int]]]();
-			    BestIndHolder.getBest().foreach { x => bestIndSet.add(x.asInstanceOf[Individual[Array[Int]]]) }
-			    VRPPopulationPersistence.writePopulation(bestIndSet,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
+			    VRPPopulationPersistence.writePopulation(ga.getBestIndHolder().getBest().toList,wPath+"salidaBestIndSet-" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH)+1) + ".txt");
 			
     			prom=0d;
     			cont=0;
-    			bestIndSet.foreach { i => {prom+=i.getFitness(); cont+=1;} }
+    			ga.getBestIndHolder().getBest().foreach { i => {prom+=i.getFitness(); cont+=1;} }
     			prom=prom/cont;
     			log.warn("Winner -> Fitness Promedio mejores individuos =" +prom)
 			

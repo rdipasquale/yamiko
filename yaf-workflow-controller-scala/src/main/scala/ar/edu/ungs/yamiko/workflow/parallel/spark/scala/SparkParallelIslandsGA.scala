@@ -29,14 +29,20 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   private var _finalPop:RDD[Individual[T]] = null
   def finalPopulation:RDD[Individual[T]] = _finalPop 
   private val r:Random=new Random(System.currentTimeMillis()) 
+  private var bestIndHolder=new BestIndHolder[T]()
+  
+  def getBestIndHolder()=bestIndHolder
   
   @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
+    
+    
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
 		  var bestInd:Individual[T]=null;
+
     
 			val bcMA:Broadcast[MorphogenesisAgent[T]]=sc.broadcast(parameter.getMorphogenesisAgent()); 
 			val bcG:Broadcast[Genome[T]]=sc.broadcast(parameter.getGenome());
@@ -146,7 +152,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  for(ti <- topIndsArray)  { Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento Población " + ti._1 + " - " + ti._2(0)) }
 			  
 			  val bestOfGeneration=topIndsArray.maxBy(_._2(0).getFitness)._2(0)
-				BestIndHolder.holdBestInd(bestOfGeneration);				
+				bestIndHolder.holdBestInd(bestOfGeneration);				
 				if (bestOfGeneration.getFitness()>bestFitness)
 				{
 					bestFitness=bestOfGeneration.getFitness();

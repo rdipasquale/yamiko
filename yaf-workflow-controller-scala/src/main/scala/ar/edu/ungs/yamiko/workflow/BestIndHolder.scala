@@ -4,27 +4,27 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.domain.Individual
 
 @SerialVersionUID(2999L)
-object BestIndHolder extends Serializable{
+class BestIndHolder[T] extends Serializable{
 
 	def CAPACITY=100
 	
-	private def best[T]=ListBuffer[Individual[T]]()
+	private def best=ListBuffer[Individual[T]]()
 	
-	def holdBestIndCol[T](col:List[Individual[T]])=
+	def holdBestIndCol(col:List[Individual[T]])=
 	{
 	  col.foreach { i => if(!best.contains(i)) best+=i }
 		purge()
 	}
 
-	def holdBestInd[T](i:Individual[T])
+	def holdBestInd(i:Individual[T])
 	{
     if(!best.contains(i)) best+=i 
     purge();
 	}
 	
-	def getBest[T]():ListBuffer[Individual[T]]=best
+	def getBest():ListBuffer[Individual[T]]=best
 	
-	def purge[T]()=
+	def purge()=
 	{
 		if (best.size>CAPACITY)
 		{

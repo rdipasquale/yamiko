@@ -67,13 +67,18 @@ class CVRPTWSimpleFitnessEvaluator(capacity:Double,avgVelocity:Double,maxVehicul
 		fitness+=fitness*calcOmitPenalty(rutas,customers.size);
 		val minVehiclesPenalty=if (rutas.size<minRoutes) MIN_VEHICLES_VIOLATION*(minRoutes-rutas.size) else 0
 		fitness+=minVehiclesPenalty;
-		fitness+=super.calcDuplicatePenalty(rutas, customers.size)*(maxFitness/customers.size);
+		fitness+=calcDuplicatePenalty(rutas, customers.size)*(maxFitness/customers.size);
 
 		return fitness;
 	  
 	}
 
-	def calcMaxVehiclePenalty(cantRutas:Int,maxVehicles:Int):Double
+	def calcMaxVehiclePenalty(cantRutas:Int,maxVehicles:Int):Double={
+	  if (cantRutas>maxVehicles)
+	    cantRutas-maxVehicles
+	  else
+	    1
+	}
 	
 	override def calcOmitPenalty(rutas:List[List[Int]],clients:Int):Double=
 	{
@@ -87,7 +92,28 @@ class CVRPTWSimpleFitnessEvaluator(capacity:Double,avgVelocity:Double,maxVehicul
 		return PENAL_PER_OMIT_CLIENT*math.pow(clients-visitados.size+1,3)/100
 	  
 	}
-	def calcDuplicatePenalty(rutas:List[List[Int]],clients:Int):Int	
+	
+	def calcDuplicatePenalty(rutas:List[List[Int]],clients:Int):Int	=
+	{
+		if (rutas==null) return clients;
+		if (rutas.size==0) return clients;
+
+		var prueba=ListBuffer[Int]();
+		for (l <-rutas) prueba=prueba++=l
+		
+		var setToReturn = Set[Int]();
+		var set1 = Set[Int]();
+ 
+		for (yourInt <- prueba) 
+			if (yourInt!=0)
+			  if (set1.contains(yourInt))
+			      setToReturn+=yourInt
+			  else
+			      set1+=yourInt 
+			
+		return setToReturn.size;
+	  
+	}
 	
 	override def calcTWPenalty(c1:Customer, c2:Customer, deltaTiempo:Double):Double=
 	{
