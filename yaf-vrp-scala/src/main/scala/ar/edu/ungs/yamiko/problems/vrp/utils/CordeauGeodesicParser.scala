@@ -89,12 +89,14 @@ object CordeauGeodesicParser {
 		var salida=Map[Int, Customer]();
 
 		//Read File Line By Line
-		while ((l = br.readLine()) != null)   {
+		l = br.readLine()
+		while (l!= null)   {
 			st=new StringTokenizer(l, " ");
 			var i=st.nextToken().toInt
 			val x=(st.nextToken()).toDouble;
 			val y=(st.nextToken()).toDouble;
-			val d=(st.nextToken()).toInt;
+			//println(st.nextToken())
+			val d=(st.nextToken()).toDouble.toInt
 			val q=(st.nextToken()).toDouble;
 			st.nextToken(); // Debe ser 0
 			st.nextToken(); // Debe ser 0
@@ -130,6 +132,7 @@ object CordeauGeodesicParser {
 			          new GeodesicalCustomer(i,i.toString(),null,lat, lon, q,tw1,d,0)
 		//	(id:Int, name:String, address:String, latitude:Double, longitude:Double,demand:Double, timeWindow:TimeWindow,serviceDuration:Int,softTimeWindowMargin:Int)
 			salida=salida + (i -> c1)
+      l = br.readLine()
 		}
 
 		//Close the input stream
@@ -166,7 +169,8 @@ object CordeauGeodesicParser {
 		var fstream = new FileInputStream(fileName);
 		val br = new BufferedReader(new InputStreamReader(fstream));
 		var l = br.readLine();
-		while ((l = br.readLine()) != null)   {
+		l = br.readLine();
+		while (l != null)   {
 			if (l.trim().length()>0)
 			{
 				var st=new StringTokenizer(l, " ");
@@ -192,6 +196,7 @@ object CordeauGeodesicParser {
 							cust+=i
 				}
 			}
+			l = br.readLine();
 		}
 		if (cust(cust.size-1)==0) cust.remove(cust.size-1);
 		br.close();

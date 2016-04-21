@@ -24,8 +24,6 @@ import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
-import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
-import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntPopulationInitializerScala
 import ar.edu.ungs.yamiko.problems.vrp.utils.CordeauGeodesicParser
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
@@ -38,6 +36,8 @@ import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 import ar.edu.ungs.yaf.vrp.GVRMutatorRandom
 import ar.edu.ungs.yamiko.problems.vrp.utils.VRPPopulationPersistence
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.operators.impl.UniqueIntPopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 
 object CVRPTWCordeau101GeoParallelScalaIsland {
   
@@ -110,7 +110,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val gene=new BasicGene("Gene X", 0, n+m)			
 			    val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()
 			    val chromosomeName="X"
-	    	  val popI =new UniqueIntPopulationInitializerScala(true, n, m);
+	    	  val popI =new UniqueIntPopulationInitializer(true, n, m);
 		
 
 			    val rma=new RoutesMorphogenesisAgent();
@@ -138,7 +138,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    
 			    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.035d, 1d, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
-    					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelectorScala(), 
+    					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelector(), 
     					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED)
 
 			    val ga=new SparkParallelIslandsGA[Array[Int]](par,ISOLATED_GENERATIONS)

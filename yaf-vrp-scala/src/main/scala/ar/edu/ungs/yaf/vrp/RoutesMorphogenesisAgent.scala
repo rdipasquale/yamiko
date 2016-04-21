@@ -31,7 +31,7 @@ class RoutesMorphogenesisAgent extends MorphogenesisAgent[Array[Int]]{
 		ind.setPhenotype(phenotype);
 	}
 
-  override def translate(allele:Array[Int]):List[Route] ={
+  def translate(allele:Array[Int]):List[Route] ={
 		if (allele==null) return null
 		if (allele.length==0) return null
 		var salida=ListBuffer[Route]();

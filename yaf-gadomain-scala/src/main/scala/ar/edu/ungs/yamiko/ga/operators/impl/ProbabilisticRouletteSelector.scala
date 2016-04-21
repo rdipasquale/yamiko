@@ -9,7 +9,7 @@ import scala.util.Random
  * Una variante del DescendantModifiedAcceptEvaluator
  */
 @SerialVersionUID(129L)
-class ProbabilisticRouletteSelectorScala[T] extends Selector[T] {
+class ProbabilisticRouletteSelector[T] extends Selector[T] {
 
  val DEFAULT_FACTOR=10000d
  def execute(p:Population[T]):Individual[T]=null

@@ -9,13 +9,12 @@ import scala.collection.mutable.IndexedSeq
 import scala.collection.mutable.ArraySeq
 import scala.reflect.internal.util.HashSet
 import scala.reflect.internal.util.Set
-import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 
-class UniqueIntPopulationInitializerScala(isStartWithZero:Boolean,maxValue:Int,maxZeros:Int) extends PopulationInitializer[Array[Int]]{
+class UniqueIntPopulationInitializer(isStartWithZero:Boolean,maxValue:Int,maxZeros:Int) extends PopulationInitializer[Array[Int]]{
   
   override def isOuterInitialized()=true;
 		
@@ -35,13 +34,16 @@ class UniqueIntPopulationInitializerScala(isStartWithZero:Boolean,maxValue:Int,m
 				}
 				var maxNum:Int=p.getGenome.size();
 				if (maxValue>0) maxNum=maxValue;
-				for ( j <- zeros until p.getGenome.size().intValue())
+				for ( j <- zeros to p.getGenome.size().intValue()-1)
 				{
-  					var rand:Int=r.nextInt(maxNum)
+				  //println(j + " -> " + p.getGenome.size().intValue() )
+  					var rand:Int=r.nextInt(maxNum+1)
   					var count:Int=0
-  					while ((zeros>=maxZeros && rand==0) || verificador.contains(rand))
+  					  					
+  					while ((zeros>=maxZeros && rand==0) || verificador.contains(rand))  					  
   					{
-  						rand=r.nextInt(maxNum)
+  					  //println("zeros= "+zeros + " maxZeros=" + maxZeros + " verificador.size=" + verificador.size)
+  						rand=r.nextInt(maxNum+1)
   						count+=1;
   						if (Math.IEEEremainder(count, maxNum*100)==0) System.out.println("Se ha llegado a " +maxNum*100 + " intentos sin poder incluir un elemento más a la lista");						
   					}
@@ -50,7 +52,7 @@ class UniqueIntPopulationInitializerScala(isStartWithZero:Boolean,maxValue:Int,m
   					numeros(j)=rand;
   					if (rand==0) zeros+=1;
 				}				
-				pop+=IndividualArrIntFactory.create(p.getGenome.getStructure.keysIterator.nextElement(),numeros)
+				pop+=IndividualArrIntFactory.create(p.getGenome.getStructure.head._1,numeros)
 			}
       pop.foreach { x => p.addIndividual(x) }
   }

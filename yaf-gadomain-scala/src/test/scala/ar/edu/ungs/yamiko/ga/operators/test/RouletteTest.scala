@@ -4,7 +4,7 @@ import org.junit._
 import org.junit.Assert._
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual
-import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelectorScala
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 
@@ -21,7 +21,7 @@ class RouletteTest {
       i2.setFitness(10d)
       i3.setFitness(1d)
       
-      val p=new ProbabilisticRouletteSelectorScala[Array[Integer]]();
+      val p=new ProbabilisticRouletteSelector[Array[Integer]]();
       
       val pop:Population[Array[Integer]]=new DistributedPopulation[Array[Integer]](null)
       pop.addIndividual(i1);
