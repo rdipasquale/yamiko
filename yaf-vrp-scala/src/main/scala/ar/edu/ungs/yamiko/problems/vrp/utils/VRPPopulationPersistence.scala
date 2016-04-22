@@ -9,7 +9,6 @@ import ar.edu.ungs.yaf.vrp.entities.VRPIndividualDto
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import scala.collection.mutable.ListBuffer
 import java.io.BufferedReader
-import org.specs2.io.FileReader
 import java.io.FileReader
 import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 

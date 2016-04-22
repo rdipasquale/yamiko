@@ -38,7 +38,7 @@ trait AcceptEvaluator[T] extends Serializable{
  * @param [T]
  */
 @SerialVersionUID(12003L)
-trait Crossover[T] {
+trait Crossover[T]  extends Serializable{
 
 	/**
 	 * Ejecuta el crossover y devuelve la descendencia generada por los individuos a ser sometidos a dicha operación.
@@ -62,7 +62,7 @@ trait Crossover[T] {
  * @param [T]
  */
 @SerialVersionUID(12005L)
-trait FitnessEvaluator[T] {
+trait FitnessEvaluator[T]  extends Serializable{
 
 	/**
 	 * Evalúa el individuo i y devuelve el valor de fitness correspondiente.
@@ -84,7 +84,7 @@ trait FitnessEvaluator[T] {
  * @param [T]
  */
 @SerialVersionUID(12007L)
-trait MorphogenesisAgent[T] {
+trait MorphogenesisAgent[T] extends Serializable{
 
 	/**
 	 * Desarrolla un individuo. Completa su fenotipo.
@@ -110,7 +110,7 @@ trait MorphogenesisAgent[T] {
  * @param [T]
  */
 @SerialVersionUID(12009L)
-trait Mutator[T] {
+trait Mutator[T]  extends Serializable{
 
 	/**
 	 * Ejecuta la mutación del genotipo de un individuo i. No modifica su fenotipo, dado que no debería estar desarrollado.

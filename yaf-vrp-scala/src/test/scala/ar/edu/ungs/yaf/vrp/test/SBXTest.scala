@@ -141,8 +141,7 @@ class SBXTest {
 		var translators=Map[Gene, Ribosome[Int]]()
 		translators+=(gene -> ribosome.asInstanceOf[ar.edu.ungs.yamiko.ga.domain.Ribosome[Int]]);
 		val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,105);
-		var population=new DistributedPopulation[Array[Int]](genome)
-		population.setSize(2);
+		var population=new DistributedPopulation[Array[Int]](genome,2)
 		popI.execute(population);
 		val rma=new RoutesMorphogenesisAgent();
 		for (ind<-population.getAll()) 

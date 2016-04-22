@@ -5,13 +5,15 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.domain.Individual
+import scala.util.Random
 
 @SerialVersionUID(119L)
-class DistributedPopulation[T](genome:Genome[T]) extends Population[T]{
+class DistributedPopulation[T](genome:Genome[T],_size:Int) extends Population[T]{
   
   private val pop:ListBuffer[Individual[T]]=new ListBuffer[Individual[T]]();
-  private var auxSize=0;
-  private val id=(Math.random()*100000).asInstanceOf[Int];
+  private var auxSize=_size;
+  private val r=new Random()
+  private val id=(r.nextDouble()*100000).asInstanceOf[Int];
 
   override def addIndividual(i: Individual[T])= {pop+=i}
   override def removeIndividual(i: Individual[T]) = {pop-=i}

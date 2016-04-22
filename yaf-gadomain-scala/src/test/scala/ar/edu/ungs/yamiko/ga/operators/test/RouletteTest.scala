@@ -23,7 +23,7 @@ class RouletteTest {
       
       val p=new ProbabilisticRouletteSelector[Array[Integer]]();
       
-      val pop:Population[Array[Integer]]=new DistributedPopulation[Array[Integer]](null)
+      val pop:Population[Array[Integer]]=new DistributedPopulation[Array[Integer]](null,3)
       pop.addIndividual(i1);
       pop.addIndividual(i2);
       pop.addIndividual(i3);

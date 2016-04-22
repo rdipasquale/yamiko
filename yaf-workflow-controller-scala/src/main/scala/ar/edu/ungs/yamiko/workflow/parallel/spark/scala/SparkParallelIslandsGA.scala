@@ -59,8 +59,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			var pops:ListBuffer[DistributedPopulation[T]]=ListBuffer[DistributedPopulation[T]]()
 			pops.clear()
 			for(i <- 1 to parameter.getMaxNodes) {
-			    val popAux:DistributedPopulation[T]=new DistributedPopulation[T](parameter.getGenome);
-			    popAux.setSize(parameter.getPopulationInstance.size())
+			    val popAux:DistributedPopulation[T]=new DistributedPopulation[T](parameter.getGenome,parameter.getPopulationInstance.size());
 			    pops+=popAux 
 			} 			
 			

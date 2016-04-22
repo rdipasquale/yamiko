@@ -45,13 +45,12 @@ class SBXTestCon10 {
 		var dm:DistanceMatrix =new DistanceMatrix(customers)
 		var fit:VRPFitnessEvaluator=new CVRPTWSimpleFitnessEvaluator(1000d,30d, 5,5,1000000000d, dm.getMatrix(),customers);
     val cross=new SBXCrossOverScala(30d, 0, 5, 4,fit,dm.getMatrix,BestCostMatrix.build(dm.getMatrix, customers));	    
-	  val popI =new UniqueIntPopulationInitializer(true, 100, 5);
-		val gene=new BasicGene("Gene X", 0, 105);
+	  val popI =new UniqueIntPopulationInitializer(true, 10, 5);
+		val gene=new BasicGene("Gene X", 0, 15);
 		var translators=Map[Gene, Ribosome[Int]]()
 		translators+=(gene -> ribosome.asInstanceOf[ar.edu.ungs.yamiko.ga.domain.Ribosome[Int]]);
-		val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,105);
-		var population=new DistributedPopulation[Array[Int]](genome)
-		population.setSize(2);
+		val genome=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,15);
+		var population=new DistributedPopulation[Array[Int]](genome,2)
 		popI.execute(population);
 		val rma=new RoutesMorphogenesisAgent();
 		for (ind<-population.getAll()) 
