@@ -24,6 +24,6 @@ class Route(routeModel:Array[Int]) extends Serializable{
     super.hashCode + ourHash
   }
 	
-	override def toString = "Route [routeModel=" + routeModel + "]"
+	override def toString = "Route [routeModel=" + routeModel.mkString(", ") + "]"
 
 }
