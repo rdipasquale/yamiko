@@ -54,21 +54,6 @@ class BestCostTest {
       
     }
   
-    @Test
-    def testMorphogenesisRoute() = 
-    {
-	    val chromosomeName:String="The Chromosome";
-	    val ribosome:Ribosome[Array[Int]]=new ByPassRibosome();
-	    val gene:Gene=new BasicGene("Gene X", 0, 15);	    
-	    val genome:Genome[Array[Int]]=new DynamicLengthGenome[Array[Int]](chromosomeName, gene, ribosome,15);
-	    val ma:MorphogenesisAgent[Array[Int]]=new RoutesMorphogenesisAgent()
-		  val translators=Map[Gene, Ribosome[Int]]((gene -> ribosome.asInstanceOf[ar.edu.ungs.yamiko.ga.domain.Ribosome[Int]]))
-		  val i1:Individual[Array[Int]]=IndividualArrIntFactory.create(chromosomeName, Array[Int](0,1,2,3,4,5,0,6,7,8,9,10))
-		  ma.develop(genome, i1);
-	    val salida=i1.getPhenotype().getAlleles()(0).values.head.asInstanceOf[List[Route]]
-	    salida.foreach { x:Route => println(x) }
-    }
-
 }
 
 
