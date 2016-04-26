@@ -21,6 +21,7 @@ import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import scala.util.Random
+import java.text.DecimalFormat
 
 
 
@@ -30,7 +31,8 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   def finalPopulation:RDD[Individual[T]] = _finalPop 
   private val r:Random=new Random(System.currentTimeMillis()) 
   private var bestIndHolder=new BestIndHolder[T]()
-  
+  private val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
+ // notScientificFormatter.setMaximumFractionDigits(3);
   def getBestIndHolder()=bestIndHolder
   
   @throws(classOf[YamikoException])
@@ -89,7 +91,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 
     			      g+=1
     			        dp.getAll().foreach { i:Individual[T] => 
-        			        if (i.getFitness()==null)
+        			        if (i.getFitness()==0)
         				      {
                           if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
         					        i.setFitness(bcFE.value.execute(i))
@@ -99,6 +101,9 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     			        //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
     			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
 
+    			        // Profiles
+    			        if (g%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+g+";"+dp.getId()+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+
 //    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
     				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue(),dp)).asInstanceOf[List[Individual[T]]];
@@ -107,21 +112,21 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
           				for (t <- tuplasSer)
           				{
     			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
-    			            if (t._1.getFitness==null) t._1.setFitness(bcFE.value.execute(t._1))
+    			            if (t._1.getFitness==0) t._1.setFitness(bcFE.value.execute(t._1))
     			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
-    			            if (t._2.getFitness==null) t._2.setFitness(bcFE.value.execute(t._2))
+    			            if (t._2.getFitness==0) t._2.setFitness(bcFE.value.execute(t._2))
     			            val parentsJ=List(t._1,t._2)
             				  val desc=bcCross.value.execute(parentsJ);
             				  for (d <- desc)
             				  {
       			            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d)
-      			            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
+      			            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
             				  }
             				  for (d <- bcDesc.value.execute(desc,parentsJ))
             				  {
             				    if (r.nextDouble()<=bcMutProb.value) bcMut.value.execute(d);
     				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
-    				            if (d.getFitness==null) d.setFitness(bcFE.value.execute(d))
+    				            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
     				            descendants+=d
           					  }      				    
           				}
