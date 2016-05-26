@@ -7,10 +7,11 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
-import scala.collection.mutable.BitSet
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
+import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToDoubleRibosome
+import scala.collection.immutable.BitSet
 
 @Test
 class BitSetTest {
@@ -18,7 +19,7 @@ class BitSetTest {
     @Test
     def testBitSet() = 
     {
-	    var bs=BitSet(1,64,65)
+	    var bs=scala.collection.mutable.BitSet(1,64,65)
 	    println(bs)
 	    bs.add(129)
 	    println(bs)
@@ -26,12 +27,27 @@ class BitSetTest {
 	    println(bs)
     }
     
-    def testBitSetRibisome() = 
+    @Test
+    def testBitSetRibosomeInt() = 
     {
-	    var bs=BitSet(1,2,3)
+	    val bs=BitSet(1,2,3)
+	    
 	    println(bs)
 	    val bsI:BitSetToIntegerRibosome=new BitSetToIntegerRibosome(10)
-	    bsI
+	    val salida=bsI.translate(bs);
+	    println("Salida = " + salida)
+	    assertEquals(24, salida)
+    }
+
+    @Test
+    def testBitSetRibosomeDouble() = 
+    {
+	    var bs=BitSet(1,2,3,8,15)
+	    println(bs)
+	    val bsI:BitSetToDoubleRibosome=new BitSetToDoubleRibosome(-10,10,16)
+	    val salida:Double=bsI.translate(bs).asInstanceOf[Double];
+	    println(salida)
+	    assertEquals(0.0823974609375, salida, 0.001)  
     }
     
 }
