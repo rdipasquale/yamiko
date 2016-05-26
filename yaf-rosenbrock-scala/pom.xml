@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>yaf-rosenbrock-scala</groupId>
+  <artifactId>yaf-rosenbrock-scala</artifactId>
+  <version>1.0.0</version>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <encoding>UTF-8</encoding>
+    <scala.version>2.11.7</scala.version>
+    <scala.compat.version>2.11</scala.compat.version>
+    <hadoop.version>2.7.1</hadoop.version>    
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-junit_${scala.compat.version}</artifactId>
+        <version>2.4.16</version>
+        <scope>test</scope>
+    </dependency>        
+    <dependency>
+      <groupId>org.specs2</groupId>
+      <artifactId>specs2-core_${scala.compat.version}</artifactId>
+      <version>2.4.16</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_${scala.compat.version}</artifactId>
+      <version>2.2.4</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>ar.edu.ungs.yamiko</groupId>
+	  <artifactId>yaf-workflow-controller-scala</artifactId>
+	  <version>1.0.0</version>
+    </dependency>
+    <dependency>
+	  <groupId>org.gavahan.geodesy</groupId>
+	  <artifactId>gavahanGeodesy</artifactId>
+	  <version>1.1.2</version>
+	</dependency>
+    <dependency>
+       <groupId>ar.edu.ungs.yamiko</groupId>
+	  <artifactId>yaf-gadomain-scala</artifactId>
+	  <version>1.0.0</version>
+	</dependency>
+
+    <dependency>
+       <groupId>com.assembla.scala-incubator</groupId>
+	  <artifactId>graph-core_2.11</artifactId>
+	  <version>1.10.1</version>
+	</dependency>
+
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src/main/scala</sourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <!-- see http://davidb.github.com/scala-maven-plugin -->
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <args>
+<!--                 <arg>-make:transitive</arg> -->
+                <arg>-dependencyfile</arg>
+                <arg>${project.build.directory}/.scala_dependencies</arg>
+              </args>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19</version>
+        <configuration>
+          <useFile>false</useFile>
+          <disableXmlReport>true</disableXmlReport>
+          <!-- If you have classpath issue like NoDefClassError,... -->
+          <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
+          <includes>
+            <include>**/*Test.*</include>
+            <include>**/*Suite.*</include>
+          </includes>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>ar.edu.ungs.yamiko:yaf-gadomain</include>
+                  <include>ar.edu.ungs:yaf-gadomain-scala</include>
+                  <include>ar.edu.ungs.yamiko.problems:yaf-vrp</include>
+                  <include>ar.edu.ungs.yamiko:yaf-workflow-controller</include>
+                  <include>ar.edu.ungs:yaf-workflow-controller-scala</include>
+                  <include>org.gavahan.geodesy:gavahanGeodesy</include>
+				  <include>org.jgrapht:jgrapht-core</include>
+					<include>org.jgrapht:jgrapht-ext</include>
+					<include>org.tinyjee.jgraphx:jgraphx</include>
+					<include>jgraph:jgraphr</include>
+					<include>com.graphhopper:graphhopper</include> 
+					<include>org.openstreetmap.osmosis:osmosis-osm-binary</include> 
+					<include>com.google.guava:guava</include> 
+					
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>    
+      
+    </plugins>
+
+  </build>
+</project>
