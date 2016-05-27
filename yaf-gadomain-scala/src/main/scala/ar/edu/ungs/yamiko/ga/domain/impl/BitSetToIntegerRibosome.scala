@@ -1,7 +1,7 @@
 package ar.edu.ungs.yamiko.ga.domain.impl
 
 import ar.edu.ungs.yamiko.ga.domain.Ribosome
-import scala.collection.immutable.BitSet
+import scala.collection.mutable.BitSet
 import ar.edu.ungs.yamiko.ga.toolkit.BitSetHelper
 
 /**

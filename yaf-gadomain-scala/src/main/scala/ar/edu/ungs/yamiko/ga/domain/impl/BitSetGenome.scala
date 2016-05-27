@@ -3,7 +3,7 @@ package ar.edu.ungs.yamiko.ga.domain.impl
 import ar.edu.ungs.yamiko.ga.domain.Gene
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Ribosome
-import scala.collection.immutable.BitSet
+import scala.collection.mutable.BitSet
 
 
 @SerialVersionUID(2159L)

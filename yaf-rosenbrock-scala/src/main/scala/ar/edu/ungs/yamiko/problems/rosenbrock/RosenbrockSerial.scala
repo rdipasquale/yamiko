@@ -8,6 +8,11 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome
 import scala.collection.immutable.BitSet
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetOnePointCrossover
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
+import ar.edu.ungs.yamiko.workflow.serial.SerialGA
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetRandomPopulationInitializer
 
 object RosenbrockSerial extends App {
 
@@ -28,15 +33,14 @@ object RosenbrockSerial extends App {
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, 200, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
         						new RosenbrockFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
         						new BitSetRandomPopulationInitializer(),  new ProbabilisticRouletteSelector(), 
-        						new GlobalSinglePopulation<BitSet>(genome), 2500, 6000d,new BitSetMorphogenesisAgent(),genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
+        						new DistributedPopulation[BitSet](genome,200), 2500, 6000d,new BitSetMorphogenesisAgent(),genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
     	
     	
-        SerialGA<BitSet> ga=new SerialGA<BitSet>(par);
+       val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);
+       val winner= ga.run()
         
-        Individual<BitSet> winner= ga.run();
+    	 val salida=winner.getPhenotype().getAlleleMap().values()(0)    	
         
-    	Map<Gene,Object> salida=winner.getPhenotype().getAlleleMap().values().iterator().next();    	
-        
-        System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());
+       System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());
 
 }
