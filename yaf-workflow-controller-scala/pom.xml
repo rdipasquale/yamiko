@@ -123,6 +123,7 @@
           <disableXmlReport>true</disableXmlReport>
           <!-- If you have classpath issue like NoDefClassError,... -->
           <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
+          <skipTests>true</skipTests>
           <includes>
             <include>**/*Test.*</include>
             <include>**/*Suite.*</include>

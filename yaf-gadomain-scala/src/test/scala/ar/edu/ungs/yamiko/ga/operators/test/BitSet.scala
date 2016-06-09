@@ -11,7 +11,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToDoubleRibosome
-import scala.collection.immutable.BitSet
+import scala.collection.mutable.BitSet
 
 @Test
 class BitSetTest {

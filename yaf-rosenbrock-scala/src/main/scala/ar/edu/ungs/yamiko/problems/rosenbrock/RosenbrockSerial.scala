@@ -13,6 +13,12 @@ import ar.edu.ungs.yamiko.ga.operators.impl.BitSetOnePointCrossover
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetRandomPopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetFlipMutator
+import ar.edu.ungs.yamiko.ga.operators.Crossover
+import ar.edu.ungs.yamiko.ga.operators.Mutator
+import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetMorphogenesisAgent
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 
 object RosenbrockSerial extends App {
 
@@ -27,19 +33,18 @@ object RosenbrockSerial extends App {
     	val genes=List(genX,genY)
     	
     	val translators=Map(genX -> new BitSetToDoubleRibosome(-2, 2, 50),genY -> new BitSetToDoubleRibosome(-2, 2, 50))
-    	
-    	val genome:Genome[BitSet]=new BitSetGenome("A", genes, translators);
+    	val genome:Genome[BitSet]=new BitSetGenome("A", genes, translators).asInstanceOf[Genome[BitSet]]
     	
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, 200, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
-        						new RosenbrockFitnessEvaluator(), new BitSetOnePointCrossover(), new BitSetFlipMutator(), 
-        						new BitSetRandomPopulationInitializer(),  new ProbabilisticRouletteSelector(), 
-        						new DistributedPopulation[BitSet](genome,200), 2500, 6000d,new BitSetMorphogenesisAgent(),genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
+        						new RosenbrockFitnessEvaluator(), new BitSetOnePointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetFlipMutator().asInstanceOf[Mutator[BitSet]], 
+        						new BitSetRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
+        						new DistributedPopulation[BitSet](genome,200), 2500, 6000d,new BitSetMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
     	
     	
        val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);
        val winner= ga.run()
         
-    	 val salida=winner.getPhenotype().getAlleleMap().values()(0)    	
+    	 val salida=winner.getPhenotype().getAlleleMap().values.toList(0)    	
         
        System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());
 
