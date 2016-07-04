@@ -43,6 +43,9 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			
 			var population=parameter.getPopulationInstance();
 			
+			// Si no vino inicializada la poblacion, se la inicializa
+			if (population.getAll().size==0) parameter.getPopulationInitializer().execute(population)
+			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 			  generationNumber+=1
