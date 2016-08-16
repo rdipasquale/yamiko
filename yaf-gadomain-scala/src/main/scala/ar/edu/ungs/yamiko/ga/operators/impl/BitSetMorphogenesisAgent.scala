@@ -32,7 +32,7 @@ class BitSetMorphogenesisAgent extends MorphogenesisAgent[BitSet] {
 			for (g <- g2) 
 			{
 				val b:BitSet=chromosome.getFullRawRepresentation().slice(g.getLoci(), g.getLoci()+g.size())
-				alleles+=(g -> genome.getTranslators().get(g).asInstanceOf[Ribosome[BitSet]].translate(b));
+				alleles+=(g -> genome.getTranslators().get(g).get.translate(b));
 			} 
 			
 			ind.setPhenotype(new BasicPhenotype(chromosome, alleles.toMap));  	  

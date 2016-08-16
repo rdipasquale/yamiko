@@ -13,6 +13,6 @@ import ar.edu.ungs.yamiko.ga.toolkit.BitSetHelper
 @SerialVersionUID(1719L)
 class BitSetToIntegerRibosome(floor:Int) extends Ribosome[BitSet]{
   
-	def translate(allele:BitSet):Any = floor+BitSetHelper.toInt(allele)
+	override def translate(allele:BitSet):Any = floor+BitSetHelper.toInt(allele)
   	
 }
