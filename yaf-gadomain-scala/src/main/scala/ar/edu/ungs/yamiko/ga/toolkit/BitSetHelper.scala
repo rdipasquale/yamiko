@@ -29,5 +29,22 @@ object BitSetHelper {
     salida
   }
 	
+  def fromInt(i:Int):BitSet=
+  {
+    var value=i
+    var salida:BitSet=BitSet()
+    var index=0
+    while (value != 0) {
+      if (value % 2 != 0) {
+        salida.add(index);
+      }
+      index+=1
+      value = value >>> 1;
+    }
+    return salida;
+  }
+  
+  
+  
   
 }
