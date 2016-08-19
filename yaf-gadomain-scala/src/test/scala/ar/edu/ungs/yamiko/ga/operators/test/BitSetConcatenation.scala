@@ -47,19 +47,21 @@ class BitSetConcatenationTest {
 		{
 		  var b1:BitSet=BitSetHelper.fromInt(i);
 		  var b2:BitSet=BitSetHelper.fromInt(i);
+		  val b3=b1++b2;
 //			List<Pair<Integer, BitSet>> b=new ArrayList<Pair<Integer, BitSet>>();
 //			b.add(new ImmutablePair<Integer, BitSet>(30,b1));
 //			b.add(new ImmutablePair<Integer, BitSet>(30,b2));
 //			BitSet bs=BitsStaticHelper.concatenate(b);			
 //			org.junit.Assert.assertTrue("Bad Concatenation",b1.equals(bs.get(0, 30)));			
 //			org.junit.Assert.assertTrue("Bad Concatenation",b2.equals(bs.get(30, 60)));		
-		}			
 	    var bs=scala.collection.mutable.BitSet(1,64,65)
 	    println(bs)
 	    bs.add(129)
 	    println(bs)
 	    for(i <- 0 to 256) bs+=i
 	    println(bs)
+		}			
+
     }
     
     @Test
