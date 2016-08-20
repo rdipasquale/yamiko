@@ -24,6 +24,8 @@ trait Chromosome[T] extends Serializable{
 	 * @return
 	 */
 	def name():String
+	
+	def getFullSize():Int  
   
 }
 

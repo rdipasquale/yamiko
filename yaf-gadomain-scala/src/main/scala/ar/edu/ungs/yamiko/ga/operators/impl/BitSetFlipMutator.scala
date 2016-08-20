@@ -20,8 +20,15 @@ class BitSetFlipMutator extends Mutator[BitSet]{
     @throws(classOf[YamikoException])  
     override def execute(ind:Individual[BitSet])=  {
       if (ind==null) throw new NullIndividualException("GVRMutatorInsertion -> Individuo Null")
-		  ind.setFitness(0d)	
-
+		  ind.setFitness(0d)
+		  val random=r.nextInt(ind.getGenotype().getChromosomes()(0).getFullSize())
+		  if (ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().contains(random))
+		    ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().remove(random)
+		  else
+		    ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().add(random)
+		    
+		  println(ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().contains(random))
+		   
     }
 
 }

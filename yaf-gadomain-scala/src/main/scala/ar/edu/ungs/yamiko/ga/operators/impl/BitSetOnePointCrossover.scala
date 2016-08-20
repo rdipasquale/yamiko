@@ -34,7 +34,7 @@ class BitSetOnePointCrossover extends Crossover[BitSet] {
       val point=r.nextInt(c1.size)
 		
       val desc1=new scala.collection.mutable.BitSet(c1.size)
-		  val desc2=new scala.collection.mutable.BitSet(c1.size)
+		  val desc2=new scala.collection.mutable.BitSet(c2.size)
 		
 		  for (i <- 0 to c1.size-1)
 			  if (i<point)
@@ -48,8 +48,8 @@ class BitSetOnePointCrossover extends Crossover[BitSet] {
 			    if (c2(i)) desc1.add(i)
   			}
 		
-		    val d1:Individual[BitSet]= IndividualBitSetFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1)
-		    val d2:Individual[BitSet]= IndividualBitSetFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2)
+		    val d1:Individual[BitSet]= IndividualBitSetFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1, i1.getGenotype().getChromosomes()(0).getFullSize())
+		    val d2:Individual[BitSet]= IndividualBitSetFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2, i2.getGenotype().getChromosomes()(0).getFullSize())
 		
 		  return List(d1,d2)		      
       

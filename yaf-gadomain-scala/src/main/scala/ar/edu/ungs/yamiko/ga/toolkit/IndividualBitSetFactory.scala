@@ -31,9 +31,9 @@ object IndividualBitSetFactory {
 	 * @param b
 	 * @return
 	 */
-	def create(chromosomeName:String ,b:BitSet):Individual[BitSet]=
+	def create(chromosomeName:String ,b:BitSet,size:Int):Individual[BitSet]=
 	{
-		  val c:Chromosome[BitSet]=new BasicChromosome[BitSet](chromosomeName,b);
+		  val c:Chromosome[BitSet]=new BasicChromosome[BitSet](chromosomeName,b,size);
 		  return create(c);
 	}   
 	

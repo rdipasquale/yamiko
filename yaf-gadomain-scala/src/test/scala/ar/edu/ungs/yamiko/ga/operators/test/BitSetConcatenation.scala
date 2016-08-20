@@ -41,52 +41,22 @@ class BitSetConcatenationTest {
 	 * Prueba 1000 concatenaciones de bits verificando la correctitud del resultado.
 	 */
     @Test
-    def testBasicTranslation1000Times() = 
+    def testBasicConc1000Times() = 
     {
-		for (i <- 1 to 1000)
-		{
-		  var b1:BitSet=BitSetHelper.fromInt(i);
-		  var b2:BitSet=BitSetHelper.fromInt(i);
-		  val b3=b1++b2;
-//			List<Pair<Integer, BitSet>> b=new ArrayList<Pair<Integer, BitSet>>();
-//			b.add(new ImmutablePair<Integer, BitSet>(30,b1));
-//			b.add(new ImmutablePair<Integer, BitSet>(30,b2));
-//			BitSet bs=BitsStaticHelper.concatenate(b);			
-//			org.junit.Assert.assertTrue("Bad Concatenation",b1.equals(bs.get(0, 30)));			
-//			org.junit.Assert.assertTrue("Bad Concatenation",b2.equals(bs.get(30, 60)));		
-	    var bs=scala.collection.mutable.BitSet(1,64,65)
-	    println(bs)
-	    bs.add(129)
-	    println(bs)
-	    for(i <- 0 to 256) bs+=i
-	    println(bs)
-		}			
-
+  		for (i <- 1 to 1000)
+  		{
+  		  var b1:BitSet=BitSetHelper.fromInt(i);
+  		  var b2:BitSet=BitSetHelper.fromInt(i);
+  		  val salida=BitSetHelper.concatenate(b1, 30, b2)
+//  		  println(BitSetHelper.toString(salida, 60))
+//  		  println(BitSetHelper.toString(BitSetHelper.bitSetSlice(salida,0, 30), 30))
+//        println(BitSetHelper.toString(BitSetHelper.bitSetSlice(salida,30, 60), 30))
+  		  assertEquals(b1,BitSetHelper.bitSetSlice(salida,0, 30))
+  		  assertEquals(b2,BitSetHelper.bitSetSlice(salida,30, 60))
+  		}			
     }
     
-    @Test
-    def testBitSetRibosomeInt() = 
-    {
-	    val bs=BitSet(1,2,3)
-	    
-	    println(bs)
-	    val bsI:BitSetToIntegerRibosome=new BitSetToIntegerRibosome(10)
-	    val salida=bsI.translate(bs);
-	    println("Salida = " + salida)
-	    assertEquals(24, salida)
-    }
-
-    @Test
-    def testBitSetRibosomeDouble() = 
-    {
-	    var bs=BitSet(1,2,3,8,15)
-	    println(bs)
-	    val bsI:BitSetToDoubleRibosome=new BitSetToDoubleRibosome(-10,10,16)
-	    val salida:Double=bsI.translate(bs).asInstanceOf[Double];
-	    println(salida)
-	    assertEquals(0.0823974609375, salida, 0.001)  
-    }
-    
+   
 }
 
 

@@ -25,7 +25,7 @@ class BitSetRandomPopulationInitializer extends PopulationInitializer[BitSet]{
 			  val b=new scala.collection.mutable.BitSet(p.getGenome().size())
 			  for (j <- 0 to p.getGenome().size()-1)
 				  if (r.nextInt(2)==1) b.add(j)
-			  p.addIndividual(IndividualBitSetFactory.create(p.getGenome().getStructure().head._1,b))
+			  p.addIndividual(IndividualBitSetFactory.create(p.getGenome().getStructure().head._1,b,p.getGenome().size()))
 			}
   }
 

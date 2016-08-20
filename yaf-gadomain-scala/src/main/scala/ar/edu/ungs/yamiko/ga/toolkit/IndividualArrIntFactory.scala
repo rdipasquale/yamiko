@@ -13,6 +13,6 @@ object IndividualArrIntFactory {
   
   def create(name:String, numeros:Array[Int]):Individual[Array[Int]]={		  
       lastId+=1
-		  new BasicIndividual[Array[Int]](new BasicGenotype[Array[Int]](List[Chromosome[Array[Int]]](new BasicChromosome[Array[Int]](name,numeros))),lastId)
+		  new BasicIndividual[Array[Int]](new BasicGenotype[Array[Int]](List[Chromosome[Array[Int]]](new BasicChromosome[Array[Int]](name,numeros,numeros.size))),lastId)
   }
 }

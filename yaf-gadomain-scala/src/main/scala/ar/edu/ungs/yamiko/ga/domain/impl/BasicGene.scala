@@ -3,7 +3,7 @@ package ar.edu.ungs.yamiko.ga.domain.impl
 import ar.edu.ungs.yamiko.ga.domain.Gene
 
 @SerialVersionUID(1139L)
-class BasicGene(name1:String, size:Int, loci:Int) extends Gene{
+class BasicGene(name1:String, loci:Int,size:Int) extends Gene{
   var name=name1
   override def getName():String=name
   override def setName(newName:String)={name=newName}
@@ -11,7 +11,7 @@ class BasicGene(name1:String, size:Int, loci:Int) extends Gene{
 	override def getLoci():Int=loci
 
 	override def toString = "BasicGene [size=" + size + ", loci=" + loci + ", name=" + name	+ "]"
-	override def cloneIt()=new BasicGene(name,size,loci)
+	override def cloneIt()=new BasicGene(name,loci,size)
 	
   def canEqual(a: Any) = a.isInstanceOf[BasicGene]
 
