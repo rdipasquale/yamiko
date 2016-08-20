@@ -68,6 +68,22 @@ class BitSetFlipMutatorTest {
   		println("After  -> " + BitSetHelper.toString(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(),200))
   		assertFalse("b == i !!",b.equals(i.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
   	}	
+  	
+  	/**
+  	 * Valida la performance del mutador, ejecutando MUTATIONS veces. 
+  	 */
+  	@Test
+  	def testMutationPerformance() {
+  		
+  		val initTime=System.currentTimeMillis()
+  		for (j <- 1 to MUTATIONS)
+  			bsfM.execute(i);
+  		val finalTime=System.currentTimeMillis();
+  		println("Elapsed for " + MUTATIONS + " mutations -> " + (finalTime-initTime) + "ms")
+  		assertTrue("Too slow",(finalTime-initTime)<5000);
+  		
+  	}  	
+  	
 	  	
 }
 

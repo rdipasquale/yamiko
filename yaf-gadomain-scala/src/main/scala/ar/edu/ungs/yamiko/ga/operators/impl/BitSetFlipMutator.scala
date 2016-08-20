@@ -26,9 +26,6 @@ class BitSetFlipMutator extends Mutator[BitSet]{
 		    ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().remove(random)
 		  else
 		    ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().add(random)
-		    
-		  println(ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().contains(random))
-		   
     }
 
 }
