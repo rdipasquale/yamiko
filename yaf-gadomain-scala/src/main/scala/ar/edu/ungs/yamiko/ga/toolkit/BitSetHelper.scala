@@ -105,6 +105,26 @@ object BitSetHelper {
       return aux.toImmutable
     }
   }
+ 
+  def stringToInt(a:String):Int={
+      val b = new Array[Int](a.length)
+      var i = 0
+      while (i < a.length) {
+        b(i) = (a(i).toInt-48)*math.pow(2,i).toInt
+        i += 1
+      }
+  	  return (b.sum).toInt  
+  }
+  
+  def stringToLong(a:String):Long={
+      val b = new Array[Long](a.length)
+      var i = 0
+      while (i < a.length) {
+        b(i) = (a(i).toInt-48)*math.pow(2,i).toLong
+        i += 1
+      }
+  	  return (b.sum).toLong
+  }
   
   
 }
