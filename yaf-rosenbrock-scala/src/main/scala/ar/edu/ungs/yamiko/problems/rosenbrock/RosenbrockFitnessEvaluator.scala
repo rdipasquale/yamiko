@@ -1,8 +1,8 @@
 package ar.edu.ungs.yamiko.problems.rosenbrock
 
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
-import scala.collection.immutable.BitSet
 import ar.edu.ungs.yamiko.ga.domain.Individual
+import java.util.BitSet
 
 class RosenbrockFitnessEvaluator extends FitnessEvaluator[BitSet]{
 

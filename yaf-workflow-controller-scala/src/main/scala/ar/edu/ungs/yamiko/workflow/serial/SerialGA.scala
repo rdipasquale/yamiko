@@ -83,7 +83,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 		            if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
 		            if (t._2.getFitness==0) t._2.setFitness(parameter.getFitnessEvaluator().execute(t._2))
 		            val parentsJ=List(t._1,t._2)
-      				  val desc=parameter.getCrossover().execute(parentsJ);
+      				  val desc=parameter.getCrossover().execute(parentsJ)
       				  for (d <- desc)
       				  {
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
@@ -91,7 +91,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
       				  }
       				  for (d <- parameter.getAcceptEvaluator().execute(desc,parentsJ))
       				  {
-      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d);
+      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d)
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
 			            descendants+=d
