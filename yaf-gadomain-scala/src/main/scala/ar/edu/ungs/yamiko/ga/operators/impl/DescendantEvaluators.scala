@@ -21,8 +21,11 @@ class DescendantModifiedAcceptLigthEvaluator[T] extends AcceptEvaluator[T] {
      val parents2=ListBuffer[Individual[T]]()
 		 parents2++=children;
      parents2++=parents;
-     parents2.sortBy { x => x.getFitness() }
-     return parents2.toList.drop(parents.length).toList
+     val aux=parents2.sortBy { x => x.getFitness() }
+     
+    // val salida=aux.toList.drop(parents.length).toList
+     
+     return aux.toList.drop(parents.length).toList
  }
 
 }

@@ -13,7 +13,7 @@ class RosenbrockFitnessEvaluator extends FitnessEvaluator[BitSet]{
     val y:Double=dobles.tail.head.asInstanceOf[Double]
 
 		val z:Double=100*math.pow(y-Math.pow(x,2),2)+math.pow((1-x),2)
-		return 5000-z;    
+		return 10*(5000-z);    
   }
 }
 

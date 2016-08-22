@@ -34,6 +34,11 @@ import ar.edu.ungs.yamiko.ga.domain.impl.StringToDoubleRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToLongRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToDoubleRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToIntegerRibosome
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaMorphogenesisAgent
+import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
+import ar.edu.ungs.yamiko.ga.toolkit.BitSetJavaHelper
+import ar.edu.ungs.yamiko.ga.toolkit.IndividualBitSetJavaFactory
 
 /**
  * Test Case para BitSetOnePointCrossover
@@ -68,6 +73,28 @@ class BitSetOrStringPerformanceCompTest {
   		i2=population.getAll()(1)
   		println("---------------------");		
   	} 
+
+  	@Test
+  	def testMorphoAgentCorrect()=
+  	{
+    	val genX:Gene=new BasicGene("x", 0, 50)
+    	val genY:Gene=new BasicGene("y", 50, 50)
+    	val genes=List(genX,genY)
+    	  	  
+    	val translators2=Map(genX -> new BitSetJavaToDoubleRibosome(-2, 2, 50),genY -> new BitSetJavaToDoubleRibosome(-2, 2, 50))
+    	val genome2:Genome[java.util.BitSet]=new BasicGenome[java.util.BitSet]("A", genes, translators2).asInstanceOf[Genome[java.util.BitSet]]
+  	  val morpho:BitSetJavaMorphogenesisAgent=new BitSetJavaMorphogenesisAgent()
+  	  val b=new java.util.BitSet()
+  	 // b.set(1, 49, true)
+  	  b.set(50, 100, true)
+  	  val ind=IndividualBitSetJavaFactory.create(chromosomeName,b,100)
+  	  morpho.develop(genome2, ind)
+
+    	val salida=ind.getPhenotype().getAlleleMap().values.toList(0)    	        
+      System.out.println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + ind.getFitness());
+  	  
+  	  
+  	}
 
   	/*
   	 * Prueba la performance de dos metodos para convertir Strings de bits a enteros

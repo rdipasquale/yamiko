@@ -94,7 +94,8 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
       				  }
       				  for (d <- parameter.getAcceptEvaluator().execute(desc,parentsJ))
       				  {
-			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
+			            if (d.getPhenotype==null) 
+			              parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
 			            descendants+=d
     					  }      				    
@@ -109,7 +110,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 
 			  			  
 			  // Ordenar por fitness
-			  population.replacePopulation(population.getAll().sortBy(_.getFitness).reverse)
+			  population.replacePopulation(descendants.sortBy(_.getFitness).reverse)
 			  if (generationNumber%100==0)
 			  {
 			    Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
