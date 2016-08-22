@@ -19,6 +19,7 @@ import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaFlipMutator
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaRandomPopulationInitializer
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaMorphogenesisAgent
+import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
 
 object RosenbrockSerial extends App {
 
@@ -35,7 +36,7 @@ object RosenbrockSerial extends App {
     	val translators=Map(genX -> new BitSetJavaToDoubleRibosome(-2, 2, 50),genY -> new BitSetJavaToDoubleRibosome(-2, 2, 50))
     	val genome:Genome[BitSet]=new BasicGenome[BitSet]("A", genes, translators).asInstanceOf[Genome[BitSet]]
     	
-    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, 200, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
+    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, 200, new DescendantAcceptEvaluator[BitSet](), 
         						new RosenbrockFitnessEvaluator(), new BitSetJavaOnePointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
         						new DistributedPopulation[BitSet](genome,200), 2500, 6000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);

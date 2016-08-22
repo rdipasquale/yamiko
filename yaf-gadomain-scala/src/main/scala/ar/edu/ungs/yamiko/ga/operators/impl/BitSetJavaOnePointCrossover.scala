@@ -27,8 +27,8 @@ class BitSetJavaOnePointCrossover extends Crossover[BitSet] {
 		  val i1 = individuals(0)
 		  val i2 = individuals(1)
 		
-		  val c1:BitSet=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
-		  val c2:BitSet=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+		  val c1:BitSet=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation().clone().asInstanceOf[BitSet]
+		  val c2:BitSet=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation().clone().asInstanceOf[BitSet]
 		
 		  val r = Random
 		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()

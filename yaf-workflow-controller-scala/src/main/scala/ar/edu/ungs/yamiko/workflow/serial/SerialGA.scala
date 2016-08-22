@@ -54,12 +54,12 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
         val t1=System.currentTimeMillis()
 
         val descendants=new ListBuffer[Individual[T]]
-		    population.getAll().foreach { i:Individual[T] => 
-  			        if (i.getFitness()==0)
-  				      {
-                    if (i.getPhenotype==null)  parameter.getMorphogenesisAgent().develop(parameter.getGenome(),i)
-  					        i.setFitness(parameter.getFitnessEvaluator().execute(i))
-  					    }
+        for(i<-population.getAll())
+		        if (i.getFitness()==0)
+			      {
+                if (i.getPhenotype==null)  parameter.getMorphogenesisAgent().develop(parameter.getGenome(),i)
+				        i.setFitness(parameter.getFitnessEvaluator().execute(i))
+				    }
 		        
         //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
         val bestOfGeneration=population.getAll().maxBy { x => x.getFitness }    			        
@@ -76,6 +76,8 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((population.size()).intValue(),population)).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 
+				val tuplasSerC=tuplasSer.size
+				
     		for (t <- tuplasSer)
     				{
 		            if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
@@ -86,12 +88,12 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
       				  val desc=parameter.getCrossover().execute(parentsJ)
       				  for (d <- desc)
       				  {
+      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d)
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator().execute(d))
       				  }
       				  for (d <- parameter.getAcceptEvaluator().execute(desc,parentsJ))
       				  {
-      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d)
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
 			            descendants+=d
@@ -107,7 +109,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 
 			  			  
 			  // Ordenar por fitness
-			  population.replacePopulation(population.getAll().sortBy(_.getFitness).reverse)}
+			  population.replacePopulation(population.getAll().sortBy(_.getFitness).reverse)
 			  if (generationNumber%100==0)
 			  {
 			    Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
