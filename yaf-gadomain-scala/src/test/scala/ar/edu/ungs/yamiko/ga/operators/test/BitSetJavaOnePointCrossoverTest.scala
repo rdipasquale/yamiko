@@ -11,6 +11,8 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToDoubleRibosome
+import scala.collection.mutable.BitSet
+import ar.edu.ungs.yamiko.ga.toolkit.BitSetHelper
 import ar.edu.ungs.yamiko.ga.operators.Mutator
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetFlipMutator
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetRandomPopulationInitializer
@@ -22,13 +24,8 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetGenome
 import ar.edu.ungs.yamiko.ga.domain.Genotype
 import ar.edu.ungs.yamiko.ga.operators.Crossover
+import ar.edu.ungs.yamiko.ga.operators.impl.BitSetOnePointCrossover
 import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException
-import java.util.BitSet
-import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaOnePointCrossover
-import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaRandomPopulationInitializer
-import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToIntegerRibosome
-import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
-import ar.edu.ungs.yamiko.ga.toolkit.BitSetJavaHelper
 
 /**
  * Test Case para BitSetOnePointCrossover
@@ -36,23 +33,23 @@ import ar.edu.ungs.yamiko.ga.toolkit.BitSetJavaHelper
  *
  */
 @Test
-class BitSetJavaOnePointCrossOverTest {
+class BitSetOnePointCrossOverTest {
 
  	  /**
 	 	* Cantidad de CROSSOVERS para ser utilizadas en testMutationPerformance
 	 	*/
   	val CROSSOVERS=100000
-  	val bsfM:Crossover[BitSet]=new BitSetJavaOnePointCrossover() 
+  	val bsfM:Crossover[BitSet]=new BitSetOnePointCrossover() 
   	var i:Individual[BitSet]=null
   	var i2:Individual[BitSet]=null
   	var population:Population[BitSet]=null 
-  	val popI:PopulationInitializer[BitSet]=new BitSetJavaRandomPopulationInitializer()  	 
+  	val popI:PopulationInitializer[BitSet]=new BitSetRandomPopulationInitializer()  	 
   	val gene:Gene=new BasicGene("Gene X", 0, 400);
   	val chromosomeName:String ="The Chromosome"
-  	val ribosome:Ribosome[BitSet]=new BitSetJavaToIntegerRibosome(0)
+  	val ribosome:Ribosome[BitSet]=new BitSetToIntegerRibosome(0)
 		val genes:List[Gene]=List(gene)
 		val translators:Map[Gene,Ribosome[BitSet]]=Map((gene,ribosome))
-		val genome:Genome[BitSet]=new BasicGenome[BitSet](chromosomeName, genes, translators);
+		val genome:Genome[BitSet]=new BitSetGenome(chromosomeName, genes, translators);
   	
   	@Before
   	def setUp()=
@@ -97,14 +94,14 @@ class BitSetJavaOnePointCrossOverTest {
   	@Test
   	def testBasicCrossover() {
   		val desc= bsfM.execute(population.getAll());
-  		println("Parent 1 -> " + BitSetJavaHelper.toString(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
-  		println("Parent 2 -> " + BitSetJavaHelper.toString(i2.getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
-  		println("Desc   1 -> " + BitSetJavaHelper.toString(desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
-  		println("Desc   2 -> " + BitSetJavaHelper.toString(desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
-  		assertTrue("Bad Crossover",i.getGenotype().getChromosomes()(0).getFullRawRepresentation().get(0)==desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().get(0));
-  		assertTrue("Bad Crossover",i2.getGenotype().getChromosomes()(0).getFullRawRepresentation().get(0)==desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation().get(0));
-  		assertTrue("Bad Crossover",i.getGenotype().getChromosomes()(0).getFullRawRepresentation().get(399)==desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation().get(399));
-  		assertTrue("Bad Crossover",i2.getGenotype().getChromosomes()(0).getFullRawRepresentation().get(399)==desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().get(399));
+  		println("Parent 1 -> " + BitSetHelper.toString(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
+  		println("Parent 2 -> " + BitSetHelper.toString(i2.getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
+  		println("Desc   1 -> " + BitSetHelper.toString(desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
+  		println("Desc   2 -> " + BitSetHelper.toString(desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation(),400))
+  		assertTrue("Bad Crossover",i.getGenotype().getChromosomes()(0).getFullRawRepresentation()(0)==desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation()(0));
+  		assertTrue("Bad Crossover",i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()(0)==desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation()(0));
+  		assertTrue("Bad Crossover",i.getGenotype().getChromosomes()(0).getFullRawRepresentation()(399)==desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation()(399));
+  		assertTrue("Bad Crossover",i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()(399)==desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation()(399));
   	}
   	
   	/**

@@ -31,6 +31,9 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToLongRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.StringToLongRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetToDoubleRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.StringToDoubleRibosome
+import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToLongRibosome
+import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToDoubleRibosome
+import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToIntegerRibosome
 
 /**
  * Test Case para BitSetOnePointCrossover
@@ -43,7 +46,7 @@ class BitSetOrStringPerformanceCompTest {
  	  /**
 	 	* Cantidad de CROSSOVERS para ser utilizadas en testMutationPerformance
 	 	*/
-  	val CROSSOVERS=1000000
+  	val CROSSOVERS=100000
   	val bsfM:Crossover[BitSet]=new BitSetOnePointCrossover() 
   	var i:Individual[BitSet]=null
   	var i2:Individual[BitSet]=null
@@ -110,7 +113,7 @@ class BitSetOrStringPerformanceCompTest {
   		for (j <- 1 to CROSSOVERS)
 	      bsI.translate(bs);
   		var finalTime=System.currentTimeMillis();
-  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")
+  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome Int-> " + (finalTime-initTime) + "ms")
       
   		val str="0111010010100010001010001"
 	    val bstrI:StringToIntegerRibosome=new StringToIntegerRibosome(25)
@@ -118,8 +121,27 @@ class BitSetOrStringPerformanceCompTest {
   		for (j <- 1 to CROSSOVERS)
 	      bstrI.translate(str);
   		finalTime=System.currentTimeMillis();
-  		println("String: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")  		
+  		println("String: Elapsed for " + CROSSOVERS + " Ribosome Int-> " + (finalTime-initTime) + "ms")  		
+
+  	  val bsIJ:BitSetJavaToIntegerRibosome=new BitSetJavaToIntegerRibosome(25)
+  		val bsJ:java.util.BitSet=new java.util.BitSet(25)
+  		bsJ.set(1)
+  		bsJ.set(2)
+  		bsJ.set(3)
+  		bsJ.set(5)
+  		bsJ.set(8)
+  		bsJ.set(10)
+  		bsJ.set(14)
+  		bsJ.set(18)
+  		bsJ.set(20)
+  		bsJ.set(24)
+  		initTime=System.currentTimeMillis()
+  		for (j <- 1 to CROSSOVERS)
+	      bsIJ.translate(bsJ);
+  		finalTime=System.currentTimeMillis();
+  		println("Java BitSet: Elapsed for " + CROSSOVERS + " Ribosome Int-> " + (finalTime-initTime) + "ms")  		
   		
+
     }
   	
   	/**
@@ -131,12 +153,11 @@ class BitSetOrStringPerformanceCompTest {
 	    val bs=BitSet(1,2,3,5,8,10,14,18,20,24)
 	    
 	    val bsI:BitSetToLongRibosome=new BitSetToLongRibosome(25)
-
   		var initTime=System.currentTimeMillis()
   		for (j <- 1 to CROSSOVERS)
 	      bsI.translate(bs);
   		var finalTime=System.currentTimeMillis();
-  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")
+  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome Long-> " + (finalTime-initTime) + "ms")
       
   		val str="0111010010100010001010001"
 	    val bstrI:StringToLongRibosome=new StringToLongRibosome(25)
@@ -144,7 +165,25 @@ class BitSetOrStringPerformanceCompTest {
   		for (j <- 1 to CROSSOVERS)
 	      bstrI.translate(str);
   		finalTime=System.currentTimeMillis();
-  		println("String: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")  		
+  		println("String: Elapsed for " + CROSSOVERS + " Ribosome Long-> " + (finalTime-initTime) + "ms")  		
+
+	    val bsIJ:BitSetJavaToLongRibosome=new BitSetJavaToLongRibosome(25)
+  		val bsJ:java.util.BitSet=new java.util.BitSet(25)
+  		bsJ.set(1)
+  		bsJ.set(2)
+  		bsJ.set(3)
+  		bsJ.set(5)
+  		bsJ.set(8)
+  		bsJ.set(10)
+  		bsJ.set(14)
+  		bsJ.set(18)
+  		bsJ.set(20)
+  		bsJ.set(24)
+  		initTime=System.currentTimeMillis()
+  		for (j <- 1 to CROSSOVERS)
+	      bsIJ.translate(bsJ);
+  		finalTime=System.currentTimeMillis();
+  		println("Java BitSet: Elapsed for " + CROSSOVERS + " Ribosome Long-> " + (finalTime-initTime) + "ms")  		
   		
     }
  	
@@ -162,7 +201,7 @@ class BitSetOrStringPerformanceCompTest {
   		for (j <- 1 to CROSSOVERS)
 	      bsI.translate(bs)
   		var finalTime=System.currentTimeMillis();
-  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")
+  		println("BitSet: Elapsed for " + CROSSOVERS + " Ribosome Double-> " + (finalTime-initTime) + "ms")
       
   		val str="0111010010100010001010001"
 	    val bstrI:StringToDoubleRibosome=new StringToDoubleRibosome(-10,10,16)
@@ -170,8 +209,26 @@ class BitSetOrStringPerformanceCompTest {
   		for (j <- 1 to CROSSOVERS)
 	      bstrI.translate(str)
   		finalTime=System.currentTimeMillis();
-  		println("String: Elapsed for " + CROSSOVERS + " Ribosome -> " + (finalTime-initTime) + "ms")  		
+  		println("String: Elapsed for " + CROSSOVERS + " Ribosome Double-> " + (finalTime-initTime) + "ms")  		
   		
+	    val bsIJ:BitSetJavaToDoubleRibosome=new BitSetJavaToDoubleRibosome(-10,10,16)
+  		val bsJ:java.util.BitSet=new java.util.BitSet(25)
+  		bsJ.set(1)
+  		bsJ.set(2)
+  		bsJ.set(3)
+  		bsJ.set(5)
+  		bsJ.set(8)
+  		bsJ.set(10)
+  		bsJ.set(14)
+  		bsJ.set(18)
+  		bsJ.set(20)
+  		bsJ.set(24)
+  		initTime=System.currentTimeMillis()
+  		for (j <- 1 to CROSSOVERS)
+	      bsIJ.translate(bsJ);
+  		finalTime=System.currentTimeMillis();
+  		println("Java BitSet: Elapsed for " + CROSSOVERS + " Ribosome Double-> " + (finalTime-initTime) + "ms")  		
+    		
     }
 
   	
@@ -198,12 +255,20 @@ class BitSetOrStringPerformanceCompTest {
   	 */
   	@Test
   	def testOnePointCrossoverPerformance()= {
-  		val initTime=System.currentTimeMillis()
+  		var initTime=System.currentTimeMillis()
   		for (j <- 1 to CROSSOVERS)
   			bsfM.execute(population.getAll());
-  		val finalTime=System.currentTimeMillis();
-  		println("Elapsed for " + CROSSOVERS + " mutations -> " + (finalTime-initTime) + "ms")
-  		assertTrue("Too slow",(finalTime-initTime)<5000);
+  		var finalTime=System.currentTimeMillis();
+  		println("Elapsed for " + CROSSOVERS + " crossover Scala BitSet-> " + (finalTime-initTime) + "ms")
+  		assertTrue("Too slow",(finalTime-initTime)<15000);
+  		
+  		initTime=System.currentTimeMillis()
+  		for (j <- 1 to CROSSOVERS)
+  			bsfM.execute(population.getAll());
+  		finalTime=System.currentTimeMillis();
+  		println("Elapsed for " + CROSSOVERS + " crossover Java BitSet-> " + (finalTime-initTime) + "ms")
+  		assertTrue("Too slow",(finalTime-initTime)<15000);  		
+  		
   	}	
 	  	
 }
