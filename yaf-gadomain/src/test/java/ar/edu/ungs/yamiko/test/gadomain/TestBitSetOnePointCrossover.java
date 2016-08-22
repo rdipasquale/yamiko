@@ -35,7 +35,7 @@ public class TestBitSetOnePointCrossover {
 	/**
 	 * Cantidad de Crossovers para ser utilizada en testOnePointCrossoverPerformance
 	 */
-	private static final int CROSSOVERS=100000;
+	private static final int CROSSOVERS=1000000;
 	private Crossover<BitSet> bsfC; 
 	private Individual<BitSet> i1;
 	private Individual<BitSet> i2;
@@ -120,9 +120,11 @@ public class TestBitSetOnePointCrossover {
 	public void testOnePointCrossoverPerformance() {
 		
 		long initTime=System.currentTimeMillis();
+		System.out.println("Comienzo en " + initTime + "ms");
 		for (int j=0;j<CROSSOVERS;j++)
 			bsfC.execute(population.getAll());
 		long finalTime=System.currentTimeMillis();
+		System.out.println("Fin en " + finalTime + "ms");
 		System.out.println("Elapsed for " + CROSSOVERS+ " crossovers -> " + (finalTime-initTime) + "ms");
 		org.junit.Assert.assertTrue("Too slow",(finalTime-initTime)<5000);
 	}	
