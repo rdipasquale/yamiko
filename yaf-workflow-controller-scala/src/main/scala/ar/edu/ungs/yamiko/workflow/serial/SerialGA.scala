@@ -88,7 +88,6 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
       				  val desc=parameter.getCrossover().execute(parentsJ)
       				  for (d <- desc)
       				  {
-      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d)
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator().execute(d))
       				  }
@@ -112,7 +111,22 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 //    		descendants.foreach { x => Logger.getLogger("file").debug("Id " + x.getId() + " - Fitness: " + x.getFitness()) }
 //    				
 			  // Ordenar por fitness
-			  population.replacePopulation(descendants.sortBy(_.getFitness).reverse)
+			  var ordenado2=ListBuffer[Individual[T]]()
+			  for(iii<-descendants)
+			  {
+          if (r.nextDouble()<=parameter.getMutationProbability()) 
+            {
+              parameter.getMutator().execute(iii)
+	            if (iii.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), iii)
+	            if (iii.getFitness==0) iii.setFitness(parameter.getFitnessEvaluator().execute(iii))
+            }
+          ordenado2+=iii
+			  }
+			  
+    		population.replacePopulation(ordenado2.sortBy(_.getFitness).reverse)
+			  
+			  //descendants.foreach { x => if (population.getAll().contains(x)) println ("No está " + x.getId()) } 
+			  
 			  if (generationNumber%100==0)
 			  {
 			    Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )

@@ -27,7 +27,12 @@ class DistributedPopulation[T](genome:Genome[T],_size:Int) extends Population[T]
    }
 
   override def replacePopulation(col: List[Individual[T]])={pop.clear();pop++=col}
-  override def replacePopulation(col: ListBuffer[Individual[T]])={pop.clear();pop++=col}
+  
+  override def replacePopulation(col: ListBuffer[Individual[T]])=
+  {
+    pop.clear();
+    pop++=col    
+  }
   
   override def setSize(l: Int)= {auxSize=l}
   override def size(): Int= {return auxSize}  

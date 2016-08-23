@@ -40,7 +40,7 @@ object RosenbrockSerial extends App {
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
         						new RosenbrockFitnessEvaluator(genX,genY), new BitSetJavaOnePointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
-        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), 1000, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
+        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), 3000, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
     	
     	
        val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);
