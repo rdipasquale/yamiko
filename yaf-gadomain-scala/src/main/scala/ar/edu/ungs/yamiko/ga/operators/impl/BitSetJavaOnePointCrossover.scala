@@ -34,8 +34,8 @@ class BitSetJavaOnePointCrossover extends Crossover[BitSet] {
 		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()
       val point=r.nextInt(realSize)
 		
-      val desc1=new BitSet(c1.size)
-		  val desc2=new BitSet(c1.size)
+      val desc1=new BitSet(realSize)
+		  val desc2=new BitSet(realSize)
 		
 		  for (i <- 0 to realSize-1)
 			  if (i<point)

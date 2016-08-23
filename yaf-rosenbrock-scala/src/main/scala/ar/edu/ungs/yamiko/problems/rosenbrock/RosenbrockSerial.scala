@@ -28,6 +28,7 @@ object RosenbrockSerial extends App {
       val MIGRATION_RATIO=0.05
       val ISOLATED_GENERATIONS=200
       val MAX_TIME_ISOLATED=200000
+      val POPULATION_SIZE=200
       
     	val genX:Gene=new BasicGene("x", 0, 50)
     	val genY:Gene=new BasicGene("y", 50, 50)
@@ -36,10 +37,10 @@ object RosenbrockSerial extends App {
     	val translators=Map(genX -> new BitSetJavaToDoubleRibosome(-2, 2, 50),genY -> new BitSetJavaToDoubleRibosome(-2, 2, 50))
     	val genome:Genome[BitSet]=new BasicGenome[BitSet]("A", genes, translators).asInstanceOf[Genome[BitSet]]
     	
-    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, 200, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
-        						new RosenbrockFitnessEvaluator(), new BitSetJavaOnePointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
+    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
+        						new RosenbrockFitnessEvaluator(genX,genY), new BitSetJavaOnePointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
-        						new DistributedPopulation[BitSet](genome,200), 2500, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
+        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), 1000, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED);
     	
     	
        val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);

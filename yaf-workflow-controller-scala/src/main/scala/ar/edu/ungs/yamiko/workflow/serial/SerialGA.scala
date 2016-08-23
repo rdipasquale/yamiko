@@ -49,7 +49,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 			  generationNumber+=1
-			  if (generationNumber%10==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
+			  //if (generationNumber%100==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
         val t1=System.currentTimeMillis()
 
@@ -71,7 +71,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 				}
 
         // Profiler
-        if (generationNumber%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+        if (generationNumber%100==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
 
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((population.size()).intValue(),population)).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
@@ -108,7 +108,9 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
     				  descendants+=(bestOfGeneration)
     				}
 
-			  			  
+//    		println("Descendants Generacion: " + generationNumber)
+//    		descendants.foreach { x => Logger.getLogger("file").debug("Id " + x.getId() + " - Fitness: " + x.getFitness()) }
+//    				
 			  // Ordenar por fitness
 			  population.replacePopulation(descendants.sortBy(_.getFitness).reverse)
 			  if (generationNumber%100==0)
