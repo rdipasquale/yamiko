@@ -111,13 +111,10 @@ object CensusConstants {
 	/**
 	 * Diccionario de datos
 	 */
-	val CENSUS_FIELDS_VALUES:Map[Int,Array[String]] =Map[Int,Array[String]]
-			{
-				private static final long serialVersionUID = 1L;
-			{
-			     put(CENSUS_FIELDS.OC.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.SEX.ordinal(), new String[]{null,"Male","Female"});
-			     put(CENSUS_FIELDS.HISPAN.ordinal(), new String[]{null,"Not Hispanic or Latino",
+	val CENSUS_FIELDS_VALUES:Map[Int,Array[String]] =Map[Int,Array[String]](
+			(CENSUS_FIELDS.OC.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.SEX.id, Array[String](null,"Male","Female")),
+			     (CENSUS_FIELDS.HISPAN.id, Array[String](null,"Not Hispanic or Latino",
 			    	 "Mexican",
 			    	 "Puerto Rican",
 			    	 "Cuban",
@@ -140,27 +137,27 @@ object CensusConstants {
 			    	 "Venezuelan",
 			    	 "Other South American",
 			    	 "Spaniard",
-			    	 "Other Spanish or Latino"});
-			     put(CENSUS_FIELDS.WHITE.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.BLACK.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.AIAN.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.ASIAN.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.NHPI.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.OTHER.ordinal(), new String[]{"No","Yes"});
-			     put(CENSUS_FIELDS.MARSTAT.ordinal(), new String[]{null,"Now married","Widowed","Divorced","Separated","Never married (includes under 15 years)"});
-			     put(CENSUS_FIELDS.ENROLL.ordinal(), new String[]{"Not in universe (Under 3 years)",
+			    	 "Other Spanish or Latino")),
+			     (CENSUS_FIELDS.WHITE.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.BLACK.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.AIAN.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.ASIAN.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.NHPI.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.OTHER.id, Array[String]("No","Yes")),
+			     (CENSUS_FIELDS.MARSTAT.id, Array[String](null,"Now married","Widowed","Divorced","Separated","Never married (includes under 15 years)")),
+			     (CENSUS_FIELDS.ENROLL.id, Array[String]("Not in universe (Under 3 years)",
 				     "No, has not attended since February 1",
 				     "Yes, public school or college",
-				     "Yes, private school or college"});
-			     put(CENSUS_FIELDS.GRADE.ordinal(), new String[]{"Not in universe (Under 3 years)",
+				     "Yes, private school or college")),
+			     (CENSUS_FIELDS.GRADE.id, Array[String]("Not in universe (Under 3 years)",
 				     "Nursery school, preschool",
 				     "Kindergarten",
 				     "Grade 1 to grade 4",
 				     "Grade 5 to grade 8",
 				     "Grade 9 to grade 12",
 				     "College undergraduate",
-				     "Graduate or professional school"});
-			     put(CENSUS_FIELDS.EDUC.ordinal(), new String[]{"Not in universe (Under 3 years)",
+				     "Graduate or professional school")),
+			     (CENSUS_FIELDS.EDUC.id, Array[String]("Not in universe (Under 3 years)",
 				     "No schooling completed",
 						"Nursery school to 4th grade",
 						"5th grade or 6th grade",
@@ -176,48 +173,48 @@ object CensusConstants {
 						"Bachelor’s degree",
 						"Master’s degree",
 						"Professional degree",
-						"Doctorate degree"});
-			     put(CENSUS_FIELDS.SPEAK.ordinal(), new String[]{"Not in universe (Under 5 years)","Yes","No" });
-			     put(CENSUS_FIELDS.CITIZEN.ordinal(), new String[]{null,			     
+						"Doctorate degree")),
+			     (CENSUS_FIELDS.SPEAK.id, Array[String]("Not in universe (Under 5 years)","Yes","No" )),
+			     (CENSUS_FIELDS.CITIZEN.id, Array[String](null,			     
 				     "Yes, born in the United States",
 				     "Yes, born in Puerto Rico, Guam, U.S. Virgin Islands, American Samoa, or Northern Marianas",
 				     "Yes, born abroad of American parent or parents",
 				     "Yes, U.S. citizen by naturalization",
-				     "No, not a citizen of the United States"});
-			     put(CENSUS_FIELDS.MOB.ordinal(), new String[]{"Not in universe (Under 5 years)",
+				     "No, not a citizen of the United States")),
+			     (CENSUS_FIELDS.MOB.id, Array[String]("Not in universe (Under 5 years)",
 				     "Yes, same house",
 				     "No, outside the U.S. (outside the U.S. or Puerto Rico if Puerto Rico is state of residence)",
-				     "No, different house in the U.S. (different house in Puerto Rico or the U.S. if Puerto Rico is the state of residence)"});
-			     put(CENSUS_FIELDS.SENSORY.ordinal(), new String[]{"Not in universe (Under 5 years)","Yes","No" });
-			     put(CENSUS_FIELDS.PHYSCL.ordinal(), new String[]{"Not in universe (Under 5 years)","Yes","No" });
-			     put(CENSUS_FIELDS.MENTAL.ordinal(), new String[]{"Not in universe (Under 5 years)","Yes","No" });
-			     put(CENSUS_FIELDS.SLFCARE.ordinal(), new String[]{"Not in universe (Under 5 years)","Yes","No" });
-			     put(CENSUS_FIELDS.ABGO.ordinal(), new String[]{"Not in universe (Under 16 years)","Yes","No" });
-			     put(CENSUS_FIELDS.ABWORK.ordinal(), new String[]{"Not in universe (Under 16 years)","Yes","No" });
-			     put(CENSUS_FIELDS.GRANDC.ordinal(), new String[]{"Not in universe (Under 15 years)","Yes","No" });
-			     put(CENSUS_FIELDS.RSPNSBL.ordinal(), new String[]{"Not in universe (Under 15 years)","Yes","No" });
-			     put(CENSUS_FIELDS.HOWLONG.ordinal(), new String[]{"Not in universe (Under 15 years)",
+				     "No, different house in the U.S. (different house in Puerto Rico or the U.S. if Puerto Rico is the state of residence)")),
+			     (CENSUS_FIELDS.SENSORY.id, Array[String]("Not in universe (Under 5 years)","Yes","No" )),
+			     (CENSUS_FIELDS.PHYSCL.id, Array[String]("Not in universe (Under 5 years)","Yes","No" )),
+			     (CENSUS_FIELDS.MENTAL.id, Array[String]("Not in universe (Under 5 years)","Yes","No" )),
+			     (CENSUS_FIELDS.SLFCARE.id, Array[String]("Not in universe (Under 5 years)","Yes","No" )),
+			     (CENSUS_FIELDS.ABGO.id, Array[String]("Not in universe (Under 16 years)","Yes","No" )),
+			     (CENSUS_FIELDS.ABWORK.id, Array[String]("Not in universe (Under 16 years)","Yes","No" )),
+			     (CENSUS_FIELDS.GRANDC.id, Array[String]("Not in universe (Under 15 years)","Yes","No" )),
+			     (CENSUS_FIELDS.RSPNSBL.id, Array[String]("Not in universe (Under 15 years)","Yes","No" )),
+			     (CENSUS_FIELDS.HOWLONG.id, Array[String]("Not in universe (Under 15 years)",
 				     "Less than 6 months",
 				     "6 to 11 months",
 				     "1 or 2 years",
 				     "3 or 4 years",
-				     "5 years or more"});
-			     put(CENSUS_FIELDS.MILTARY.ordinal(), new String[]{"Not in universe (Under 17 years)",
+				     "5 years or more")),
+			     (CENSUS_FIELDS.MILTARY.id, Array[String]("Not in universe (Under 17 years)",
 				     "Yes, now on active duty",
 				     "Yes, on active duty in the past, but not now",
 				     "No, training for reserves or National Guard only",
-				     "No active duty service"});
-			     put(CENSUS_FIELDS.VPS1.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS2.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS3.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS4.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS5.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS6.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS7.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS8.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});
-			     put(CENSUS_FIELDS.VPS9.ordinal(), new String[]{"Did not serve in this period or under 17 years", "Served in this period"});			     
-			     put(CENSUS_FIELDS.MILYRS.ordinal(), new String[]{"Not in universe (Under 17 years)", "Less than 2 years","2 years or more"});
-			     put(CENSUS_FIELDS.VPSR.ordinal(), new String[]{"Not in universe (Under 18 years or no active duty military service)",
+				     "No active duty service")),
+			     (CENSUS_FIELDS.VPS1.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS2.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS3.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS4.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS5.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS6.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS7.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS8.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),
+			     (CENSUS_FIELDS.VPS9.id, Array[String]("Did not serve in this period or under 17 years", "Served in this period")),			     
+			     (CENSUS_FIELDS.MILYRS.id, Array[String]("Not in universe (Under 17 years)", "Less than 2 years","2 years or more")),
+			     (CENSUS_FIELDS.VPSR.id, Array[String]("Not in universe (Under 18 years or no active duty military service)",
 			    		 "August 1990 or later (including Persian Gulf War); Served in Vietnam era",
 			    		 "August 1990 or later (including Persian Gulf War); No Vietnam era service; September 1980 or later only; Served under 2 years",
 			    		 "August 1990 or later (including Persian Gulf War); No Vietnam era service; September 1980 or later only; Served 2 years or more",
@@ -232,15 +229,15 @@ object CensusConstants {
 						"Korean War, no Vietnam era, no WWII",
 						"Korean War and WWII, no Vietnam era",
 						"WWII, no Korean War, no Vietnam era",
-						"Other service only"});
-			     put(CENSUS_FIELDS.ESR.ordinal(), new String[]{"Not in universe (Under 16 years)",
+						"Other service only")),
+			     (CENSUS_FIELDS.ESR.id, Array[String]("Not in universe (Under 16 years)",
 					     "Employed, at work",
 					     "Employed, with a job but not at work",
 					     "Unemployed",
 					     "Armed Forces, at work",
 					     "Armed Forces, with a job but not at work",
-					     "Not in labor force"});
-			     put(CENSUS_FIELDS.ESP.ordinal(), new String[]{"Not in universe (not own child in family or child in subfamily)",
+					     "Not in labor force")),
+			     (CENSUS_FIELDS.ESP.id, Array[String]("Not in universe (not own child in family or child in subfamily)",
 			    		 "Living with 2 parents, both parents in labor force",
 			    		 "Living with 2 parents, father only in labor force",
 			    		 "Living with 2 parents, mother only in labor force",
@@ -248,8 +245,8 @@ object CensusConstants {
 			    		 "Living with one parent: living with father; father in labor force",
 			    		 "Living with one parent; living with father; father not in labor force",
 			    		 "Living with one parent: living with mother; mother in labor force",
-			    		 "Living with one parent; living"});
-			     put(CENSUS_FIELDS.TRVMNS.ordinal(), new String[]{"Not in universe (Under 16 years)",
+			    		 "Living with one parent; living")),
+			     (CENSUS_FIELDS.TRVMNS.id, Array[String]("Not in universe (Under 16 years)",
 			    		 "Car, truck, or van",
 			    		 "Bus or trolley bus",
 			    		 "Streetcar or trolley car (público in Puerto Rico)",
@@ -259,15 +256,15 @@ object CensusConstants {
 			    		 "Taxicab",
 			    		 "Motorcycle",
 			    		 "Bicycle",
-			    		 "Walked", "Worked at home","Other"});
-			     put(CENSUS_FIELDS.CARPOOL.ordinal(), new String[]{"Not in universe (Under 16 years)",
+			    		 "Walked", "Worked at home","Other")),
+			     (CENSUS_FIELDS.CARPOOL.id, Array[String]("Not in universe (Under 16 years)",
 			     		 "Drove alone",
 			    		 "2 people",
 			    		 "3 people",
 			    		 "4 people",
 			    		 "5 or 6 people",
-			    		 "7 or more people"});
-			     put(CENSUS_FIELDS.LVTIME.ordinal(), new String[]{"Not in universe (Under 16 years)",
+			    		 "7 or more people")),
+			     (CENSUS_FIELDS.LVTIME.id, Array[String]("Not in universe (Under 16 years)",
 			    		 "12:00 am to 12:29 am",
 			    		 "12:30 am to 12:59 am",
 			    		 "1:00 am to 1:29 am",
@@ -435,32 +432,32 @@ object CensusConstants {
 			     "11:20 pm to 11:29 pm",
 			     "11:30 pm to 11:39 pm",
 			     "11:40 pm to 11:59 pm",
-			     "Not used"});
-			     put(CENSUS_FIELDS.LAYOFF.ordinal(), new String[]{"Not in universe (Under 16 years)",
+			     "Not used")),
+			     (CENSUS_FIELDS.LAYOFF.id, Array[String]("Not in universe (Under 16 years)",
 			    		 "Yes, on layoff",
 			    		 "No",
-			    		 "Not reported"});
-			     put(CENSUS_FIELDS.ABSENT.ordinal(), new String[]{"Not in universe (Under 16 years)",
+			    		 "Not reported")),
+			     (CENSUS_FIELDS.ABSENT.id, Array[String]("Not in universe (Under 16 years)",
 					     "Yes, temporarily absent from work",
 					     "No",
-					     "Not reported"});			     
-			     put(CENSUS_FIELDS.RECALL.ordinal(), new String[]{"Not in universe (Under 16 years)",
+					     "Not reported")),			     
+			     (CENSUS_FIELDS.RECALL.id, Array[String]("Not in universe (Under 16 years)",
 				     "Yes",
 				     "No",
-				     "Not reported"});
-			     put(CENSUS_FIELDS.LOOKWRK.ordinal(), new String[]{"Not in universe (Under 16 years)",
+				     "Not reported")),
+			     (CENSUS_FIELDS.LOOKWRK.id, Array[String]("Not in universe (Under 16 years)",
 				     "Yes",
 				     "No",
-				     "Not reported"});			     
-			     put(CENSUS_FIELDS.BACKWRK .ordinal(), new String[]{"Not in universe (Under 16 years)",
+				     "Not reported")),			     
+			     (CENSUS_FIELDS.BACKWRK .id, Array[String]("Not in universe (Under 16 years)",
 				     "Yes",
 				     "No, because of temporary illness",
 				     "No, because of other reasons (in school, etc.)",
-				     "Not reported"});			     
-			     put(CENSUS_FIELDS.LASTWRK .ordinal(), new String[]{"Not in universe (Under 16 years)",
+				     "Not reported")),			     
+			     (CENSUS_FIELDS.LASTWRK .id, Array[String]("Not in universe (Under 16 years)",
 				     "1995 to 2000",
-			     	 "1994 or earlier, or never worked"});
-			     put(CENSUS_FIELDS.CLWKR .ordinal(), new String[]{"Not in universe (Under 16 years)",
+			     	 "1994 or earlier, or never worked")),
+			     (CENSUS_FIELDS.CLWKR .id, Array[String]("Not in universe (Under 16 years)",
 				     "Employee of private for-profit company",
 					"Employee of private not-for- profit company",
 					"Employee of local government",
@@ -469,8 +466,10 @@ object CensusConstants {
 					"Self-employed in unincorporated business or company",
 					"Self-employed in incorporated business or company",
 					"Unpaid family worker",
-					"Unemployed, no work experience since 1995"});
-			     put(CENSUS_FIELDS.WRKLYR.ordinal(), new String[]{"Not in universe (Under 16 years)","Yes","No"});			     		     
-			}};	
+					"Unemployed, no work experience since 1995")),
+			     (CENSUS_FIELDS.WRKLYR.id, Array[String]("Not in universe (Under 16 years)","Yes","No"))			     		     
+			)	
 
+			//public static final Text N_TAG=new Text("N");
+			val N_TAG="N"
 }

@@ -58,12 +58,10 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) {
    * @author ricardo
    *
    */
-  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescriptions:Array[String] ) {
+  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) {
   	
-    def getStrCampo():String = {
-		  if (campo==null) return null;
-		  return fieldDescriptions(campo);
-	  }
+    def getStrCampo():String = fieldDescription
+
   	def getStrOperador():String = {
   		if (operador==null) return null
   		return FormulaComp.OPERADORES(operador)
