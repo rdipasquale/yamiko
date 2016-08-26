@@ -62,10 +62,7 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) {
   	
     def getStrCampo():String = fieldDescription
 
-  	def getStrOperador():String = {
-  		if (operador==null) return null
-  		return FormulaComp.OPERADORES(operador)
-  	}
+  	def getStrOperador():String = FormulaComp.OPERADORES(operador)
   
   	def getStrValor():String = {
   		if (valoresPosibles==null)
