@@ -14,7 +14,8 @@ import ar.edu.ungs.yamiko.ga.toolkit.BitSetJavaHelper
 @SerialVersionUID(4919L)
 class BitSetJavaToDoubleRibosome(floor:Int,roof:Int,bitsize:Int) extends Ribosome[BitSet]{
   
-	override def translate(allele:BitSet):Any = floor+(roof-floor)*BitSetJavaHelper.toLong(allele)/math.pow(2,bitsize)
+	override def translate(allele:BitSet):Any = 
+	  floor+(roof-floor)*BitSetJavaHelper.toLong(allele)/math.pow(2,bitsize)
   
   	
 }

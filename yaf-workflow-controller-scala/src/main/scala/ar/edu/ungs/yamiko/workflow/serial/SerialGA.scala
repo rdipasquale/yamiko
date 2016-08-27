@@ -49,17 +49,17 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 			  generationNumber+=1
-			  if (generationNumber%10==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
+			  //if (generationNumber%100==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
         val t1=System.currentTimeMillis()
 
         val descendants=new ListBuffer[Individual[T]]
-		    population.getAll().foreach { i:Individual[T] => 
-  			        if (i.getFitness()==0)
-  				      {
-                    if (i.getPhenotype==null)  parameter.getMorphogenesisAgent().develop(parameter.getGenome(),i)
-  					        i.setFitness(parameter.getFitnessEvaluator().execute(i))
-  					    }
+        for(i<-population.getAll())
+		        if (i.getFitness()==0)
+			      {
+                if (i.getPhenotype==null)  parameter.getMorphogenesisAgent().develop(parameter.getGenome(),i)
+				        i.setFitness(parameter.getFitnessEvaluator().execute(i))
+				    }
 		        
         //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
         val bestOfGeneration=population.getAll().maxBy { x => x.getFitness }    			        
@@ -71,11 +71,13 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 				}
 
         // Profiler
-        if (generationNumber%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+        if (generationNumber%100==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
 
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((population.size()).intValue(),population)).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 
+				val tuplasSerC=tuplasSer.size
+				
     		for (t <- tuplasSer)
     				{
 		            if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
@@ -83,7 +85,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 		            if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
 		            if (t._2.getFitness==0) t._2.setFitness(parameter.getFitnessEvaluator().execute(t._2))
 		            val parentsJ=List(t._1,t._2)
-      				  val desc=parameter.getCrossover().execute(parentsJ);
+      				  val desc=parameter.getCrossover().execute(parentsJ)
       				  for (d <- desc)
       				  {
 			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
@@ -91,8 +93,8 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
       				  }
       				  for (d <- parameter.getAcceptEvaluator().execute(desc,parentsJ))
       				  {
-      				    if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d);
-			            if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
+			            if (d.getPhenotype==null) 
+			              parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
 			            if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
 			            descendants+=d
     					  }      				    
@@ -105,9 +107,26 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
     				  descendants+=(bestOfGeneration)
     				}
 
-			  			  
+//    		println("Descendants Generacion: " + generationNumber)
+//    		descendants.foreach { x => Logger.getLogger("file").debug("Id " + x.getId() + " - Fitness: " + x.getFitness()) }
+//    				
 			  // Ordenar por fitness
-			  population.replacePopulation(population.getAll().sortBy(_.getFitness).reverse)}
+			  var ordenado2=ListBuffer[Individual[T]]()
+			  for(iii<-descendants)
+			  {
+          if (r.nextDouble()<=parameter.getMutationProbability()) 
+            {
+              parameter.getMutator().execute(iii)
+	            if (iii.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), iii)
+	            if (iii.getFitness==0) iii.setFitness(parameter.getFitnessEvaluator().execute(iii))
+            }
+          ordenado2+=iii
+			  }
+			  
+    		population.replacePopulation(ordenado2.sortBy(_.getFitness).reverse)
+			  
+			  //descendants.foreach { x => if (population.getAll().contains(x)) println ("No está " + x.getId()) } 
+			  
 			  if (generationNumber%100==0)
 			  {
 			    Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
