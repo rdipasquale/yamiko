@@ -3,3 +3,5 @@
 /.cache-main
 /.classpath
 /.project
+**/.cache-main
+**/.cache-tests

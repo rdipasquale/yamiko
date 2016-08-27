@@ -42,3 +42,5 @@ build.log
 /.cache-main
 /.cache-tests
 /bin/
+**/.cache-main
+**/.cache-tests
