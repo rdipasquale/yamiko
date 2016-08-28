@@ -23,6 +23,8 @@ import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import scala.util.Random
 import java.text.DecimalFormat
 import ar.edu.ungs.yamiko.workflow.JdbcDataParameter
+import java.sql.DriverManager
+import java.sql.Connection
 
 
 
@@ -78,6 +80,19 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  populations=populations.map { dp:DistributedPopulation[T] => 
 			        var g=0
 			        val t1=System.currentTimeMillis()
+			        // Inicializamos cache para Data Retrieving
+			        var cacheData=Map[String,Int]()
+			        var connection:Connection=null
+              // Evalua si hay procesos de Data Retrieving
+              if (parameter.getDataParameter()!=null)
+                if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
+                {
+                  Class.forName(parameter.getDataParameter().asInstanceOf[JdbcDataParameter[T]].getDriver())
+                  connection = DriverManager.getConnection(parameter.getDataParameter().asInstanceOf[JdbcDataParameter[T]].getDriver())
+                }
+              
+      
+			        
 
     			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
@@ -88,13 +103,26 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
         				      {
                           if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
                           
+                          // TODO: Sin Cache central, sino por executor
                           // Evalua si hay procesos de Data Retrieving
                           if (parameter.getDataParameter()!=null)
                             if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
-                              parameter.getDataParameter().getQueries(i).map { q:String => (q,1) }
-                          {
-                            
-                          }
+                            {
+                              val queries=parameter.getDataParameter().getQueries(i)
+                              val queriesProcess=queries.find { x => !cacheData.contains(x) }.toList
+                              val procesados=queriesProcess.map { x =>
+                                      val statement = connection.createStatement()
+                                      val resultSet = statement.executeQuery(x)
+                                      var salida:Int=0
+                                      if ( resultSet.next() ) salida=resultSet.getInt(1) 
+                                      (x,salida)
+                               }
+                              cacheData++=procesados
+                              val encontrados=cacheData.filter(x=>queries.contains(x._1))
+                              val results=ListBuffer[Int]()
+                              for (ii<-0 to encontrados.size-1) results+=cacheData.filter(x=>x._1.equals(queries(ii))).head._2
+                              i.setIntAttachment(results.toList)                              
+                            }
                           
         					        i.setFitness(bcFE.value.execute(i))
         					    }
@@ -184,14 +212,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  val bcTopInds=sc.broadcast(topIndsArray);
 
 			  populations.foreach { dp:DistributedPopulation[T] => dp.replacePopulation(dp.getAll().dropRight(bcMR.value)++bcTopInds.value.find(_._1 == dp.getId()).get._2 ) }
-
-			  // Debug
-//			  populations.foreach { dp:DistributedPopulation[T] => println("Poblacion " + dp.getId() + " - " + dp.getAll().size()) }
-			  
-			  // Debug
-//			  populations.foreach { dp:DistributedPopulation[T] => 
-//			    dp.getAll().foreach { i:Individual[T] => println("Población " + dp.getId() + " - Invidivido " + i.getId + " - " + i.getFitness)}  
-//			  }			   			  
 
 			  Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
 			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness)

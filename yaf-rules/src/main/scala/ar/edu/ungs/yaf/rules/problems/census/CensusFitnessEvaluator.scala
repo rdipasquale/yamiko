@@ -1,12 +1,10 @@
 package ar.edu.ungs.yaf.rules.problems.census
 
-import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import java.util.BitSet
-import ar.edu.ungs.yamiko.ga.domain.Individual
+
 import ar.edu.ungs.yaf.rules.toolkit.RuleAdaptor
-import ar.edu.ungs.yaf.rules.toolkit.RuleStringAdaptor
-import ar.edu.ungs.yaf.rules.toolkit.QueryProvider
-import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 
 
 /**
@@ -18,34 +16,22 @@ import scala.collection.mutable.ListBuffer
  * @author ricardo
  *
  */
-class CensusFitnessEvaluator(q:QueryProvider) extends FitnessEvaluator[BitSet]{
+class CensusFitnessEvaluator() extends FitnessEvaluator[BitSet]{
 
 	val W1=0.6
 	val W2=0.4
-	val ATTR=CensusConstants.CANT_ATTRIBUTES
-	val N=CensusConstants.CANT_RECORDS
-	var ocurrencias:Map[String, Int]=Map[String, Int]()
 	
 	override def execute(i:Individual[BitSet]): Double = {
 
-		val rule=RuleAdaptor.adapt(i,ATTR,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
-	  val qCond=q.queryConditions(rule)
-	  val qRule=q.queryRule(rule)
-	  val qPred=q.queryPrediction(rule)
-	  val process=ListBuffer[String]()
-	  if (!ocurrencias.contains(qCond)) process+=qCond
-	  if (!ocurrencias.contains(qRule)) process+=qRule
-	  if (!ocurrencias.contains(qPred)) process+=qPred
-
-	  
-		val c=ocurrencias.getOrElse(key=RuleStringAdaptor.adaptConditions(rule),default=0)
-		val cYp=ocurrencias.getOrElse(key=RuleStringAdaptor.adapt(rule),default=0)
-		val p=ocurrencias.getOrElse(key=RuleStringAdaptor.adaptPrediction(rule),default=0)
-		val a=p/N;
+		val rule=RuleAdaptor.adapt(i,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
+		val c=i.getIntAttachment()(0)
+		val cYp=i.getIntAttachment()(1)
+		val p=i.getIntAttachment()(2)
+		val a=p/CensusConstants.CANT_RECORDS;
 		val b=if (c!=0) cYp/c else 0d 
-		val j1=if (a==0 || b==0) (c/N)*b	else (c/N)*b*math.log(b/a)
+		val j1=if (a==0 || b==0) (c/CensusConstants.CANT_RECORDS)*b	else (c/CensusConstants.CANT_RECORDS)*b*math.log(b/a)
 		val conditions=rule.getCondiciones().length		
-		return (W1*j1+W2*conditions/ATTR)/(W1+W2);		
+		return (W1*j1+W2*conditions/CensusConstants.CANT_ATTRIBUTES)/(W1+W2);		
 	}
 }	
 
