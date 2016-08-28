@@ -60,6 +60,9 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) {
    */
   class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) {
   	
+//    def getCampo()= campo
+//    def getOperador()= operador
+//    def getValor()=valor
     def getStrCampo():String = fieldDescription
 
   	def getStrOperador():String = FormulaComp.OPERADORES(operador)

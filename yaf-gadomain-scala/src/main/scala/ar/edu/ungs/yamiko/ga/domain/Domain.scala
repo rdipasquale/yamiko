@@ -182,6 +182,8 @@ trait Individual[T]  extends Serializable{
 	def setFitness(fitness:Double) 	
 	def getId():Int
 	def getGenotype():Genotype[T]
+	def getIntAttachment():List[Int]
+	def setIntAttachment(a:List[Int])
 }
 
 

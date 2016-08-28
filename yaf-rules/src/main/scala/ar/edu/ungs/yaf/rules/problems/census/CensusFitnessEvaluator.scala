@@ -5,6 +5,8 @@ import java.util.BitSet
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yaf.rules.toolkit.RuleAdaptor
 import ar.edu.ungs.yaf.rules.toolkit.RuleStringAdaptor
+import ar.edu.ungs.yaf.rules.toolkit.QueryProvider
+import scala.collection.mutable.ListBuffer
 
 
 /**
@@ -16,17 +18,26 @@ import ar.edu.ungs.yaf.rules.toolkit.RuleStringAdaptor
  * @author ricardo
  *
  */
-class CensusFitnessEvaluator(ocurrencias:Map[String, Int]) extends FitnessEvaluator[BitSet]{
+class CensusFitnessEvaluator(q:QueryProvider) extends FitnessEvaluator[BitSet]{
 
 	val W1=0.6
 	val W2=0.4
-	val ATTR=72;
+	val ATTR=CensusConstants.CANT_ATTRIBUTES
+	val N=CensusConstants.CANT_RECORDS
+	var ocurrencias:Map[String, Int]=Map[String, Int]()
 	
 	override def execute(i:Individual[BitSet]): Double = {
-		
-		val N=ocurrencias.getOrElse(CensusConstants.N_TAG,0)
 
 		val rule=RuleAdaptor.adapt(i,ATTR,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
+	  val qCond=q.queryConditions(rule)
+	  val qRule=q.queryRule(rule)
+	  val qPred=q.queryPrediction(rule)
+	  val process=ListBuffer[String]()
+	  if (!ocurrencias.contains(qCond)) process+=qCond
+	  if (!ocurrencias.contains(qRule)) process+=qRule
+	  if (!ocurrencias.contains(qPred)) process+=qPred
+
+	  
 		val c=ocurrencias.getOrElse(key=RuleStringAdaptor.adaptConditions(rule),default=0)
 		val cYp=ocurrencias.getOrElse(key=RuleStringAdaptor.adapt(rule),default=0)
 		val p=ocurrencias.getOrElse(key=RuleStringAdaptor.adaptPrediction(rule),default=0)

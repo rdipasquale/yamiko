@@ -27,7 +27,8 @@ class Parameter[T](mutationProbability:Double,
                     genome:Genome[T],
                     maxNodes:Int,
                     migrationRatio:Double ,
-                    maxTimeIsolatedMs:Int
+                    maxTimeIsolatedMs:Int,
+                    dataParameter:DataParameter[T]
                     ) extends Serializable{
   
   def getMutationProbability():Double=mutationProbability
@@ -47,5 +48,5 @@ class Parameter[T](mutationProbability:Double,
   def getMaxNodes():Int=maxNodes
   def getMigrationRatio():Double=migrationRatio
   def getMaxTimeIsolatedMs():Int=maxTimeIsolatedMs
-  
+  def getDataParameter()=dataParameter
 }

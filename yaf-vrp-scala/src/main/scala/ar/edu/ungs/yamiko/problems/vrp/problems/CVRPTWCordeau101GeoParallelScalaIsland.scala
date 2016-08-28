@@ -138,7 +138,7 @@ object CVRPTWCordeau101GeoParallelScalaIsland {
 			    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.035d, 1d, individuals, acceptEvaluator, 
     					fit, cross, new GVRMutatorRandom(), 
     					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelector(), 
-    					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED)
+    					pop, maxGenerations, fitnesOptInd,rma,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,null)
 
 			    val ga=new SparkParallelIslandsGA[Array[Int]](par,ISOLATED_GENERATIONS)
 					

@@ -16,6 +16,7 @@ class BasicIndividual[T](genotype:Genotype[T],id:Int) extends Individual[T]{
   
 	private var phenotype:Phenotype[T] =null
 	private var fitness:Double=0d
+	private var intAttachment:List[Int]=null
 	
 	override def getGenotype()=genotype
 	override def getPhenotype():Phenotype[T]={return phenotype}
@@ -23,6 +24,8 @@ class BasicIndividual[T](genotype:Genotype[T],id:Int) extends Individual[T]{
 	override def getFitness():Double={return fitness}
 	override def setFitness(v:Double)={fitness=v}
   override def getId():Int=id
+	override def getIntAttachment():List[Int]=intAttachment
+	override def setIntAttachment(a:List[Int])=intAttachment=a
 
 	override def toString = "BasicIndividual [id=" + id + ", fitness=" + fitness + "]";
 		

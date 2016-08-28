@@ -67,7 +67,12 @@
 	  <artifactId>graph-core_2.11</artifactId>
 	  <version>1.10.1</version>
 	</dependency>
-
+	<dependency>
+      <groupId>org.apache.drill.exec</groupId>
+      <artifactId>drill-jdbc</artifactId>
+      <version>1.7.0</version>
+    </dependency>
+    
   </dependencies>
 
   <build>

@@ -7,6 +7,9 @@ package ar.edu.ungs.yaf.rules.problems.census
  */
 object CensusConstants {
   
+  val CANT_ATTRIBUTES=72
+  val CANT_RECORDS=14271294
+  
 	/**
 	 * Valores máximos posibles para cada campo. Se utiliza para calcular el módulo del valor que viene en los campos "Valor" de cada fórmula en los individuos.
 	 */
@@ -470,6 +473,4 @@ object CensusConstants {
 			     (CENSUS_FIELDS.WRKLYR.id, Array[String]("Not in universe (Under 16 years)","Yes","No"))			     		     
 			)	
 
-			//public static final Text N_TAG=new Text("N");
-			val N_TAG="N"
 }

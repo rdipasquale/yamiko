@@ -22,6 +22,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import scala.util.Random
 import java.text.DecimalFormat
+import ar.edu.ungs.yamiko.workflow.JdbcDataParameter
 
 
 
@@ -44,7 +45,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     	var generationNumber=0;
 		  var bestFitness:Double=0;
 		  var bestInd:Individual[T]=null;
-
     
 			val bcMA:Broadcast[MorphogenesisAgent[T]]=sc.broadcast(parameter.getMorphogenesisAgent()); 
 			val bcG:Broadcast[Genome[T]]=sc.broadcast(parameter.getGenome());
@@ -78,22 +78,24 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  populations=populations.map { dp:DistributedPopulation[T] => 
 			        var g=0
 			        val t1=System.currentTimeMillis()
-      			  // Profiling
-//			        var startTime2=System.currentTimeMillis()
 
     			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
 		          val descendants=new ListBuffer[Individual[T]]
-	      			  //Profiling
-//        			  if (g%100==0) Logger.getLogger("file").warn("Profiling - Generation " + generationNumber + "/" + g + " -> Inicio vuelta - " + (System.currentTimeMillis()-startTime2)+"ms por generación");
-//        			  if (dp.getAll().size()>200) Logger.getLogger("file").warn("Size Poblacion = " + dp.getAll().size() + " Generation " + generationNumber + "/" + g );
-//        			  startTime2=System.currentTimeMillis()
-
     			      g+=1
     			        dp.getAll().foreach { i:Individual[T] => 
         			        if (i.getFitness()==0)
         				      {
                           if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
+                          
+                          // Evalua si hay procesos de Data Retrieving
+                          if (parameter.getDataParameter()!=null)
+                            if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
+                              parameter.getDataParameter().getQueries(i).map { q:String => (q,1) }
+                          {
+                            
+                          }
+                          
         					        i.setFitness(bcFE.value.execute(i))
         					    }
                     }
@@ -103,7 +105,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 
     			        // Profiles
     			        if (g%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+g+";"+dp.getId()+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
-
 //    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
     				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue(),dp)).asInstanceOf[List[Individual[T]]];
