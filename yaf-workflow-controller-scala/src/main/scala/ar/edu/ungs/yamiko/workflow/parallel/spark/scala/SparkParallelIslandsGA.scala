@@ -155,11 +155,33 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
             				  {
             				    if (r.nextDouble()<=bcMutProb.value) bcMut.value.execute(d);
     				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
+
+                          // TODO: Sin Cache central, sino por executor
+                          // Evalua si hay procesos de Data Retrieving
+                          if (parameter.getDataParameter()!=null)
+                            if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
+                            {
+                              val queries=parameter.getDataParameter().getQueries(d)
+                              val queriesProcess=queries.find { x => !cacheData.contains(x) }.toList
+                              val procesados=queriesProcess.map { x =>
+                                      val statement = connection.createStatement()
+                                      val resultSet = statement.executeQuery(x)
+                                      var salida:Int=0
+                                      if ( resultSet.next() ) salida=resultSet.getInt(1) 
+                                      (x,salida)
+                               }
+                              cacheData++=procesados
+                              val encontrados=cacheData.filter(x=>queries.contains(x._1))
+                              val results=ListBuffer[Int]()
+                              for (ii<-0 to encontrados.size-1) results+=cacheData.filter(x=>x._1.equals(queries(ii))).head._2
+                              d.setIntAttachment(results.toList)                              
+                            }            				        
+    				            
     				            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
     				            descendants+=d
           					  }      				    
           				}
-          				if (g==1)
+//          				if (g==1)
           				if (!descendants.contains(bestOfGeneration))
           				{
     			          //Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> No contenía al mejor de la generación " + bestOfGeneration.getId + " - " + bestOfGeneration.getFitness);

@@ -18,7 +18,7 @@ class BasicGene(name1:String, loci:Int,size:Int) extends Gene{
   override def equals(that: Any): Boolean =
     that match {
       case that: BasicGene => 
-        that.canEqual(this) && this.hashCode == that.hashCode
+        that.canEqual(this) && this.name.equals(that.name)
       case _ => false
   }
 
