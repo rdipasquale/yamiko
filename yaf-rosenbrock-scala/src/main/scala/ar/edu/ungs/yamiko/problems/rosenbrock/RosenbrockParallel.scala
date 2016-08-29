@@ -21,13 +21,17 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaMorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaTwoPointCrossover
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
 
-object RosenbrockSerial extends App {
+object RosenbrockParallel extends App {
 
-  	  val URI_SPARK="local[2]"
-      val MAX_NODES=2
+  	  val URI_SPARK="local[8]"
+      val MAX_NODES=8
       val MIGRATION_RATIO=0.05
-      val ISOLATED_GENERATIONS=5000
+      val MAX_GENERATIONS=5000
+      val ISOLATED_GENERATIONS=200
       val MAX_TIME_ISOLATED=200000
       val POPULATION_SIZE=300
       
@@ -41,14 +45,46 @@ object RosenbrockSerial extends App {
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
         						new RosenbrockFitnessEvaluator(genX,genY), new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
-        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), ISOLATED_GENERATIONS, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,null);
+        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), MAX_GENERATIONS, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,null);
     	
-    	
-       val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);
-       val winner= ga.run()
+	    val ga=new SparkParallelIslandsGA[BitSet](par,ISOLATED_GENERATIONS)
+	    
+    	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("Rosenbrock");
+      val sc=new SparkContext(conf)
+      
+	    val t1=System.currentTimeMillis()
+      
+      val winner= ga.run(sc)
+
+	    val t2=System.currentTimeMillis();
+      
+	    println("Fin ga.run()");
+    	val salida=winner.getPhenotype().getAlleleMap().values.toList(0)    	
+
+      println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());
+			println("Tiempo -> " + (t2-t1)/1000 + " seg");
+			println("Promedio -> " + ((t2-t1)/(par.getMaxGenerations().toDouble))+ " ms/generacion");
+		
+	    var prom=0d;
+	    var cont=0;
+	    
+	    val finalPop=ga.finalPopulation.collect().toList
+	    
+			finalPop.foreach { i => {prom+=i.getFitness(); cont+=1;} }
+			
+			prom=prom/cont;
+			println("Winner -> Fitness Promedio población final =" +prom);
+    			
+			prom=0d;
+			cont=0;
+			ga.getBestIndHolder().getBest().foreach { i => {prom+=i.getFitness(); cont+=1;} }
+			prom=prom/cont;
+			println("Winner -> Fitness Promedio mejores individuos =" +prom)      
+      
+      
+      
+      
+      
         
-    	 val salida=winner.getPhenotype().getAlleleMap().values.toList(0)    	
-        
-       println("...And the winner is... (" + salida.get(genX) + " ; " + salida.get(genY) + ") -> " + winner.getFitness());
 
 }
