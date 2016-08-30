@@ -1,30 +1,31 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark.scala
 
+import java.sql.Connection
+import java.sql.DriverManager
+import java.text.DecimalFormat
+
+import scala.collection.TraversableOnce.flattenTraversableOnce
+import scala.collection.mutable.ListBuffer
+import scala.util.Random
+
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
-import org.apache.spark.api.java.JavaRDD.fromRDD
-import org.apache.spark.api.java.JavaSparkContext.fromSparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
+
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.Crossover
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.operators.Mutator
-import ar.edu.ungs.yamiko.workflow.BestIndHolder
-import ar.edu.ungs.yamiko.workflow.Parameter
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
-import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
-import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
-import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import scala.util.Random
-import java.text.DecimalFormat
+import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.JdbcDataParameter
-import java.sql.DriverManager
-import java.sql.Connection
+import ar.edu.ungs.yamiko.workflow.Parameter
 
 
 
@@ -41,8 +42,8 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
-    
-    
+          
+            
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
@@ -115,6 +116,8 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                                       val resultSet = statement.executeQuery(x)
                                       var salida:Int=0
                                       if ( resultSet.next() ) salida=resultSet.getInt(1) 
+                                      resultSet.close()
+                                      statement.close()
                                       (x,salida)
                                }
                               cacheData++=procesados
@@ -168,6 +171,8 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                                       val resultSet = statement.executeQuery(x)
                                       var salida:Int=0
                                       if ( resultSet.next() ) salida=resultSet.getInt(1) 
+                                      resultSet.close()
+                                      statement.close()                                      
                                       (x,salida)
                                }
                               cacheData++=procesados

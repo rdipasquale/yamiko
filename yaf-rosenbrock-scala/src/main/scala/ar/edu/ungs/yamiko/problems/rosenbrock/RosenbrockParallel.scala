@@ -27,7 +27,7 @@ import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 object RosenbrockParallel extends App {
 
   	  val URI_SPARK="local[4]"
-      val MAX_NODES=8
+      val MAX_NODES=4
       val MIGRATION_RATIO=0.05
       val MAX_GENERATIONS=5000
       val ISOLATED_GENERATIONS=200

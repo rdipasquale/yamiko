@@ -23,11 +23,11 @@ class RecordTextAdaptTest {
 
   	/*
   	 * Requiere la declaracion de este workspace:
-  	 *"pum": {
-      "location": "/home/ricardo/pums",
-      "writable": true,
-      "defaultInputFormat": null
-    }
+         "pum": {
+              "location": "/home/ricardo/pums",
+              "writable": true,
+              "defaultInputFormat": null
+        },    
   	 */
   	@Test
   	def testQueryDrill= {

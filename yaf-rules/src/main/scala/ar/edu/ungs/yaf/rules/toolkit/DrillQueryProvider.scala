@@ -2,6 +2,7 @@ package ar.edu.ungs.yaf.rules.toolkit
 
 import ar.edu.ungs.yaf.rules.entities.Rule
 
+@SerialVersionUID(50008L)
 class DrillQueryProvider extends QueryProvider{
   
   val TABLE="dfs.pum.`/parquet/pum/` "

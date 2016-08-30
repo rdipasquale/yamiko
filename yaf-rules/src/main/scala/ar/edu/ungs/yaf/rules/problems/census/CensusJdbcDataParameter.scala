@@ -6,6 +6,7 @@ import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yaf.rules.toolkit.RuleAdaptor
 import ar.edu.ungs.yaf.rules.toolkit.QueryProvider
 
+@SerialVersionUID(50011L)
 class CensusJdbcDataParameter(driver:String,url:String,q:QueryProvider) extends JdbcDataParameter[BitSet](driver,url){
 
       override def getQueries(i:Individual[BitSet]):List[String]={
