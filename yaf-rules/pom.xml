@@ -68,17 +68,17 @@
 	  <version>1.10.1</version>
 	</dependency>
 	
-	<dependency>
-	    <groupId>org.apache.drill.exec</groupId>
-	    <artifactId>drill-jdbc-all</artifactId>
-	    <version>1.7.0</version>
-	      <exclusions>
-	      	<exclusion>
-	      		<artifactId>log4j-over-slf4j</artifactId>
-	      		<groupId>org.slf4j</groupId>
-	      	</exclusion>
-	      </exclusions>
-	</dependency>	
+<!-- 	<dependency> -->
+<!-- 	    <groupId>org.apache.drill.exec</groupId> -->
+<!-- 	    <artifactId>drill-jdbc-all</artifactId> -->
+<!-- 	    <version>1.7.0</version> -->
+<!-- 	      <exclusions> -->
+<!-- 	      	<exclusion> -->
+<!-- 	      		<artifactId>log4j-over-slf4j</artifactId> -->
+<!-- 	      		<groupId>org.slf4j</groupId> -->
+<!-- 	      	</exclusion> -->
+<!-- 	      </exclusions> -->
+<!-- 	</dependency>	 -->
 <!-- 	<dependency> -->
 <!--       <groupId>org.apache.drill.exec</groupId> -->
 <!--       <artifactId>drill-jdbc</artifactId> -->
