@@ -50,7 +50,7 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) extends Seriali
   	val OP_MENOR=1
   	val OP_MAYOR=2
   	val OP_DISTINTO=3
-  	val OPERADORES=Array("=","<",">","!=")
+  	val OPERADORES=Array("=","<",">","<>")
   }
 
 
