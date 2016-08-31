@@ -58,7 +58,42 @@ object CensusConstants {
 		INCOTH ,INCTOT ,
 		EARNS ,POVERTY= Value
    }
-	
+
+	def CENSUS_FIELDS_NAMES:Array[String]=Array[String](
+    "OC","SEX","AGE","HISPAN","WHITE",
+		"BLACK","AIAN","ASIAN",
+		"NHPI","OTHER"," MARSTAT",
+		"ENROLL",
+		"GRADE","EDUC",
+		"SPEAK","ENGABIL","POB5",
+		"CITIZEN","YR2US","MOB",
+		"MIGST5","SENSORY","PHYSCL",
+		"MENTAL","SLFCARE","ABGO",
+		"ABWORK","GRANDC",
+		"RSPNSBL","HOWLONG",
+		"MILTARY","VPS1",
+		"VPS2",
+		"VPS3",
+		"VPS4",
+		"VPS5",
+		"VPS6",
+		"VPS7",
+		"VPS8",
+		"VPS9",
+		"MILYRS","VPSR",
+		"ESR","ESP",
+		"POWST5","TRVMNS",
+		"CARPOOL","LVTIME","TRVTIME",
+		"LAYOFF","ABSENT","RECALL",
+		"LOOKWRK","BACKWRK","LASTWRK","INDCEN","OCCCEN5",
+		"CLWKR ","WRKLYR","WEEKS","HOURS",
+		"INCWS","INCSE","INCINT",
+		"INCSS","INCSSI",
+		"INCPA","INCRET",
+		"INCOTH","INCTOT",
+		"EARNS","POVERTY"
+   )
+  
 	/**
 	 * Descripciones de los campos
 	 */

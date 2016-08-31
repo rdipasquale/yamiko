@@ -23,17 +23,18 @@ object RuleAdaptor {
 	
 		if (i==null) return null;
 		val valores= i.getPhenotype().getAlleleMap().valuesIterator.next()
-		val campo=valores.get(RulesValueObjects.genCondicionACampo).asInstanceOf[Int] % modulus //72
-		val campoB=valores.get(RulesValueObjects.genCondicionACampo).asInstanceOf[Int] % modulus //72
-		val campoC=valores.get(RulesValueObjects.genCondicionACampo).asInstanceOf[Int] % modulus //72
-		val campoPrediccion=valores.get(RulesValueObjects.genPrediccionCampo).asInstanceOf[Int] % modulus //72
+		val campo=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
+		val campoB=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
+		val campoC=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
+		val campoPrediccion=valores.getOrElse(RulesValueObjects.genPrediccionCampo,default=0).asInstanceOf[Int] % modulus //72
 		
-		val condition1:Formula =new Formula(campo, valores.get(RulesValueObjects.genCondicionAOperador).asInstanceOf[Int], valores.get(RulesValueObjects.genCondicionAValor).asInstanceOf[Int] % maxFieldsArray(campo),valoresPosibles(campo),descriptions(campo))
-		val flagCondition2:Int=valores.get(RulesValueObjects.genCondicionBPresente).asInstanceOf[Int]
-		val condition2:Formula =new Formula(campoB, valores.get(RulesValueObjects.genCondicionBOperador).asInstanceOf[Int], valores.get(RulesValueObjects.genCondicionBValor).asInstanceOf[Int] % maxFieldsArray(campoB),valoresPosibles(campoB),descriptions(campoB))
-		val flagCondition3:Int=valores.get(RulesValueObjects.genCondicionCPresente).asInstanceOf[Int]
-		val condition3:Formula =new Formula(campoC, valores.get(RulesValueObjects.genCondicionCOperador).asInstanceOf[Int], valores.get(RulesValueObjects.genCondicionCValor).asInstanceOf[Int] % maxFieldsArray(campoC),valoresPosibles(campoC),descriptions(campoC))
-		val prediccion:Formula =new Formula(campoPrediccion, FormulaComp.OP_IGUAL, valores.get(RulesValueObjects.genPrediccionValor).asInstanceOf[Int] % maxFieldsArray(campoPrediccion),valoresPosibles(campoPrediccion),descriptions(campoPrediccion))		
+		val xxx=valoresPosibles.getOrElse(campo,default=null)
+		val condition1:Formula =new Formula(campo, valores.getOrElse(RulesValueObjects.genCondicionAOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionAValor,default=0).asInstanceOf[Int] % maxFieldsArray(campo),valoresPosibles.getOrElse(campo,default=null),descriptions(campo))
+		val flagCondition2:Int=valores.getOrElse(RulesValueObjects.genCondicionBPresente,default=0).asInstanceOf[Int]
+		val condition2:Formula =new Formula(campoB, valores.getOrElse(RulesValueObjects.genCondicionBOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionBValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoB),valoresPosibles.getOrElse(campoB,default=null),descriptions(campoB))
+		val flagCondition3:Int=valores.getOrElse(RulesValueObjects.genCondicionCPresente,default=0).asInstanceOf[Int]
+		val condition3:Formula =new Formula(campoC, valores.getOrElse(RulesValueObjects.genCondicionCOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionCValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoC),valoresPosibles.getOrElse(campoC,default=null),descriptions(campoC))
+		val prediccion:Formula =new Formula(campoPrediccion, FormulaComp.OP_IGUAL, valores.getOrElse(RulesValueObjects.genPrediccionValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoPrediccion),valoresPosibles.getOrElse(campoPrediccion,default=null),descriptions(campoPrediccion))		
 		val salida:Rule =new Rule(ListBuffer[Formula](condition1),prediccion);
 		if (flagCondition2==1) salida.addCondition(condition2);
 		if (flagCondition3==1) salida.addCondition(condition3);
