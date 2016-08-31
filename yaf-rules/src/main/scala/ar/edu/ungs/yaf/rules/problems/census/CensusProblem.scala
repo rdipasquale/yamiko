@@ -55,7 +55,7 @@ object CensusProblem extends App {
     	val translators=genes.map { x => (x,new BitSetJavaToIntegerRibosome(0).asInstanceOf[Ribosome[BitSet]]) }.toMap
     	val genome:Genome[BitSet]=new BasicGenome[BitSet]("Chromosome 1", genes, translators).asInstanceOf[Genome[BitSet]]
   
-    	val dataParameter:DataParameter[BitSet]=new CensusJdbcDataParameter("org.apache.drill.jdbc.Driver","jdbc:drill:drillbit=localhost",new DrillQueryProvider())
+    	val dataParameter:DataParameter[BitSet]=new CensusRestDataParameter("http://localhost:8080/getCount",new DrillQueryProvider())
     	
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
         						new CensusFitnessEvaluator(), new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 

@@ -7,12 +7,10 @@ import java.text.DecimalFormat
 import scala.collection.TraversableOnce.flattenTraversableOnce
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
-
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
-
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
@@ -24,10 +22,10 @@ import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.operators.Mutator
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
-import ar.edu.ungs.yamiko.workflow.JdbcDataParameter
 import ar.edu.ungs.yamiko.workflow.Parameter
-
-
+import ar.edu.ungs.yamiko.workflow.RestDataParameter
+import ar.edu.ungs.yamiko.toolkit.RestClient
+import java.net.URLEncoder
 
 class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int) extends Serializable{
   
@@ -81,19 +79,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 			  populations=populations.map { dp:DistributedPopulation[T] => 
 			        var g=0
 			        val t1=System.currentTimeMillis()
-			        // Inicializamos cache para Data Retrieving
-			        var cacheData=Map[String,Int]()
-			        var connection:Connection=null
-              // Evalua si hay procesos de Data Retrieving
-              if (parameter.getDataParameter()!=null)
-                if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
-                {
-                  Class.forName(parameter.getDataParameter().asInstanceOf[JdbcDataParameter[T]].getDriver())
-                  connection = DriverManager.getConnection(parameter.getDataParameter().asInstanceOf[JdbcDataParameter[T]].getDriver())
-                }
-              
-      
-			        
 
     			    while(g<isolatedGenerations && (System.currentTimeMillis()-t1)<bcMaxTimeIso.value ) 
     			    {
@@ -107,23 +92,12 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                           // TODO: Sin Cache central, sino por executor
                           // Evalua si hay procesos de Data Retrieving
                           if (parameter.getDataParameter()!=null)
-                            if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
+                            if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(i)
-                              val queriesProcess=queries.find { x => !cacheData.contains(x) }.toList
-                              val procesados=queriesProcess.map { x =>
-                                      val statement = connection.createStatement()
-                                      val resultSet = statement.executeQuery(x)
-                                      var salida:Int=0
-                                      if ( resultSet.next() ) salida=resultSet.getInt(1) 
-                                      resultSet.close()
-                                      statement.close()
-                                      (x,salida)
-                               }
-                              cacheData++=procesados
-                              val encontrados=cacheData.filter(x=>queries.contains(x._1))
+                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
-                              for (ii<-0 to encontrados.size-1) results+=cacheData.filter(x=>x._1.equals(queries(ii))).head._2
+                              for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               i.setIntAttachment(results.toList)                              
                             }
                           
@@ -162,25 +136,14 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                           // TODO: Sin Cache central, sino por executor
                           // Evalua si hay procesos de Data Retrieving
                           if (parameter.getDataParameter()!=null)
-                            if(parameter.getDataParameter().isInstanceOf[JdbcDataParameter[T]])
+                            if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(d)
-                              val queriesProcess=queries.find { x => !cacheData.contains(x) }.toList
-                              val procesados=queriesProcess.map { x =>
-                                      val statement = connection.createStatement()
-                                      val resultSet = statement.executeQuery(x)
-                                      var salida:Int=0
-                                      if ( resultSet.next() ) salida=resultSet.getInt(1) 
-                                      resultSet.close()
-                                      statement.close()                                      
-                                      (x,salida)
-                               }
-                              cacheData++=procesados
-                              val encontrados=cacheData.filter(x=>queries.contains(x._1))
+                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
-                              for (ii<-0 to encontrados.size-1) results+=cacheData.filter(x=>x._1.equals(queries(ii))).head._2
+                              for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               d.setIntAttachment(results.toList)                              
-                            }            				        
+                            }
     				            
     				            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
     				            descendants+=d

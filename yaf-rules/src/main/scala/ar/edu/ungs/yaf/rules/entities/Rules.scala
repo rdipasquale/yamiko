@@ -8,7 +8,8 @@ import scala.collection.mutable.ListBuffer
  * @author ricardo
  *
  */
-class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) {
+@SerialVersionUID(9992L)
+class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) extends Serializable{
 
   val condicionesL:List[Formula]=condiciones.toList
 	def getCondiciones():List[Formula]=condicionesL
@@ -58,11 +59,12 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) {
    * @author ricardo
    *
    */
-  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) {
+  @SerialVersionUID(9991L)
+  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) extends Serializable{
   	
-//    def getCampo()= campo
-//    def getOperador()= operador
-//    def getValor()=valor
+    def getCampo()= campo
+    def getOperador()= operador
+    def getValor()=valor
     def getStrCampo():String = fieldDescription
 
   	def getStrOperador():String = FormulaComp.OPERADORES(operador)
