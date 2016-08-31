@@ -10,7 +10,7 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome
 @SerialVersionUID(1219L)
 class ByPassRibosome extends Ribosome[Array[Int]]{
 
-	def translate(allele:Array[Int]):Any = allele
+	override def translate(allele:Array[Int]):Any = allele
 	
   def canEqual(a: Any) = a.isInstanceOf[ByPassRibosome]
 

@@ -14,7 +14,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <encoding>UTF-8</encoding>
-    <scala.version>2.11.7</scala.version>
+    <scala.version>2.11.8</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
     <hadoop.version>2.7.1</hadoop.version>    
   </properties>
@@ -67,7 +67,30 @@
 	  <artifactId>graph-core_2.11</artifactId>
 	  <version>1.10.1</version>
 	</dependency>
-
+	
+<!-- 	<dependency> -->
+<!-- 	    <groupId>org.apache.drill.exec</groupId> -->
+<!-- 	    <artifactId>drill-jdbc-all</artifactId> -->
+<!-- 	    <version>1.7.0</version> -->
+<!-- 	      <exclusions> -->
+<!-- 	      	<exclusion> -->
+<!-- 	      		<artifactId>log4j-over-slf4j</artifactId> -->
+<!-- 	      		<groupId>org.slf4j</groupId> -->
+<!-- 	      	</exclusion> -->
+<!-- 	      </exclusions> -->
+<!-- 	</dependency>	 -->
+<!-- 	<dependency> -->
+<!--       <groupId>org.apache.drill.exec</groupId> -->
+<!--       <artifactId>drill-jdbc</artifactId> -->
+<!--       <version>1.7.0</version> -->
+<!--       <exclusions> -->
+<!--       	<exclusion> -->
+<!--       		<artifactId>log4j-over-slf4j</artifactId> -->
+<!--       		<groupId>org.slf4j</groupId> -->
+<!--       	</exclusion> -->
+<!--       </exclusions> -->
+<!-- 	</dependency> -->
+    
   </dependencies>
 
   <build>
@@ -124,26 +147,30 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>ar.edu.ungs.yamiko:yaf-gadomain</include>
                   <include>ar.edu.ungs:yaf-gadomain-scala</include>
-                  <include>ar.edu.ungs.yamiko.problems:yaf-vrp</include>
-                  <include>ar.edu.ungs.yamiko:yaf-workflow-controller</include>
                   <include>ar.edu.ungs:yaf-workflow-controller-scala</include>
-                  <include>org.gavahan.geodesy:gavahanGeodesy</include>
-				  <include>org.jgrapht:jgrapht-core</include>
-					<include>org.jgrapht:jgrapht-ext</include>
-					<include>org.tinyjee.jgraphx:jgraphx</include>
-					<include>jgraph:jgraphr</include>
-					<include>com.graphhopper:graphhopper</include> 
-					<include>org.openstreetmap.osmosis:osmosis-osm-binary</include> 
-					<include>com.google.guava:guava</include> 
-					
                 </includes>
               </artifactSet>
             </configuration>
           </execution>
         </executions>
       </plugin>    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19</version>
+        <configuration>
+          <useFile>false</useFile>
+          <disableXmlReport>true</disableXmlReport>
+          <!-- If you have classpath issue like NoDefClassError,... -->
+          <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
+          <skipTests>true</skipTests>
+          <includes>
+            <include>**/*Test.*</include>
+            <include>**/*Suite.*</include>
+          </includes>
+        </configuration>
+      </plugin>
       
     </plugins>
 
