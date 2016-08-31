@@ -1,9 +1,6 @@
 package ar.edu.ungs.census;
 
 import java.util.Arrays;
-import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -17,11 +14,7 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+
 
 
 @SpringBootApplication
@@ -55,7 +48,10 @@ public class Application{ // extends SpringBootServletInitializer {
 	 
 //	   @Value("${spring.datasource.dataSourceClassName}")
 //	   private String dataSourceClassName;
-	 
+	   
+	   @Value("${spring.datasource.driver-class-name}")
+	   private String driverClassName;
+	   
 	   @Value("${spring.datasource.poolName}")
 	   private String poolName;
 	 
@@ -75,51 +71,10 @@ public class Application{ // extends SpringBootServletInitializer {
 	   private int idleTimeout;
 	 
 	   @Bean
-	   public DataSource dataSource() {
-	       Properties dsProps = new Properties();
-	       dsProps.put("jdbcUrl", dataSourceUrl);
-	       dsProps.put("url", dataSourceUrl);
-	       dsProps.put("user", user);
-	       dsProps.put("password", password);
-	 
-	       Properties configProps = new Properties();
-	       	  configProps.put("jdbcUrl", dataSourceUrl);
-	          configProps.put("poolName",poolName);
-	          configProps.put("maximumPoolSize",maximumPoolSize);
-	          configProps.put("minimumIdle",minimumIdle);
-	          configProps.put("minimumIdle",minimumIdle);
-	          configProps.put("connectionTimeout", connectionTimeout);
-	          configProps.put("idleTimeout", idleTimeout);
-	          configProps.put("dataSourceProperties", dsProps);
-	          
-	 
-	      HikariConfig hc = new HikariConfig(configProps);
-	      HikariDataSource ds = new HikariDataSource(hc);
-	      return ds;
+	   public DataSourceDrill dataSource() {
+	      return new DataSourceDrill();
 	   }
 	   
-//	    @Bean
-//	    public DataSourceInitializer dataSourceInitializer(DataSource dataSource)
-//	    {
-//	        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();    
-//	        dataSourceInitializer.setDataSource(dataSource);
-//	        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-//	        databasePopulator.addScript(new ClassPathResource("data.sql"));
-//	        dataSourceInitializer.setDatabasePopulator(databasePopulator);
-//	        dataSourceInitializer.setEnabled(Boolean.parseBoolean(initDatabase));
-//	        return dataSourceInitializer;
-//	    }	
 	   
-	    @Bean
-	    public JdbcTemplate jdbcTemplate(DataSource dataSource)
-	    {
-	        return new JdbcTemplate(dataSource);
-	    }
-	 
-	    @Bean
-	    public PlatformTransactionManager transactionManager(DataSource dataSource)
-	    {
-	        return new DataSourceTransactionManager(dataSource);
-	    }	   
 
 }

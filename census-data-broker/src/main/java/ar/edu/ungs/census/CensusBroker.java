@@ -1,9 +1,10 @@
 package ar.edu.ungs.census;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CensusBroker {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private DataSourceDrill jdbcTemplate;
     
     public CensusBroker() {
 		// TODO Auto-generated constructor stub
@@ -24,9 +25,14 @@ public class CensusBroker {
     {
     	try {
 			Integer salida=0;
-			salida=jdbcTemplate.query(sql,new IntRowMapper()).get(0);
-			return salida;
-		} catch (DataAccessException e) {
+			Statement stmt=jdbcTemplate.getConnection().createStatement();
+	        ResultSet rs = stmt.executeQuery(sql);
+	        if (rs.next()) salida=rs.getInt(1);
+		    salida=rs.getInt(1);
+            rs.close();
+            stmt.close();				
+            return salida;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
 		}
