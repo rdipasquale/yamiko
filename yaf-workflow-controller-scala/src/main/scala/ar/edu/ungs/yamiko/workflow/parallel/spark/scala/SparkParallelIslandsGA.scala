@@ -117,23 +117,44 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
 
           				for (t <- tuplasSer)
           				{
-    			            if (t._1.getPhenotype==null) bcMA.value.develop(bcG.value, t._1 )
+    			            if (t._1.getPhenotype==null)
+    			              {
+    			                bcMA.value.develop(bcG.value, t._1 )
+                          // Evalua si hay procesos de Data Retrieving
+                          if (parameter.getDataParameter()!=null)
+                            if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
+                            {
+                              val queries=parameter.getDataParameter().getQueries(t._1)
+                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val results=ListBuffer[Int]()
+                              for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
+                              t._1.setIntAttachment(results.toList)                              
+                            }    			              
+    			              }
     			            if (t._1.getFitness==0) t._1.setFitness(bcFE.value.execute(t._1))
-    			            if (t._2.getPhenotype==null) bcMA.value.develop(bcG.value, t._2 )
+    			            if (t._2.getPhenotype==null)
+    			              {
+    			                bcMA.value.develop(bcG.value, t._2 )
+                          // Evalua si hay procesos de Data Retrieving
+                          if (parameter.getDataParameter()!=null)
+                            if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
+                            {
+                              val queries=parameter.getDataParameter().getQueries(t._1)
+                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val results=ListBuffer[Int]()
+                              for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
+                              t._1.setIntAttachment(results.toList)                              
+                            }    			              
+      			              
+    			              }
     			            if (t._2.getFitness==0) t._2.setFitness(bcFE.value.execute(t._2))
     			            val parentsJ=List(t._1,t._2)
             				  val desc=bcCross.value.execute(parentsJ);
             				  for (d <- desc)
             				  {
-      			            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d)
-      			            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
-            				  }
-            				  for (d <- bcDesc.value.execute(desc,parentsJ))
-            				  {
-            				    if (r.nextDouble()<=bcMutProb.value) bcMut.value.execute(d);
-    				            if (d.getPhenotype==null) bcMA.value.develop(bcG.value, d )
-
-                          // TODO: Sin Cache central, sino por executor
+      			            if (d.getPhenotype==null)
+      			            {
+      			              bcMA.value.develop(bcG.value, d)
                           // Evalua si hay procesos de Data Retrieving
                           if (parameter.getDataParameter()!=null)
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
@@ -144,7 +165,26 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               d.setIntAttachment(results.toList)                              
                             }
-    				            
+      			            }
+      			            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
+            				  }
+            				  for (d <- bcDesc.value.execute(desc,parentsJ))
+            				  {
+            				    if (r.nextDouble()<=bcMutProb.value) bcMut.value.execute(d);
+    				            if (d.getPhenotype==null)
+    				            {
+    				              bcMA.value.develop(bcG.value, d )
+                          // Evalua si hay procesos de Data Retrieving
+                          if (parameter.getDataParameter()!=null)
+                            if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
+                            {
+                              val queries=parameter.getDataParameter().getQueries(d)
+                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val results=ListBuffer[Int]()
+                              for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
+                              d.setIntAttachment(results.toList)                              
+                            }
+    				            }
     				            if (d.getFitness==0) d.setFitness(bcFE.value.execute(d))
     				            descendants+=d
           					  }      				    
