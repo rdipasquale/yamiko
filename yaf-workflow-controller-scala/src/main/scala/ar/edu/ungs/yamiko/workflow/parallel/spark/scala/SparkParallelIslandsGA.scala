@@ -84,7 +84,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
     			    {
 		          val descendants=new ListBuffer[Individual[T]]
     			      g+=1
-    			        dp.getAll().foreach { i:Individual[T] => 
+    			        dp.getAll().par.foreach { i:Individual[T] => 
         			        if (i.getFitness()==0)
         				      {
                           if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
@@ -95,7 +95,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(i)
-                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val procesados=queries.par.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               i.setIntAttachment(results.toList)                              
@@ -105,12 +105,13 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
         					    }
                     }
     			        
-    			        //if (g%10==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
+    			        if (g%1==0) Logger.getLogger("file").warn("Generation población " + dp.getId() + " - " +g + " -> developed");
     			        val bestOfGeneration=dp.getAll().maxBy { x => x.getFitness }    			        
 
+    			        dp.getAll().foreach { x => println(x.getFitness() + " - " + x.getIntAttachment().mkString(",") + " - " + x.getPhenotype().getAlleles().mkString(" - ")) }
     			        // Profiles
-    			        if (g%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+g+";"+dp.getId()+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
-//    			        if (g%30==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
+    			        //if (g%30==0) Logger.getLogger("profiler").debug(generationNumber+";"+g+";"+dp.getId()+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+    			        if (g%1==0) Logger.getLogger("file").warn("Generation " + dp.getId() + " - " + g  + " -> Mejor Individuo -> Fitness: " + bestOfGeneration.getFitness());
     
     				      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((dp.size()).intValue(),dp)).asInstanceOf[List[Individual[T]]];
           				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
@@ -125,7 +126,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(t._1)
-                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val procesados=queries.par.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               t._1.setIntAttachment(results.toList)                              
@@ -140,7 +141,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(t._1)
-                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val procesados=queries.par.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               t._1.setIntAttachment(results.toList)                              
@@ -160,7 +161,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(d)
-                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val procesados=queries.par.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               d.setIntAttachment(results.toList)                              
@@ -179,7 +180,7 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])
                             {
                               val queries=parameter.getDataParameter().getQueries(d)
-                              val procesados=queries.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
+                              val procesados=queries.par.map { x => (x,RestClient.getRestContent(parameter.getDataParameter().asInstanceOf[RestDataParameter[T]].getCompleteURL+URLEncoder.encode(x,java.nio.charset.StandardCharsets.UTF_8.toString())).toInt)}
                               val results=ListBuffer[Int]()
                               for (ii<-0 to procesados.size-1) results+=procesados.filter(x=>x._1.equals(queries(ii))).head._2
                               d.setIntAttachment(results.toList)                              

@@ -29,12 +29,13 @@ object RuleAdaptor {
 		val campoPrediccion=valores.getOrElse(RulesValueObjects.genPrediccionCampo,default=0).asInstanceOf[Int] % modulus //72
 		
 		val xxx=valoresPosibles.getOrElse(campo,default=null)
-		val condition1:Formula =new Formula(campo, valores.getOrElse(RulesValueObjects.genCondicionAOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionAValor,default=0).asInstanceOf[Int] % maxFieldsArray(campo),valoresPosibles.getOrElse(campo,default=null),descriptions(campo))
+		val condition1:Formula =new Formula(campo, valores.getOrElse(RulesValueObjects.genCondicionAValor,default=0).asInstanceOf[Int] % maxFieldsArray(campo),valoresPosibles.getOrElse(campo,default=null),descriptions(campo))
+//		val condition1:Formula =new Formula(campo, valores.getOrElse(RulesValueObjects.genCondicionAOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionAValor,default=0).asInstanceOf[Int] % maxFieldsArray(campo),valoresPosibles.getOrElse(campo,default=null),descriptions(campo))
 		val flagCondition2:Int=valores.getOrElse(RulesValueObjects.genCondicionBPresente,default=0).asInstanceOf[Int]
-		val condition2:Formula =new Formula(campoB, valores.getOrElse(RulesValueObjects.genCondicionBOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionBValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoB),valoresPosibles.getOrElse(campoB,default=null),descriptions(campoB))
+		val condition2:Formula =new Formula(campoB, valores.getOrElse(RulesValueObjects.genCondicionBValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoB),valoresPosibles.getOrElse(campoB,default=null),descriptions(campoB))
 		val flagCondition3:Int=valores.getOrElse(RulesValueObjects.genCondicionCPresente,default=0).asInstanceOf[Int]
-		val condition3:Formula =new Formula(campoC, valores.getOrElse(RulesValueObjects.genCondicionCOperador,default=0).asInstanceOf[Int], valores.getOrElse(RulesValueObjects.genCondicionCValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoC),valoresPosibles.getOrElse(campoC,default=null),descriptions(campoC))
-		val prediccion:Formula =new Formula(campoPrediccion, FormulaComp.OP_IGUAL, valores.getOrElse(RulesValueObjects.genPrediccionValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoPrediccion),valoresPosibles.getOrElse(campoPrediccion,default=null),descriptions(campoPrediccion))		
+		val condition3:Formula =new Formula(campoC, valores.getOrElse(RulesValueObjects.genCondicionCValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoC),valoresPosibles.getOrElse(campoC,default=null),descriptions(campoC))
+		val prediccion:Formula =new Formula(campoPrediccion, valores.getOrElse(RulesValueObjects.genPrediccionValor,default=0).asInstanceOf[Int] % maxFieldsArray(campoPrediccion),valoresPosibles.getOrElse(campoPrediccion,default=null),descriptions(campoPrediccion))		
 		val salida:Rule =new Rule(ListBuffer[Formula](condition1),prediccion);
 		if (flagCondition2==1) salida.addCondition(condition2);
 		if (flagCondition3==1) salida.addCondition(condition3);
@@ -55,7 +56,8 @@ object RuleStringAdaptor {
 	{
 		if (r==null) return null;
 		var salida=""
-		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+c.getStrOperador()+c.getStrValor()+"|";
+		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+"="+c.getStrValor()+"|";
+//		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+c.getStrOperador()+c.getStrValor()+"|";
 		salida=salida.substring(0,salida.length()-1);
 		salida+="/"+r.getPrediccion().getStrCampo()+"="+r.getPrediccion().getStrValor()
 		return salida;
@@ -66,7 +68,8 @@ object RuleStringAdaptor {
 		if (r==null) return null;
 		if (r==null) return null;
 		var salida=""
-		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+c.getStrOperador()+c.getStrValor()+"|";
+		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+"="+c.getStrValor()+"|";
+//		for (c <- r.getCondiciones()) salida+=c.getStrCampo()+c.getStrOperador()+c.getStrValor()+"|";
 		salida=salida.substring(0,salida.length()-1);
 		return salida;
 	}

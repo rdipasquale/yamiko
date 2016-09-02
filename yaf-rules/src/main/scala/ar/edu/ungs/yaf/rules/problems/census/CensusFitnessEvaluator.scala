@@ -27,11 +27,14 @@ class CensusFitnessEvaluator() extends FitnessEvaluator[BitSet]{
 		val c=i.getIntAttachment()(0)
 		val cYp=i.getIntAttachment()(1)
 		val p=i.getIntAttachment()(2)
-		val a=p/CensusConstants.CANT_RECORDS;
-		val b=if (c!=0) cYp/c else 0d 
-		val j1=if (a==0 || b==0) (c/CensusConstants.CANT_RECORDS)*b	else (c/CensusConstants.CANT_RECORDS)*b*math.log(b/a)
+		val a:Double=p.toDouble/CensusConstants.CANT_RECORDS.toDouble;
+		val b:Double=if (c!=0) cYp.toDouble/c.toDouble else 0d 
+		val j1=if (a==0 || b==0) (c.toDouble/CensusConstants.CANT_RECORDS.toDouble)*b	else (c.toDouble/CensusConstants.CANT_RECORDS.toDouble)*b*math.log(b/a)
 		val conditions=rule.getCondiciones().length		
-		return (W1*j1+W2*conditions/CensusConstants.CANT_ATTRIBUTES)/(W1+W2);		
+		val salida=(W1*j1+W2*conditions.toDouble/CensusConstants.CANT_ATTRIBUTES.toDouble)/(W1+W2);
+		if (salida<0)
+		  println("stop")
+		return salida
 	}
 }	
 

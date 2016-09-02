@@ -60,14 +60,15 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) extends Seriali
    *
    */
   @SerialVersionUID(9991L)
-  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) extends Serializable{
+  class Formula(campo:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) extends Serializable{
+//  class Formula(campo:Int,operador:Int,valor:Int,valoresPosibles:Array[String],fieldDescription:String ) extends Serializable{
   	
     def getCampo()= campo
-    def getOperador()= operador
+    //def getOperador()= operador
     def getValor()=valor
     def getStrCampo():String = fieldDescription
 
-  	def getStrOperador():String = FormulaComp.OPERADORES(operador)
+  	//def getStrOperador():String = FormulaComp.OPERADORES(operador)
   
   	def getStrValor():String = {
   		if (valoresPosibles==null)
@@ -79,7 +80,7 @@ class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) extends Seriali
   				return valoresPosibles(valor)
   	}
   
-  	override def toString():String = getStrCampo()+getStrOperador()+getStrValor()
+  	override def toString():String = getStrCampo()+"="+getStrValor() //getStrCampo()+getStrOperador()+getStrValor()
   	
   	
   	

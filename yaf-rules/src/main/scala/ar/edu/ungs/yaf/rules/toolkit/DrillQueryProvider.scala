@@ -12,7 +12,8 @@ class DrillQueryProvider extends QueryProvider{
   override def queryConditions(r:Rule):String={
     var where="where "
     for (c <- r.getCondiciones())
-      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+c.getStrOperador()+c.getValor()+ " AND "
+      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+"="+c.getValor()+ " AND "
+//      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+c.getStrOperador()+c.getValor()+ " AND "
     where=where.substring(0,where.size-4)  
     return PREFIX+TABLE+where
   }
@@ -22,7 +23,8 @@ class DrillQueryProvider extends QueryProvider{
   override def queryRule(r:Rule):String={
     var where="where "
     for (c <- r.getCondiciones())
-      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+c.getStrOperador()+c.getValor()+ " AND "
+      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+"="+c.getValor()+ " AND "
+//      where+=CensusConstants.CENSUS_FIELDS_NAMES(c.getCampo())+c.getStrOperador()+c.getValor()+ " AND "
     where+=CensusConstants.CENSUS_FIELDS_NAMES(r.getPrediccion().getCampo())+"="+r.getPrediccion().getValor()
     return PREFIX+TABLE+where
     
