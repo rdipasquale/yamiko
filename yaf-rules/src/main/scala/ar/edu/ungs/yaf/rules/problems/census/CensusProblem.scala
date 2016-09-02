@@ -27,6 +27,7 @@ import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.DataParameter
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
+import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
 
 object CensusProblem extends App {
   
@@ -57,8 +58,8 @@ object CensusProblem extends App {
   
     	val dataParameter:DataParameter[BitSet]=new CensusRestDataParameter("http://localhost:8080/getCount",new DrillQueryProvider())
     	
-    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
-        						new CensusFitnessEvaluator(), new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
+    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.05, 1d, POPULATION_SIZE, new DescendantAcceptEvaluator[BitSet](), 
+        						new CensusFitnessEvaluatorInterestingness(), new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
         						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), MAX_GENERATIONS, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,dataParameter);
 

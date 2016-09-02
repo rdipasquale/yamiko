@@ -16,7 +16,7 @@ import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
  * @author ricardo
  *
  */
-class CensusFitnessEvaluator() extends FitnessEvaluator[BitSet]{
+class CensusFitnessEvaluatorJMeasure() extends FitnessEvaluator[BitSet]{
 
 	val W1=0.6
 	val W2=0.4
@@ -38,6 +38,31 @@ class CensusFitnessEvaluator() extends FitnessEvaluator[BitSet]{
 	}
 }	
 
+
+/**
+ * Multi-Objective Evolutionary Algorithms for Knowledge Discovery from Databases - Ed: editado por Ashish Ghosh,Satchidananda Dehuri,Susmita Ghosh - 2008. p.14
+ * I(R)=cYp/c * cYp/p * (1 - cYp/N)
+ */
+class CensusFitnessEvaluatorInterestingness() extends FitnessEvaluator[BitSet]{
+
+	val W1=0.6
+	val W2=0.4
 	
+	override def execute(i:Individual[BitSet]): Double = {
+
+		val rule=RuleAdaptor.adapt(i,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
+		val c=i.getIntAttachment()(0)
+		val cYp=i.getIntAttachment()(1)
+		val p=i.getIntAttachment()(2)
+		
+		val prod1=if(c==0) 0d else cYp.toDouble/c.toDouble
+		val prod2=if(p==0) 0d else cYp.toDouble/p.toDouble
+		val prod3=1d-cYp.toDouble/CensusConstants.CANT_RECORDS.toDouble
+		
+		val salida=prod1*prod2*prod3
+		return salida
+	}
+}	
+
 	
 	
