@@ -1,5 +1,6 @@
 package ar.edu.ungs.census;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CensusBroker {
 
     @Autowired
-    private DataSourceDrill jdbcTemplate;
+    private DrillPool jdbcTemplate;
     
     public CensusBroker() {
 		// TODO Auto-generated constructor stub
@@ -25,14 +26,18 @@ public class CensusBroker {
     {
     	try {
 			Integer salida=0;
-			Statement stmt=jdbcTemplate.getConnection().createStatement();
+			Connection con=jdbcTemplate.borrowConnection();
+			Statement stmt=con.createStatement();
 	        ResultSet rs = stmt.executeQuery(sql);
 	        if (rs.next()) salida=rs.getInt(1);
 		    salida=rs.getInt(1);
             rs.close();
-            stmt.close();				
+            stmt.close();	
+//            System.out.println(salida + " - " + sql);
+            jdbcTemplate.returnConnection(con);
             return salida;
 		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
 			e.printStackTrace();
 			return 0;
 		}
