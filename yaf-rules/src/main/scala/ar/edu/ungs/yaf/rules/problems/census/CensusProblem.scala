@@ -64,13 +64,8 @@ object CensusProblem extends App {
 
 	    val ga=new SparkParallelIslandsGA[BitSet](par,ISOLATED_GENERATIONS)
 	    
-    	val conf = new SparkConf().setMaster(URI_SPARK).
-    	                           setAppName("CensusProblem").
-    	                           setJars(Array[String]("/home/ricardo/.m2/repository/org/apache/drill/exec/drill-jdbc-all/1.7.0/drill-jdbc-all-1.7.0.jar"))
-    	                           .set("spark.driver.extraClassPath","/home/ricardo/.m2/repository/org/apache/drill/exec/drill-jdbc-all/1.7.0/drill-jdbc-all-1.7.0.jar")
-    	                           .set("spark.executor.extraClassPath", "/home/ricardo/.m2/repository/org/apache/drill/exec/drill-jdbc-all/1.7.0/drill-jdbc-all-1.7.0.jar")
+    	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("CensusProblem")
       val sc=new SparkContext(conf)
-	    sc.addJar("/home/ricardo/.m2/repository/org/apache/drill/exec/drill-jdbc-all/1.7.0/drill-jdbc-all-1.7.0.jar")
       
 	    val t1=System.currentTimeMillis()
       

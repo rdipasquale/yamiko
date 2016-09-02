@@ -10,13 +10,14 @@ import org.apache.http.impl.client.HttpClientBuilder
 import java.net.URLEncoder
 
 object RestClient {
-  
+
+    val httpClient = HttpClientBuilder.create().build();
+
     /**
    * Returns the text content from a REST URL. Returns a blank String if there
    * is a problem.
    */
   def getRestContent(url:String): String = {
-    val httpClient = HttpClientBuilder.create().build();
     val httpResponse = httpClient.execute(new HttpGet(url))
     val entity = httpResponse.getEntity()
     var content = ""
@@ -25,7 +26,7 @@ object RestClient {
       content = scala.io.Source.fromInputStream(inputStream).getLines.mkString
       inputStream.close
     }
-    httpClient.close()
+    //httpClient.close()
     return content
     
   }
