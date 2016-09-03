@@ -10,7 +10,7 @@ import org.apache.drill.jdbc.impl.DriverImpl;
 
 public class DrillPool {
 
-	private final int INIT=500;
+	private final int INIT=400;
    private long expirationTime;   
    private Hashtable<Connection, Long> locked, unlocked; 
 	   
@@ -40,8 +40,7 @@ public class DrillPool {
 	      while( e.hasMoreElements() )
 	      {
 	         o = e.nextElement();           
-	         if( ( now - ( ( Long ) unlocked.get( o ) ).longValue() ) >
-	expirationTime )
+	         if( ( now - ( ( Long ) unlocked.get( o ) ).longValue() ) > expirationTime )
 	         {
 	            // object has expired
 	            unlocked.remove( o );

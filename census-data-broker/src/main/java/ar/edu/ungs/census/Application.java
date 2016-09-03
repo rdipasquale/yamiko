@@ -22,17 +22,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableAutoConfiguration
 @Configuration
 @ConfigurationProperties()
-@EnableCaching
 public class Application{ // extends SpringBootServletInitializer {
 
-    @Bean
-    public CacheManager cacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("basicCache")));
-        return cacheManager;
-
-    }   
-    
 	public static void main(String[] args) throws Exception {
 	    SpringApplication.run(Application.class, args);
 	}
