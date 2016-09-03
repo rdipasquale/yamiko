@@ -11,8 +11,8 @@ import scala.collection.mutable.ListBuffer
 @SerialVersionUID(9992L)
 class Rule(condiciones:ListBuffer[Formula],prediccion:Formula  ) extends Serializable{
 
-  val condicionesL:List[Formula]=condiciones.toList
-	def getCondiciones():List[Formula]=condicionesL
+//  val condicionesL:List[Formula]=condiciones.toList
+	def getCondiciones():List[Formula]=condiciones.toList
 	def getPrediccion():Formula=prediccion
 
 	def addCondition(f:Formula )= condiciones+=f
