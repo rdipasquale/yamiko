@@ -24,8 +24,8 @@ object RuleAdaptor {
 		if (i==null) return null;
 		val valores= i.getPhenotype().getAlleleMap().valuesIterator.next()
 		val campo=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
-		val campoB=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
-		val campoC=valores.getOrElse(RulesValueObjects.genCondicionACampo,default=0).asInstanceOf[Int] % modulus //72
+		val campoB=valores.getOrElse(RulesValueObjects.genCondicionBCampo,default=0).asInstanceOf[Int] % modulus //72
+		val campoC=valores.getOrElse(RulesValueObjects.genCondicionCCampo,default=0).asInstanceOf[Int] % modulus //72
 		val campoPrediccion=valores.getOrElse(RulesValueObjects.genPrediccionCampo,default=0).asInstanceOf[Int] % modulus //72
 		
 		val xxx=valoresPosibles.getOrElse(campo,default=null)

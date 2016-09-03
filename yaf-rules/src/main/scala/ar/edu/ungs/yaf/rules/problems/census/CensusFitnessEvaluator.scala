@@ -24,6 +24,20 @@ class CensusFitnessEvaluatorJMeasure() extends FitnessEvaluator[BitSet]{
 	override def execute(i:Individual[BitSet]): Double = {
 
 		val rule=RuleAdaptor.adapt(i,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
+
+		val len=rule.getCondiciones().length
+		if (len>1)
+		{
+		  for (j<-0 to len-2)
+		    if (rule.getCondiciones()(j).getCampo()==rule.getCondiciones()(j+1).getCampo() ||
+		        rule.getCondiciones()(j).getCampo()==rule.getPrediccion().getCampo() ||
+		        rule.getCondiciones()(j+1).getCampo()==rule.getPrediccion().getCampo())
+		      return 0.0000001d
+		}
+		else
+		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo())
+		    return 0.0000001d
+		
 		val c=i.getIntAttachment()(0)
 		val cYp=i.getIntAttachment()(1)
 		val p=i.getIntAttachment()(2)
@@ -32,8 +46,7 @@ class CensusFitnessEvaluatorJMeasure() extends FitnessEvaluator[BitSet]{
 		val j1=if (a==0 || b==0) (c.toDouble/CensusConstants.CANT_RECORDS.toDouble)*b	else (c.toDouble/CensusConstants.CANT_RECORDS.toDouble)*b*math.log(b/a)
 		val conditions=rule.getCondiciones().length		
 		val salida=(W1*j1+W2*conditions.toDouble/CensusConstants.CANT_ATTRIBUTES.toDouble)/(W1+W2);
-		if (salida<0)
-		  println("stop")
+
 		return salida
 	}
 }	
@@ -51,6 +64,19 @@ class CensusFitnessEvaluatorInterestingness() extends FitnessEvaluator[BitSet]{
 	override def execute(i:Individual[BitSet]): Double = {
 
 		val rule=RuleAdaptor.adapt(i,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS)
+		val len=rule.getCondiciones().length
+		if (len>1)
+		{
+		  for (j<-0 to len-2)
+		    if (rule.getCondiciones()(j).getCampo()==rule.getCondiciones()(j+1).getCampo() ||
+		        rule.getCondiciones()(j).getCampo()==rule.getPrediccion().getCampo() ||
+		        rule.getCondiciones()(j+1).getCampo()==rule.getPrediccion().getCampo())
+		      return 0.0000001d
+		}
+		else
+		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo())
+		    return 0.0000001d
+		      
 		val c=i.getIntAttachment()(0)
 		val cYp=i.getIntAttachment()(1)
 		val p=i.getIntAttachment()(2)
