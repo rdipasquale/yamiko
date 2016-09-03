@@ -27,7 +27,7 @@ class RecordTextAdaptTest {
               "location": "/home/ricardo/pums",
               "writable": true,
               "defaultInputFormat": null
-        },    
+        },            
   	 */
   	@Test
   	def testQueryDrill= {

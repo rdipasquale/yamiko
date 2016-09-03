@@ -85,7 +85,7 @@ class CensusFitnessEvaluatorInterestingness() extends FitnessEvaluator[BitSet]{
 		val prod2=if(p==0) 0d else cYp.toDouble/p.toDouble
 		val prod3=1d-cYp.toDouble/CensusConstants.CANT_RECORDS.toDouble
 		
-		val salida=prod1*prod2*prod3
+		val salida=prod1*prod2*prod3+(len-1)*0.1 // Modificado
 		return salida
 	}
 }	

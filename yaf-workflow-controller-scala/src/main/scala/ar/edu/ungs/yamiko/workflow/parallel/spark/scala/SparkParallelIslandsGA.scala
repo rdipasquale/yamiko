@@ -40,8 +40,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
   @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
 		{
-          
-            
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
@@ -88,8 +86,6 @@ class SparkParallelIslandsGA[T] (parameter: Parameter[T],isolatedGenerations:Int
         			        if (i.getFitness()==0)
         				      {
                           if (i.getPhenotype==null)  bcMA.value.develop(bcG.value,i)
-                          
-                          // TODO: Sin Cache central, sino por executor
                           // Evalua si hay procesos de Data Retrieving
                           if (parameter.getDataParameter()!=null)
                             if(parameter.getDataParameter().isInstanceOf[RestDataParameter[T]])

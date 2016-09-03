@@ -53,3 +53,63 @@ class RuleMutatorSwap(ma:MorphogenesisAgent[BitSet],ge:Genome[BitSet],fe:Fitness
       
     }
 }
+
+
+/**
+ * Operador de Mutación que hace Flip de algún gen de valor de campo.
+ *
+ * @author ricardo
+ */
+@SerialVersionUID(521103L)
+class RuleFlipMutator() extends Mutator[BitSet]{
+    
+    private val r=new Random(System.currentTimeMillis())
+    
+    @throws(classOf[YamikoException])  
+    override def execute(ind:Individual[BitSet])=  {
+      if (ind==null) throw new NullIndividualException("BitSetFlipMutator -> Individuo Null")
+		  val random=r.nextInt(2)
+		  // Decide si muta antecedentes o consecuentes
+		  if (random==0)
+		  {
+		    //Muta Antecedentes. TODO: Solo revisa el primer antecedente
+		    val random2=r.nextInt(12)+RulesValueObjects.genCondicionAValor.getLoci()		    
+  		  ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().flip(random2);		    
+		  }
+		  else
+		  {
+		    //Muta consecuentes
+		    val random2=r.nextInt(12)+RulesValueObjects.genPrediccionValor.getLoci()		    
+  		  ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().flip(random2);		    
+		  }
+		  
+		  ind.setFitness(0d)
+      ind.setPhenotype(null)
+    }
+
+}
+
+
+/**
+ * Operador de Mutación que elige uno de los dos Mutators
+ *
+ * @author ricardo
+ */
+@SerialVersionUID(421103L)
+class RuleRandomMutator(ma:MorphogenesisAgent[BitSet],ge:Genome[BitSet],fe:FitnessEvaluator[BitSet]) extends Mutator[BitSet]{
+    
+    private val r=new Random(System.currentTimeMillis())
+    private val m1=new RuleMutatorSwap(ma,ge,fe);
+    private val m2=new RuleFlipMutator();
+    
+    @throws(classOf[YamikoException])  
+    override def execute(ind:Individual[BitSet])=  {
+      if (ind==null) throw new NullIndividualException("BitSetFlipMutator -> Individuo Null")
+		  val random=r.nextInt(2)
+		  // Decide que mutator usar
+		  if (random==0) m1.execute(ind)
+		  else
+		    if (random==1) m2.execute(ind) 
+    }
+
+}

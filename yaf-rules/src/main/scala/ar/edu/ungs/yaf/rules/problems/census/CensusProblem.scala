@@ -5,7 +5,7 @@ import java.util.BitSet
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-import ar.edu.ungs.yaf.rules.operators.RuleMutatorSwap
+import ar.edu.ungs.yaf.rules.operators.RuleRandomMutator
 import ar.edu.ungs.yaf.rules.toolkit.DrillQueryProvider
 import ar.edu.ungs.yaf.rules.toolkit.RuleAdaptor
 import ar.edu.ungs.yaf.rules.valueObjects.RulesValueObjects
@@ -14,6 +14,7 @@ import ar.edu.ungs.yamiko.ga.domain.Ribosome
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
 import ar.edu.ungs.yamiko.ga.domain.impl.BitSetJavaToIntegerRibosome
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 import ar.edu.ungs.yamiko.ga.operators.Crossover
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
@@ -30,13 +31,13 @@ import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 
 object CensusProblem extends App {
   
-    	val URI_SPARK="local[8]"
-      val MAX_NODES=8
-      val MIGRATION_RATIO=0.05
-      val MAX_GENERATIONS=100
-      val ISOLATED_GENERATIONS=20
+    	val URI_SPARK="local[4]"
+      val MAX_NODES=4
+      val MIGRATION_RATIO=0.1
+      val MAX_GENERATIONS=500
+      val ISOLATED_GENERATIONS=40
       val MAX_TIME_ISOLATED=2000000
-      val POPULATION_SIZE=40
+      val POPULATION_SIZE=60
       		
     	val genes=List( RulesValueObjects.genCondicionACampo,
 //                  		RulesValueObjects.genCondicionAOperador,
@@ -59,8 +60,8 @@ object CensusProblem extends App {
     	val mAgent=new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]]
     	val dataParameter:DataParameter[BitSet]=new CensusRestDataParameter("http://localhost:8080/getCount",new DrillQueryProvider())
     	
-    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.09, 1d, POPULATION_SIZE, new DescendantAcceptEvaluator[BitSet](), 
-        						fev, new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new RuleMutatorSwap(mAgent,genome,fev).asInstanceOf[Mutator[BitSet]], 
+    	val par:Parameter[BitSet]=	new Parameter[BitSet](0.15, 1d, POPULATION_SIZE, new DescendantAcceptEvaluator[BitSet](), 
+        						fev, new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new RuleRandomMutator(mAgent,genome,fev).asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
         						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), MAX_GENERATIONS, 2d,mAgent,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,dataParameter);
 
@@ -79,8 +80,13 @@ object CensusProblem extends App {
 
       mAgent.develop(genome, winner)
       winner.setFitness(fev.execute(winner))
-      println("...And the winner is... (" + RuleAdaptor.adapt(winner,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS).toString() + ") -> " + winner.getFitness());
+      println("...And the winner is... (" + RuleAdaptor.adapt(winner,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS).toString() + ") -> " + winner.getFitness())
       println("...And the winner is... (" + winner.getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + winner.getFitness());
+      
+      ga.finalPopulation.foreach { x =>
+              mAgent.develop(genome, x)
+              x.setFitness(fev.execute(x))
+              println(RuleAdaptor.adapt(x,CensusConstants.CANT_ATTRIBUTES,CensusConstants.CENSUS_FIELDS_MAX_VALUE, CensusConstants.CENSUS_FIELDS_VALUES,CensusConstants.CENSUS_FIELDS_DESCRIPTIONS).toString() + " -> " + x.getFitness()) }
       
 			println("Tiempo -> " + (t2-t1)/1000 + " seg");
 			println("Promedio -> " + ((t2-t1)/(par.getMaxGenerations().toDouble))+ " ms/generacion");
