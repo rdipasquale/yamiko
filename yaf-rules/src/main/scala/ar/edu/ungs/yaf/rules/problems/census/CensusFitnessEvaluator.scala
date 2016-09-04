@@ -6,7 +6,6 @@ import ar.edu.ungs.yaf.rules.toolkit.RuleAdaptor
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 
-
 /**
  * Evaluador de fitness para el problema del censo. El cálculo está basado en la J-measure propuesta por Smith y Goodman, que intenta cuantificar la pertinencia
  * de una regla. Mientras más alto sea el J-measure, mas "interesante" será la regla. |C| es la cantidad de instancias en donde se verifica la parte de la condición
@@ -33,10 +32,33 @@ class CensusFitnessEvaluatorJMeasure() extends FitnessEvaluator[BitSet]{
 		        rule.getCondiciones()(j).getCampo()==rule.getPrediccion().getCampo() ||
 		        rule.getCondiciones()(j+1).getCampo()==rule.getPrediccion().getCampo())
 		      return 0.0000001d
+		   if (len==2)
+		   {
+  		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => 
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(1).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) }
+  		    if (affinity.size>0) return 0.0000001d
+		   }
+		   else
+		   {
+  		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => 
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(1).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(2).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(2).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(2).getCampo())) }
+  		    if (affinity.size>0) return 0.0000001d
+		   }
 		}
 		else
-		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo())
-		    return 0.0000001d
+		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo()) return 0.0000001d
+		  else 
+		  {
+		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo()) }
+		    if (affinity.size>0) return 0.0000001d
+		  }
 		
 		val c=i.getIntAttachment()(0)
 		val cYp=i.getIntAttachment()(1)
@@ -72,11 +94,36 @@ class CensusFitnessEvaluatorInterestingness() extends FitnessEvaluator[BitSet]{
 		        rule.getCondiciones()(j).getCampo()==rule.getPrediccion().getCampo() ||
 		        rule.getCondiciones()(j+1).getCampo()==rule.getPrediccion().getCampo())
 		      return 0.0000001d
+		   if (len==2)
+		   {
+  		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => 
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(1).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) }
+  		    if (affinity.size>0) 
+  		      return 0.0000001d
+		   }
+		   else
+		   {
+  		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => 
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(1).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(2).getCampo()) && x.contains(rule.getPrediccion().getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(2).getCampo()) && x.contains(rule.getCondiciones()(1).getCampo())) ||
+  		      (x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getCondiciones()(2).getCampo())) }
+  		    if (affinity.size>0) 
+  		      return 0.0000001d
+		   }
 		}
 		else
-		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo())
-		    return 0.0000001d
-		      
+		  if (rule.getCondiciones()(0).getCampo()==rule.getPrediccion().getCampo()) return 0.0000001d
+		  else 
+		  {
+		    val affinity=CensusConstants.CENSUS_AFINITY_GROUPS.find { x => x.contains(rule.getCondiciones()(0).getCampo()) && x.contains(rule.getPrediccion().getCampo()) }
+		    if (affinity.size>0) 
+		      return 0.0000001d
+		  }		      
 		val c=i.getIntAttachment()(0)
 		val cYp=i.getIntAttachment()(1)
 		val p=i.getIntAttachment()(2)
@@ -85,7 +132,7 @@ class CensusFitnessEvaluatorInterestingness() extends FitnessEvaluator[BitSet]{
 		val prod2=if(p==0) 0d else cYp.toDouble/p.toDouble
 		val prod3=1d-cYp.toDouble/CensusConstants.CANT_RECORDS.toDouble
 		
-		val salida=prod1*prod2*prod3+(len-1)*0.1 // Modificado
+		val salida=prod1*prod2*prod3+(len-1)*0.001 // Modificado
 		return salida
 	}
 }	

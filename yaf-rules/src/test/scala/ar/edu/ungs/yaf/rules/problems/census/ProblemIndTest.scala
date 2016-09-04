@@ -85,7 +85,7 @@ class ProblemIndTest {
   		for (j<-0 to 100)
   		  i.getGenotype().getChromosomes()(0).getFullRawRepresentation().set(j,false)
   		  
-  		val prob=List(0, 3, 4, 7, 10, 11, 13, 16, 17, 19, 20, 22, 23, 24, 25, 28, 29, 30, 31, 32, 34, 39, 40, 43, 45, 47, 49, 50, 51, 53, 54, 55, 58, 60, 61, 62, 63, 65, 66, 69, 70, 72, 73, 75, 78, 79, 81)
+  		val prob=List(0, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14, 17, 18, 20, 21, 24, 25, 30, 31, 32, 35, 36, 37, 38, 39, 40, 41, 46, 47, 48, 50, 56, 59, 61, 71, 73, 78, 79, 80)
   		for (j<-prob)
   		  i.getGenotype().getChromosomes()(0).getFullRawRepresentation().set(j,true)
 

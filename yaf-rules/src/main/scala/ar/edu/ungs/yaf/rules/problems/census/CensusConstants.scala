@@ -98,16 +98,34 @@ object CensusConstants {
 	 * Descripciones de los campos
 	 */
 	def CENSUS_FIELDS_DESCRIPTIONS:Array[String]=Array[String](
-		"Own Child Indicator","Sex","Age","Hispanic or Latino Origin","White recode",
-		"Black or African American","American Indian and Alaska Native","Asian",
-		"Native Hawaiian and Other Pacific Islander","Some other race","Marital Status",
+		"Own Child Indicator",
+		"Sex",
+		"Age",
+		"Hispanic or Latino Origin",
+		"White recode",
+		"Black or African American",
+		"American Indian and Alaska Native",
+		"Asian",
+		"Native Hawaiian and Other Pacific Islander",
+		"Some other race",
+		"Marital Status",
 		"School Enrollment; Attended since February 1, 2000",
-		"School Enrollment: Grade Level Attending","Educational Attainment",
-		"Non-English Language","English Ability","Place of Birth",
-		"Citizenship Status", "Year of Entry to United States", "Residence 5 Years Ago",
-		"Migration State or Foreign Country Code", "Sensory Disability","Physical Disability",
-		"Mental Disability", "Self-Care Disability", "Able to Go Out Disability",
-		"Employment Disability", "Presence of Grandchildren under 18 years",
+		"School Enrollment: Grade Level Attending",
+		"Educational Attainment",
+		"Non-English Language",
+		"English Ability",
+		"Place of Birth",
+		"Citizenship Status", 
+		"Year of Entry to United States", 
+		"Residence 5 Years Ago",
+		"Migration State or Foreign Country Code", 
+		"Sensory Disability",
+		"Physical Disability",
+		"Mental Disability", 
+		"Self-Care Disability", 
+		"Able to Go Out Disability",
+		"Employment Disability", 
+		"Presence of Grandchildren under 18 years",
 		"Responsible for Grandchildren","Length of Responsibility for Grandchildren",
 		"Military Service", "Veteran’s Period of Service 1: On active duty April 1995 or later",
 		"Veteran’s Period of Service 2: On active duty August 1990 to March 1995 (including Persian Gulf War)",
@@ -508,4 +526,22 @@ object CensusConstants {
 			     (CENSUS_FIELDS.WRKLYR.id, Array[String]("Not in universe (Under 16 years)","Yes","No"))			     		     
 			)	
 
+	  val CENSUS_AFINITY_GROUPS=List( 
+	      List(CENSUS_FIELDS.ENROLL.id,CENSUS_FIELDS.GRADE.id,CENSUS_FIELDS.EDUC.id)
+		    //"School Enrollment; Attended since February 1, 2000","School Enrollment: Grade Level Attending","Educational Attainment",
+	      ,List(CENSUS_FIELDS.GRANDC.id,CENSUS_FIELDS.RSPNSBL.id,CENSUS_FIELDS.HOWLONG.id)
+	      //"Presence of Grandchildren under 18 years","Responsible for Grandchildren","Length of Responsibility for Grandchildren",
+	      ,List(CENSUS_FIELDS.MILTARY.id,CENSUS_FIELDS.VPS1.id,CENSUS_FIELDS.VPS2.id,CENSUS_FIELDS.VPS3.id,CENSUS_FIELDS.VPS4.id,CENSUS_FIELDS.VPS5.id,CENSUS_FIELDS.VPS6.id,CENSUS_FIELDS.VPS7.id,CENSUS_FIELDS.VPS8.id,CENSUS_FIELDS.VPS9.id,CENSUS_FIELDS.MILYRS.id,CENSUS_FIELDS.VPSR.id)
+        //		"Military Service", "Veteran’s Period of Service 1: On active duty April 1995 or later",
+        //		"Veteran’s Period of Service 2: On active duty August 1990 to March 1995 (including Persian Gulf War)",
+        //		"Veteran’s Period of Service 3: On active duty September 1980 to July 1990",
+        //		"Veteran’s Period of Service 4: On active duty May 1975 to August 1980",
+        //		"Veteran’s Period of Service 5: On active duty during the Vietnam Era (August 1964 to April 1975)",
+        //		"Veteran’s Period of Service 6: On active duty February 1955 to July 1964",
+        //		"Veteran’s Period of Service 7: On active duty during the Korean War (June 1950 to January 1955)",
+        //		"Veteran’s Period of Service 8: On active duty during World War II (September 1940 to July 1947)",
+        //		"Veteran’s Period of Service 9: On active duty any other time"	,
+        //		"Years of Military Service", "Veteran’s Period of Service",
+	          
+	      )
 }
