@@ -542,6 +542,7 @@ object CensusConstants {
         //		"Veteran’s Period of Service 8: On active duty during World War II (September 1940 to July 1947)",
         //		"Veteran’s Period of Service 9: On active duty any other time"	,
         //		"Years of Military Service", "Veteran’s Period of Service",
-	          
-	      )
+			  ,List(CENSUS_FIELDS.LAYOFF.id,CENSUS_FIELDS.ABSENT.id,CENSUS_FIELDS.RECALL.id,CENSUS_FIELDS.LOOKWRK.id,CENSUS_FIELDS.BACKWRK.id,CENSUS_FIELDS.LASTWRK.id)
+	      //"Layoff from Job","Absent from Work","Return-to-Work Recall","Looking for Work","Back to Work","Year Last Worked"          
+	  )
 }

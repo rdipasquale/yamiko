@@ -31,13 +31,13 @@ import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelIslandsGA
 
 object CensusProblem extends App {
   
-    	val URI_SPARK="local[8]"
-      val MAX_NODES=8
+    	val URI_SPARK="local[4]"
+      val MAX_NODES=4
       val MIGRATION_RATIO=0.05
       val MAX_GENERATIONS=10000
       val ISOLATED_GENERATIONS=200
       val MAX_TIME_ISOLATED=2000000
-      val POPULATION_SIZE=200
+      val POPULATION_SIZE=400
       		
     	val genes=List( RulesValueObjects.genCondicionACampo,
                   		RulesValueObjects.genCondicionAValor,
