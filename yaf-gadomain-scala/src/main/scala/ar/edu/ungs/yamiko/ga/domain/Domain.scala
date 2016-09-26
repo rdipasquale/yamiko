@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
  * 
  * @version 1.0
  * @author ricardo
- * @created 08-Oct-2013 11:38:35 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:38:35 p.m.
  * @param [T]
  */
 @SerialVersionUID(10002L)
@@ -35,7 +35,7 @@ trait Chromosome[T] extends Serializable{
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:39:23 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:39:23 p.m.
  * @param [T]
  */
 @SerialVersionUID(10003L)
@@ -117,11 +117,10 @@ trait Ribosome[T]  extends Serializable{
 
 /**
  * Representa una población de individuos.
- * @TODO: Revisar concepto, dado que en una ejecución con una cantidad muy grande de individuos, va a atentar contra el paralelismo. 
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:39:38 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:39:38 p.m.
  * @param [T]
  */
 @SerialVersionUID(10001L)
@@ -170,7 +169,7 @@ trait Phenotype[T]  extends Serializable{
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:39:34 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:39:34 p.m.
  * @param [T]
  */
 @SerialVersionUID(10007L)
@@ -192,7 +191,7 @@ trait Individual[T]  extends Serializable{
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:39:29 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:39:29 p.m.
  * @param [T]
  */
 @SerialVersionUID(10008L)

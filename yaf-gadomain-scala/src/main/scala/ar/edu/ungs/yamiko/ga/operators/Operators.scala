@@ -10,7 +10,7 @@ import ar.edu.ungs.yamiko.ga.domain.Genome
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:40:56 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:40:56 p.m.
  * @param [T]
  */
 @SerialVersionUID(12001L)
@@ -34,7 +34,7 @@ trait AcceptEvaluator[T] extends Serializable{
  * 
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:40:56 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:40:56 p.m.
  * @param [T]
  */
 @SerialVersionUID(12003L)
@@ -45,7 +45,6 @@ trait Crossover[T]  extends Serializable{
 	 * 
 	 * @param individuals	-] Padres
 	 * @return				-] List[Individual[T]] 
-	 * @throws YamikoException
 	 */
 	def execute(individuals:List[Individual[T]]):List[Individual[T]] 
 
@@ -58,7 +57,7 @@ trait Crossover[T]  extends Serializable{
  *  
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:40:56 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:40:56 p.m.
  * @param [T]
  */
 @SerialVersionUID(12005L)
@@ -80,7 +79,7 @@ trait FitnessEvaluator[T]  extends Serializable{
  *  
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:40:56 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:40:56 p.m.
  * @param [T]
  */
 @SerialVersionUID(12007L)
@@ -91,7 +90,6 @@ trait MorphogenesisAgent[T] extends Serializable{
 	 * 
 	 * @param genome	-] Genoma correspondiente
 	 * @param ind		-] Individuo
-	 * @throws YamikoException
 	 */
 	def develop(genome:Genome[T], ind:Individual[T])
 
@@ -106,7 +104,7 @@ trait MorphogenesisAgent[T] extends Serializable{
  *  
  * @author ricardo
  * @version 1.0
- * @created 08-Oct-2013 11:40:56 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:40:56 p.m.
  * @param [T]
  */
 @SerialVersionUID(12009L)
@@ -116,7 +114,6 @@ trait Mutator[T]  extends Serializable{
 	 * Ejecuta la mutación del genotipo de un individuo i. No modifica su fenotipo, dado que no debería estar desarrollado.
 	 * 
 	 * @param i
-	 * @throws YamikoException
 	 */
 	def execute(i:Individual[T])
 
@@ -152,7 +149,7 @@ trait PopulationInitializer[T] extends Serializable {
  * Operador de Selección de individuos de una población para ser sometidos a una operación genética como el crossover.
  * 
  * @version 1.0
- * @created 08-Oct-2013 11:41:32 p.m.
+ * <br>Fecha Primera Version:  08-Oct-2013 11:41:32 p.m.
  * @author ricardo
  */
 @SerialVersionUID(12013L)
