@@ -116,10 +116,10 @@
 <!-- 		<scope>runtime</scope> -->
 <!--     </dependency>	 -->
 	
-<!-- 	<dependency> -->
-<!-- 		<groupId>com.zaxxer</groupId> -->
-<!-- 		<artifactId>HikariCP</artifactId> -->
-<!-- 	</dependency> -->
+	<dependency>
+		<groupId>com.zaxxer</groupId>
+		<artifactId>HikariCP</artifactId>
+	</dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
@@ -166,17 +166,28 @@
 <!--        <artifactId>spring-jdbc</artifactId> -->
 <!--      </dependency> -->
      
-	<dependency>
-	    <groupId>org.apache.drill.exec</groupId>
-	    <artifactId>drill-jdbc-all</artifactId>
-	    <version>1.7.0</version>
-	      <exclusions>
-	      	<exclusion>
-	      		<artifactId>log4j-over-slf4j</artifactId>
-	      		<groupId>org.slf4j</groupId>
-	      	</exclusion>
-	      </exclusions>
-	</dependency>	
+<!-- 	<dependency> -->
+<!-- 	    <groupId>org.apache.drill.exec</groupId> -->
+<!-- 	    <artifactId>drill-jdbc-all</artifactId> -->
+<!-- 	    <version>1.9.0</version> -->
+<!-- 	      <exclusions> -->
+<!-- 	      	<exclusion> -->
+<!-- 	      		<artifactId>log4j-over-slf4j</artifactId> -->
+<!-- 	      		<groupId>org.slf4j</groupId> -->
+<!-- 	      	</exclusion> -->
+<!-- 	      </exclusions> -->
+<!-- 	</dependency>	 -->
+<!-- 	<dependency> -->
+<!-- 	    <groupId>org.apache.drill.exec</groupId> -->
+<!-- 	    <artifactId>drill-jdbc</artifactId> -->
+<!-- 	    <version>1.9.0</version> -->
+<!-- 	      <exclusions> -->
+<!-- 	      	<exclusion> -->
+<!-- 	      		<artifactId>log4j-over-slf4j</artifactId> -->
+<!-- 	      		<groupId>org.slf4j</groupId> -->
+<!-- 	      	</exclusion> -->
+<!-- 	      </exclusions> -->
+<!-- 	</dependency> -->
 
 <!-- 	<dependency> -->
 <!-- 	    <groupId>org.apache.commons</groupId> -->
