@@ -12,7 +12,7 @@ trait VMG extends Serializable{
   def getSpeed(angle:Int, windspeed:Int):Double
   
   /**
-   * Busca en el polar correspondiente a la velocidad pasada como parámetro, la velocidad más alta. Devuelve un par ordenado con el ángulo y la velocidad
+   * Busca en el polar correspondiente a la velocidad de viento pasada como parámetro, el ángulo (y la velocidad del barco) más alta. Devuelve un par ordenado con el ángulo y la velocidad
    */
   def getMaxSpeed(windspeed:Int):(Int,Double)
   
