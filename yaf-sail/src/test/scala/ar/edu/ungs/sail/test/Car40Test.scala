@@ -1,4 +1,4 @@
-package ar.edu.ungs.yaf.rules.problems.census
+package ar.edu.ungs.sail.test
 
 import org.junit.Assert._
 import org.scalatest.junit.AssertionsForJUnit
@@ -29,13 +29,30 @@ class Car40Test {
   	@Test
   	def testInValidValues = {
       assertEquals(vmg.getSpeed(31, 18),0d,0.001d);
-      assertEquals(vmg.getSpeed(360, 11),5.2,0.001d);
+      assertEquals(vmg.getSpeed(360, 11),0d,0.001d);
       assertEquals(vmg.getSpeed(179, 35),12d,0.001d);
       assertEquals(vmg.getSpeed(44, 35),6.7,0.001d);
       assertEquals(vmg.getSpeed(46, 35),6.7,0.001d);
       assertEquals(vmg.getSpeed(270, 4),4.5,0.001d);
   	}	
-  	
+
+  	@Test
+  	def testMaxSpeed = {
+      assertEquals(vmg.getMaxSpeed(35),(156,14.3));
+      assertEquals(vmg.getMaxSpeed(200),(156,14.3));
+  	}	
+
 }
+
+
+
+
+
+
+
+
+
+
+
 
 

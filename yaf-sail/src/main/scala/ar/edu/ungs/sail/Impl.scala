@@ -162,7 +162,7 @@ class Carr40 extends VMG{
       var an:Int=angle
       if (an<32) return 0d;
       if (ws>35) ws=35;
-      if (ws<4) ws=4;
+      if (ws<4) return 0d;
       ws=ws-4;
       if (an>360) an=an % 360;
       if (an>180) an=360-an
@@ -172,7 +172,7 @@ class Carr40 extends VMG{
   override def getMaxSpeed(windspeed:Int):(Int,Double)={
       var ws:Int=windspeed
       if (ws>35) ws=35;
-      if (ws<4) ws=4;
+      if (ws<4) return (0,0d)
       ws=ws-4;
       var i:Int=0
       var angle:Int=0
