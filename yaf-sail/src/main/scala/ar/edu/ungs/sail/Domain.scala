@@ -31,6 +31,8 @@ trait Cancha extends Serializable{
   def getNodosPorCelda():Int
   def getMetrosPorLadoCelda():Int
   def getNodos():List[Nodo]
-  def getArcos():List[WUnDiEdge[Nodo]]  
+  def getArcos():List[WUnDiEdge[Nodo]]
+  def getNodoInicial():Nodo
+  def getNodoFinal():Nodo
 }
 
