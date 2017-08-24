@@ -19,17 +19,30 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
   for (x <- 0 to dimension*nodosPorCelda-1)
     for (y <- 0 to dimension*nodosPorCelda-1)      
       if(x==0 || (x+1)%dimension==0 || y==0 || (y+1)%dimension==0 )
-        nodos+=new Nodo("("+x+")"+"("+y+")",armarCuadrantes(x, y));
+        MANIOBRAS.values.foreach(m => nodos+=new Nodo("("+x+")"+"("+y+")-"+m.id,armarCuadrantes(x, y),m))
+        
 	
   for (x <- 0 to dimension-1)
     for (y <- 0 to dimension-1)     
-      ((nodos.filter(p=>p.cuadrante.contains((x,y))).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l)))
+      MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )
+  
+      
+  val nodoInicial:Nodo=new Nodo("Inicial",List((0,0)),null)
+  val nodoFinal:Nodo=new Nodo("Final",List((3,3)),null)
+  nodos+=nodoInicial
+  nodos+=nodoFinal
+  MANIOBRAS.values.foreach(m => {
+    val kkk=nodos.filter(p=> {
+      p.getManiobra().equals(m) && p.getId().startsWith("(0)(1)")
+    })
+    val kkk2=nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(3)(9)"))
+    arcos+=WUnDiEdge(nodoInicial,nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(0)(1)"))(0))(0)
+    arcos+=WUnDiEdge(nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(3)(9)"))(0),nodoInicial)(0)
+  })
   
   val vertex=nodos.toList
   val edges=arcos.toList
-  
-  val nodoFinal:Nodo=nodos.filter(p=>p.id.equals("(3)(9)"))(0)
-  val nodoInicial:Nodo=nodos.filter(p=>p.id.equals("(0)(1)"))(0)
+
   val graph=Graph.from(vertex, edges)
   
   private def armarCuadrantes(x:Int,y:Int):List[(Int,Int)]={

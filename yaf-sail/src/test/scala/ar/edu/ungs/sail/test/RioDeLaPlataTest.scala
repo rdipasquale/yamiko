@@ -19,9 +19,9 @@ class RioDeLaPlataTest {
   	
   	@Test
   	def testValidCancha = {  	  
-      assertEquals(135,rioDeLaPlata.getNodos().count(p=>true))
-      assertEquals("(0)(1)",rioDeLaPlata.getNodoInicial().id)
-      assertEquals("(3)(9)",rioDeLaPlata.getNodoFinal().id)
+      assertEquals(135*4+2,rioDeLaPlata.getNodos().count(p=>true))
+      assertEquals("Inicial",rioDeLaPlata.getNodoInicial().getId())
+      assertEquals("final",rioDeLaPlata.getNodoFinal().getId())
       //assertEquals(16*66,rioDeLaPlata.getArcos().count(p=>true))
   	}	
 
