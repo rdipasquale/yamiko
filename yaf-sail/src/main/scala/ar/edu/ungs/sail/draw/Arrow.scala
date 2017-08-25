@@ -17,7 +17,7 @@ class Arrow(percentLength:Double,angle:Double,cuadrant:(Int,Int),g:Graphics2D,ca
       // 4. translate it to the center of the component
        val xCuadrante=cuadrant._1*canvas.getWidth()/n
        val yCuadrante=(n-cuadrant._2-1)*canvas.getHeight()/n
-      val centerX=10+(Math.abs(Math.sin(angle*Math.PI/180))*canvas.getWidth()/(2*n)).intValue()
+      val centerX=(image.getWidth()*0.4).intValue()+(Math.abs(Math.sin(angle*Math.PI/180))*canvas.getWidth()/(2*n)).intValue()
       val centerY=10+(Math.abs(Math.cos(angle*Math.PI/180))*canvas.getHeight()/(2*n)).intValue()
       at.translate(xCuadrante+centerX,yCuadrante +centerY)
 //      at.translate(image.getWidth/2,image.getHeight/2);
