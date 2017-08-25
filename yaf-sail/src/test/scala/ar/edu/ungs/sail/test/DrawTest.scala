@@ -18,6 +18,7 @@ import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.Image
 import ar.edu.ungs.sail.draw.Arrow
+import ar.edu.ungs.sail.draw.Graficador
 
 @Test
 class DrawTest {
@@ -26,6 +27,30 @@ class DrawTest {
   	def setUp()=
   	{
   	} 
+  	
+    @Test
+  	def testDrawGraficador = {
+
+      val vientos=Array(  ((0,0),125,60),((0,1),135,70),((0,2),145,80),((0,3),150,90),
+                    ((1,0),115,50),((1,1),125,40),((1,2),145,30),((1,3),10,90),
+                    ((2,0),95,60),((2,1),105,50),((2,2),115,40),((2,3),110,30),
+                    ((3,0),90,35),((3,1),100,45),((3,2),190,45),((3,3),210,40)
+                    )
+
+      val g:Graficador=new Graficador()
+      
+      assert(g.draw(4, 4, vientos, "drawing.png"))
+      
+    }
+    
+  	
+    @Test
+  	def testDrawGraficadorSinVientos = {
+
+      val g:Graficador=new Graficador()
+      assert(g.draw(4, 4, null, "drawing.png"))
+      
+    }    
   	
     @Test
   	def testDraw = {  
