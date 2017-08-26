@@ -6,7 +6,7 @@ import scala.collection.mutable.ListBuffer
 import scalax.collection.edge.WUnDiEdge
 
 @SerialVersionUID(1L)
-class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda:Int) extends Cancha
+class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda:Int,nodoInicial:Nodo,nodoFinal:Nodo) extends Cancha
 {
   val dimension=_dimension
   val nodosPorCelda=_nodosPorCelda
@@ -26,18 +26,15 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
     for (y <- 0 to dimension-1)     
       MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )
   
+  val strNodoInicial=nodoInicial.getId().substring(nodoInicial.getId().indexOf("("))
+  val strNodoFinal=nodoFinal.getId().substring(nodoFinal.getId().indexOf("("))
       
-  val nodoInicial:Nodo=new Nodo("Inicial",List((0,0)),null)
-  val nodoFinal:Nodo=new Nodo("Final",List((3,3)),null)
   nodos+=nodoInicial
   nodos+=nodoFinal
+  
   MANIOBRAS.values.foreach(m => {
-    val kkk=nodos.filter(p=> {
-      p.getManiobra().equals(m) && p.getId().startsWith("(0)(1)")
-    })
-    val kkk2=nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(3)(9)"))
-    arcos+=WUnDiEdge(nodoInicial,nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(0)(1)"))(0))(0)
-    arcos+=WUnDiEdge(nodos.filter(p=>p.getManiobra().equals(m) && p.getId().startsWith("(3)(9)"))(0),nodoInicial)(0)
+    arcos+=WUnDiEdge(nodoInicial,nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getId().startsWith(strNodoInicial))(0))(0)
+    arcos+=WUnDiEdge(nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getId().startsWith(strNodoFinal))(0),nodoFinal)(0)
   })
   
   val vertex=nodos.toList

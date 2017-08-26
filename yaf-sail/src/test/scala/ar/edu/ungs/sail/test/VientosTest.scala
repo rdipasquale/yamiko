@@ -24,6 +24,9 @@ import ar.edu.ungs.serialization.Serializador
 import ar.edu.ungs.serialization.Deserializador
 import scala.util.Random
 import ar.edu.ungs.sail.simulation.WindSimulation
+import ar.edu.ungs.sail.Cancha
+import ar.edu.ungs.sail.CanchaRioDeLaPlata
+import ar.edu.ungs.sail.Nodo
 
 @Test
 class VientosTest {
@@ -58,12 +61,21 @@ class VientosTest {
 
     @Test
     def generarEstadoInicial={
-          val ws=new WindSimulation()
-          val salida=ws.generarEstadoInicial(50, 270, 14, 6, 3)
+          val salida=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
           Serializador.run("estadoInicial.winds", salida)
           Graficador.draw(50, 4, salida, "estadoInicial.png", 35)
           assert(true)
     }
 
+    @Test
+    def simular4x4SinRafagas={
+      val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo("Final - (3)(9)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
+      val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 6, 3)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 12, 3, 2, 1, 1, false)
+      Serializador.run("escenario4x4.winds", salida)
+      salida.foreach(f=>Graficador.draw(4, 4, f._2, "escenario4x4_t" + f._1 + ".png", 35))
+    }
 
 }      

@@ -2,12 +2,13 @@ package ar.edu.ungs.sail.simulation
 
 import scala.util.Random
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.sail.Cancha
 
 /**
  * Simulacion de vientos.
  * Estructura para vientos: Celda x Angulo x Velocidad x Momento [((Int, Int), Int, Int,Int)]
  */
-class WindSimulation {
+object WindSimulation extends Serializable {
 
   /**
    * Genera un estado inicial posible
@@ -51,12 +52,44 @@ class WindSimulation {
   /**
    * Simula un flujo de vientos para una cancha determinada
    */
-  def simular(estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,rafagas:Boolean):List[(Int,List[((Int, Int), Int, Int, Int)])]={
+  def simular(cancha:Cancha,estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,meanAngleMod:Double, meanSpeedMod:Double,devAngleMod:Double, devSpeedMod:Double,rafagas:Boolean):List[(Int,List[((Int, Int), Int, Int, Int)])]={
     var salida:ListBuffer[(Int,List[((Int, Int), Int, Int, Int)])]=ListBuffer((0,estadoInicial))
+    var estadoAnterior:List[((Int, Int), Int, Int, Int)]=estadoInicial
     for (t<-1 to tiempoMax){
       var estadoNuevo:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
+      
+      // 1) Agrego los puntos seleccionados para ser mutados al azar (y de paso los muto) cuya cantidad será un pseudoaleatorio gaussiano con media en el 8% de las celdas y stddev del 2% (minimo 4 celdas)      
+      val cantPuntosAMutar:Int=Math.max(4, (Random.nextGaussian()*0.02*(cancha.getDimension()^2)+0.08*(cancha.getDimension()^2)).intValue())
+      1 to cantPuntosAMutar foreach{_=>{
+        val seleccionado=Random.nextInt(estadoAnterior.length)
+        estadoNuevo+=((estadoAnterior(seleccionado)._1,
+                      estadoAnterior(seleccionado)._2+(Random.nextGaussian()*devAngleMod+meanAngleMod).intValue(),
+                      estadoAnterior(seleccionado)._3+(Random.nextGaussian()*devSpeedMod+meanSpeedMod).intValue(),
+                      t))}
+      }
+
+      // Mientras no esté completo el estado nuevo
+      while(estadoNuevo.length<(cancha.getDimension()^2))
+      {
+        var aux:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
+        // 2) Selecciono los vecinos de los puntos seleccionados en el punto anterios
+        estadoNuevo.foreach(f=>aux++=estadoAnterior.filter(p=>Math.abs(p._1._1-f._1._1)==1 && Math.abs(p._1._2-f._1._2)==1))
+        // 3) Ls muto en función de todos los vecinos que encuentre
+        aux.foreach(f=> {
+          val vecinosNuevos=estadoNuevo.filter(p=>Math.abs(p._1._1-f._1._1)==1 && Math.abs(p._1._2-f._1._2)==1)
+          val avgAng=(vecinosNuevos.map(b=>b._2).sum)/vecinosNuevos.length.toDouble
+          val avgSpeed=(vecinosNuevos.map(b=>b._3).sum)/vecinosNuevos.length.toDouble
+          estadoNuevo+=((f._1,
+                        f._2+((Random.nextGaussian()*devAngleMod+meanAngleMod)*0.25+0.75*(avgAng-f._2)).intValue(),
+                        f._3+((Random.nextGaussian()*devSpeedMod+meanSpeedMod)*0.25+0.75*(avgSpeed-f._2)).intValue(),
+                        t))          
+        })
+      }
+
       salida+=((t,estadoNuevo.toList))
+      estadoAnterior=estadoNuevo.toList
     }
+    
     salida.toList
   }
   
