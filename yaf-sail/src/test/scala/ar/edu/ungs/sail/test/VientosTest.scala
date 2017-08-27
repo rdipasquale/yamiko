@@ -80,6 +80,17 @@ class VientosTest {
     }
     
     @Test
+    def simular4x4ConRachas={
+      val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
+      val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 6, 3)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 50, 0, 0, 5, 2,  10,true,150,150,40,14,true,null)
+      Serializador.run("escenario4x4ConRachas.winds", salida)
+      salida.foreach(f=>Graficador.draw(4, 4, f._2, "escenario4x4ConRachas_t" + f._1 + ".png", 35))
+    }    
+    
+    @Test
     def simular50x50SinRafagas={
       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)

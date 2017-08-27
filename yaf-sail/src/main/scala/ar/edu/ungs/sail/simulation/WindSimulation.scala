@@ -126,25 +126,25 @@ object WindSimulation extends Serializable {
               var colaCeldasAux:ListBuffer[(Int,Int)]=ListBuffer()            
               colaCeldas.foreach(celda=>{
                 val celdaVieja=estadoNuevo.filter(p=>p._1._1==celda._1 && p._1._2==celda._2)(0)
-                val celdaNueva=((celdaVieja._1,celdaVieja._2-anguloDesvioRacha,Math.round(celdaVieja._3+celdaVieja._3*aumentoPorcentualViento/100-((i-1)*(celdaVieja._3*aumentoPorcentualViento/100)/(longitudRachaCeldas+2))).intValue(),t)) 
+                val celdaNueva=((celdaVieja._1,celdaVieja._2-anguloDesvioRacha,Math.min(35,Math.round(celdaVieja._3+celdaVieja._3*aumentoPorcentualViento/100-((i-1)*(celdaVieja._3*aumentoPorcentualViento/100)/(longitudRachaCeldas+2))).intValue()),t)) 
                 celdasRemover+=celdaVieja
                 celdasAgregar+=celdaNueva
-                if (celdaNueva._2>=330 || celdaNueva._2<30) if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                if (celdaNueva._2>=330 || celdaNueva._2<30) {if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))}
                   else  if (celdaNueva._2>=30 && celdaNueva._2<60){
                             if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
                             if (celda._1<cancha.getDimension()-1 || celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2+1))
                             if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))                                                        
-                  }  else if (celdaNueva._2>=60 && celdaNueva._2<120) if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
+                  }  else if (celdaNueva._2>=60 && celdaNueva._2<120) {if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))}
                         else if (celdaNueva._2>=120 && celdaNueva._2<150){
                             if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
                             if (celda._1<cancha.getDimension()-1 || celda._2>0) colaCeldasAux+=((celda._1+1,celda._2-1))
                             if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))                          
-                        }  else if (celdaNueva._2>=150 && celdaNueva._2<210) if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
+                        }  else if (celdaNueva._2>=150 && celdaNueva._2<210) {if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))}
                               else if (celdaNueva._2>=210 && celdaNueva._2<240){
                                   if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
                                   if (celda._1>0 && celda._2>0) colaCeldasAux+=((celda._1-1,celda._2-1))
                                   if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))                          
-                              }  else if (celdaNueva._2>=240 && celdaNueva._2<300) if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
+                              }  else if (celdaNueva._2>=240 && celdaNueva._2<300) {if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))}
                                     else if (celdaNueva._2>=300 && celdaNueva._2<330){
                                       if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
                                       if (celda._1>0 && celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1-1,celda._2+1))
