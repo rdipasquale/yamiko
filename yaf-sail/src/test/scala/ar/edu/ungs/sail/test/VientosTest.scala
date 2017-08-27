@@ -27,6 +27,7 @@ import ar.edu.ungs.sail.simulation.WindSimulation
 import ar.edu.ungs.sail.Cancha
 import ar.edu.ungs.sail.CanchaRioDeLaPlata
 import ar.edu.ungs.sail.Nodo
+import ar.edu.ungs.serialization.SerializadorEscenario
 
 @Test
 class VientosTest {
@@ -70,12 +71,34 @@ class VientosTest {
     @Test
     def simular4x4SinRafagas={
       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo("Final - (3)(9)",List((3,3)),null)
+      val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
       val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 6, 3)
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 12, 3, 2, 1, 1, false)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 12, 0, 0, 5, 2, false)
       Serializador.run("escenario4x4.winds", salida)
       salida.foreach(f=>Graficador.draw(4, 4, f._2, "escenario4x4_t" + f._1 + ".png", 35))
     }
+    
+    @Test
+    def simular50x50SinRafagas={
+      val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal);
+      val t0=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 200, 0, 0, 5, 2, false)
+      Serializador.run("escenario50x50.winds", salida)
+      salida.foreach(f=>Graficador.draw(50, 4, f._2, "escenario50x50_t" + f._1 + ".png", 35))
+    }  
+    
+    @Test
+    def simular50x50TextFile={
+      val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal);
+      val t0=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 150, 0, 0, 5, 2, false)
+      SerializadorEscenario.run("escenario50x50.txt", "1",salida)
+      salida.foreach(f=>Graficador.draw(50, 4, f._2, "escenario50x50_t" + f._1 + ".png", 35))
+    }    
 
 }      

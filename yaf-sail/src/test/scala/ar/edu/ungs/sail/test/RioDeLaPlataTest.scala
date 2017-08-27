@@ -12,7 +12,7 @@ import ar.edu.ungs.sail.Nodo
 class RioDeLaPlataTest {
 
     val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
-    val nodoFinal:Nodo=new Nodo("Final - (3)(9)",List((3,3)),null)
+    val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
     val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
     
   	@Before
