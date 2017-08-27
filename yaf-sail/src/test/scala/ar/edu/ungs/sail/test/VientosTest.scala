@@ -74,7 +74,7 @@ class VientosTest {
       val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
       val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 6, 3)
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 12, 0, 0, 5, 2, false)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 12, 0, 0, 5, 2,  10,false,0,0,0,0,false,null)
       Serializador.run("escenario4x4.winds", salida)
       salida.foreach(f=>Graficador.draw(4, 4, f._2, "escenario4x4_t" + f._1 + ".png", 35))
     }
@@ -85,7 +85,7 @@ class VientosTest {
       val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal);
       val t0=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 200, 0, 0, 5, 2, false)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 200, 0, 0, 5, 2,  10,false,0,0,0,0,false,null)
       Serializador.run("escenario50x50.winds", salida)
       salida.foreach(f=>Graficador.draw(50, 4, f._2, "escenario50x50_t" + f._1 + ".png", 35))
     }  
@@ -96,7 +96,7 @@ class VientosTest {
       val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal);
       val t0=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 150, 0, 0, 5, 2, false)
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 150, 0, 0, 5, 2,  10,false,0,0,0,0,false,null)
       SerializadorEscenario.run("escenario50x50.txt", "1",salida)
       salida.foreach(f=>Graficador.draw(50, 4, f._2, "escenario50x50_t" + f._1 + ".png", 35))
     }    

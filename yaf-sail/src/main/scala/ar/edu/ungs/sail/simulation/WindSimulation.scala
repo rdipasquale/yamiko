@@ -52,7 +52,9 @@ object WindSimulation extends Serializable {
   /**
    * Simula un flujo de vientos para una cancha determinada
    */
-  def simular(cancha:Cancha,estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,meanAngleMod:Double, meanSpeedMod:Double,devAngleMod:Double, devSpeedMod:Double,rafagas:Boolean):List[(Int,List[((Int, Int), Int, Int, Int)])]={
+  def simular(cancha:Cancha,estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,meanAngleMod:Double, meanSpeedMod:Double,devAngleMod:Double, devSpeedMod:Double,tiempoMedioPorIntervaloTSeg:Int, racha:Boolean,tiempoMedioEntreRachasSeg:Int,longitudMediaRacha:Int, aumentoMedioVientoBaseRacha:Int,anguloDesvioMedioRacha:Int,probRachaUniforme:Boolean,probabilidadesRacha:Array[Array[Int]]):List[(Int,List[((Int, Int), Int, Int, Int)])]={
+
+    var ultimaRacha:Int=0
     var salida:ListBuffer[(Int,List[((Int, Int), Int, Int, Int)])]=ListBuffer((0,estadoInicial))
     var estadoAnterior:List[((Int, Int), Int, Int, Int)]=estadoInicial
     for (t<-1 to tiempoMax){
@@ -86,6 +88,74 @@ object WindSimulation extends Serializable {
                         f._3+((Random.nextGaussian()*devSpeedMod+meanSpeedMod)*0.25+0.75*(avgSpeed-f._3)).intValue(),
                         t))          
         })
+      }
+      
+      // 4) Si el modelo Admite Rachas
+      if (racha)
+      {
+        // 5) Evaluo la probabilidad de que haya una racha en el tiempo actual        
+        val tiempoDesdeUltimaRacha=(t-ultimaRacha)*tiempoMedioPorIntervaloTSeg
+        val razonTiempos=tiempoDesdeUltimaRacha/tiempoMedioEntreRachasSeg
+        val umbralProb=(if (razonTiempos>0.9)0.9 else razonTiempos)
+        if (Random.nextDouble()<umbralProb)
+        {
+          ultimaRacha=t
+          val longitudRachaMetros=Math.abs(Random.nextGaussian()*longitudMediaRacha/3+longitudMediaRacha)
+          val longitudRachaCeldas=Math.round(longitudRachaMetros/cancha.getMetrosPorLadoCelda()).intValue()
+          val anguloDesvioRacha=Math.round(Random.nextGaussian()*anguloDesvioMedioRacha/3+anguloDesvioMedioRacha).intValue()
+          val aumentoPorcentualViento=Random.nextGaussian()*aumentoMedioVientoBaseRacha/3+aumentoMedioVientoBaseRacha
+
+          // 6) Determino donde caerá la racha
+          var xRacha:Int=0
+          var yRacha:Int=0
+          if (probRachaUniforme)
+          {
+            xRacha=Random.nextInt(cancha.getDimension())
+            yRacha=Random.nextInt(cancha.getDimension())
+          }
+          else
+          {
+            
+          }
+          
+          // 7) Calculo la turbulencia provocada porla racha
+          var colaCeldas:ListBuffer[(Int,Int)]=ListBuffer((xRacha,yRacha))
+          val celdasRemover:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
+          val celdasAgregar:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()          
+          1 to longitudRachaCeldas foreach(i=>{
+              var colaCeldasAux:ListBuffer[(Int,Int)]=ListBuffer()            
+              colaCeldas.foreach(celda=>{
+                val celdaVieja=estadoNuevo.filter(p=>p._1._1==celda._1 && p._1._2==celda._2)(0)
+                val celdaNueva=((celdaVieja._1,celdaVieja._2-anguloDesvioRacha,Math.round(celdaVieja._3+celdaVieja._3*aumentoPorcentualViento/100-((i-1)*(celdaVieja._3*aumentoPorcentualViento/100)/(longitudRachaCeldas+2))).intValue(),t)) 
+                celdasRemover+=celdaVieja
+                celdasAgregar+=celdaNueva
+                if (celdaNueva._2>=330 || celdaNueva._2<30) if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                  else  if (celdaNueva._2>=30 && celdaNueva._2<60){
+                            if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                            if (celda._1<cancha.getDimension()-1 || celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2+1))
+                            if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))                                                        
+                  }  else if (celdaNueva._2>=60 && celdaNueva._2<120) if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
+                        else if (celdaNueva._2>=120 && celdaNueva._2<150){
+                            if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
+                            if (celda._1<cancha.getDimension()-1 || celda._2>0) colaCeldasAux+=((celda._1+1,celda._2-1))
+                            if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))                          
+                        }  else if (celdaNueva._2>=150 && celdaNueva._2<210) if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
+                              else if (celdaNueva._2>=210 && celdaNueva._2<240){
+                                  if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
+                                  if (celda._1>0 && celda._2>0) colaCeldasAux+=((celda._1-1,celda._2-1))
+                                  if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))                          
+                              }  else if (celdaNueva._2>=240 && celdaNueva._2<300) if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
+                                    else if (celdaNueva._2>=300 && celdaNueva._2<330){
+                                      if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
+                                      if (celda._1>0 && celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1-1,celda._2+1))
+                                      if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                                    }
+              })
+            colaCeldas=colaCeldasAux
+          })          
+          celdasRemover.foreach(f=>estadoNuevo-=f)
+          estadoNuevo++=celdasAgregar
+        }
       }
 
       salida+=((t,estadoNuevo.toList))
