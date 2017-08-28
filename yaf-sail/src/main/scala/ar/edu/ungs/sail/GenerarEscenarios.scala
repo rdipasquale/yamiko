@@ -25,8 +25,8 @@ object ProbRachasNoUniformes50x50 {
 object GenerarEscenarios extends App {
   
   override def main(args : Array[String]) {
-      val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo("Final - (195)(199)",List((3,3)),null)
+      val nodoInicial:Nodo=new Nodo(0,0,"Inicial - (0)(1)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(0,0,"Final - (195)(199)",List((3,3)),null)
 //      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
       
       // Generar estado inicial
