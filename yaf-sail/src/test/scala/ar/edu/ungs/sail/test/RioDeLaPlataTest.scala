@@ -13,7 +13,7 @@ class RioDeLaPlataTest {
 
     val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
     val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
-    val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal);
+    val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
     
   	@Before
   	def setUp()=

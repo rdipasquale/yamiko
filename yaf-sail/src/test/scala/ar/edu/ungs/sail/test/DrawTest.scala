@@ -20,6 +20,9 @@ import java.awt.Image
 import ar.edu.ungs.sail.draw.Arrow
 import ar.edu.ungs.sail.draw.Graficador
 import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.sail.Nodo
+import ar.edu.ungs.sail.Cancha
+import ar.edu.ungs.sail.CanchaRioDeLaPlata
 
 @Test
 class DrawTest {
@@ -37,8 +40,11 @@ class DrawTest {
                     ((2,0),95,60,0),((2,1),105,50,0),((2,2),115,40,0),((2,3),110,30,0),
                     ((3,0),90,35,0),((3,1),100,45,0),((3,2),190,45,0),((3,3),210,40,0)
                     )
-
-       assert(Graficador.draw(4, 4, vientos.toList, "drawing.png",100))
+       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+       val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
+       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+ 
+       assert(Graficador.draw(rioDeLaPlata,4, 4, vientos.toList, "drawing.png",100))
       
     }
     
@@ -53,15 +59,23 @@ class DrawTest {
       for (i<-0 to 49) for (j<-0 to 49) x+=(((i,j),125,20,0))
       val vientos:List[((Int, Int), Int, Int,Int)]=x.toList
 
+       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+       val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
+       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+ 
 
-      assert(Graficador.draw(50, 4, vientos, "drawing.png",35))      
+      assert(Graficador.draw(rioDeLaPlata,50, 4, vientos, "drawing.png",35))      
     }
         
   	
     @Test
   	def testDrawGraficadorSinVientos = {
+       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+       val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
+       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+ 
 
-      assert(Graficador.draw(4, 4, null, "drawing.png",100))
+      assert(Graficador.draw(rioDeLaPlata,4, 4, null, "drawing.png",100))
       
     }    
   	
@@ -133,5 +147,14 @@ class DrawTest {
       assert(true)
       }	
 
+    @Test
+  	def testDrawRioDeLaPlataConIslas= {
+       val nodoInicial:Nodo=new Nodo("Inicial - (0)(1)",List((0,0)),null)
+       val nodoFinal:Nodo=new Nodo("Final - (9)(15)",List((3,3)),null)
+       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,List((2,3),(2,2)));
+       assert(Graficador.draw(rioDeLaPlata,4, 4, null, "RioDeLaPlataConIslas.png",35))
+       
+    }
+    
 
 }      

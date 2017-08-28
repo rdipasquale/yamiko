@@ -52,11 +52,25 @@ object WindSimulation extends Serializable {
   /**
    * Simula un flujo de vientos para una cancha determinada
    */
-  def simular(cancha:Cancha,estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,meanAngleMod:Double, meanSpeedMod:Double,devAngleMod:Double, devSpeedMod:Double,tiempoMedioPorIntervaloTSeg:Int, racha:Boolean,tiempoMedioEntreRachasSeg:Int,longitudMediaRacha:Int, aumentoMedioVientoBaseRacha:Int,anguloDesvioMedioRacha:Int,probRachaUniforme:Boolean,probabilidadesRacha:Array[Array[Int]]):List[(Int,List[((Int, Int), Int, Int, Int)])]={
+  def simular(cancha:Cancha,estadoInicial:List[((Int, Int), Int, Int, Int)],tiempoMax:Int,meanAngleMod:Double, meanSpeedMod:Double,devAngleMod:Double, devSpeedMod:Double,tiempoMedioPorIntervaloTSeg:Int, racha:Boolean,tiempoMedioEntreRachasSeg:Int,longitudMediaRacha:Int, aumentoMedioVientoBaseRacha:Int,anguloDesvioMedioRacha:Int,probRachaUniforme:Boolean,probabilidadesRacha:Array[Array[Double]]):List[(Int,List[((Int, Int), Int, Int, Int)])]={
 
     var ultimaRacha:Int=0
     var salida:ListBuffer[(Int,List[((Int, Int), Int, Int, Int)])]=ListBuffer((0,estadoInicial))
     var estadoAnterior:List[((Int, Int), Int, Int, Int)]=estadoInicial
+    var vectorProbRachas:ListBuffer[(Double,Double,Int, Int)]=ListBuffer()
+    
+    // Si hay rachas de manera no uniforme, hay que calcular el vector de probabilidades
+    if (racha && !probRachaUniforme && probabilidadesRacha!=null) 
+    {
+      var pivote:Double=0
+      0 to cancha.getDimension()-1 foreach(i=>{
+        0 to cancha.getDimension()-1 foreach(j=>{
+            vectorProbRachas+=((pivote,pivote+probabilidadesRacha(i)(j),i,j))
+            pivote=pivote+probabilidadesRacha(i)(j)
+          })          
+        })      
+    }
+    
     for (t<-1 to tiempoMax){
       var estadoNuevo:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
       
@@ -110,12 +124,17 @@ object WindSimulation extends Serializable {
           var yRacha:Int=0
           if (probRachaUniforme)
           {
+            // Si es uniforme, tiro la moneda y listo
             xRacha=Random.nextInt(cancha.getDimension())
             yRacha=Random.nextInt(cancha.getDimension())
           }
           else
           {
-            
+            // Si no es uniforme, uso el vector de probabilidades
+            val moneda=Random.nextDouble()
+            val celdaSelec=vectorProbRachas.filter(p=>p._1>=moneda && p._2<moneda)(0)
+            xRacha=celdaSelec._3
+            yRacha=celdaSelec._4
           }
           
           // 7) Calculo la turbulencia provocada porla racha

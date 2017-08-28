@@ -34,5 +34,6 @@ trait Cancha extends Serializable{
   def getArcos():List[WUnDiEdge[Nodo]]
   def getNodoInicial():Nodo
   def getNodoFinal():Nodo
+  def getIslas():List[(Int,Int)]
 }
 
