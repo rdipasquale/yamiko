@@ -85,6 +85,7 @@ object WindSimulation extends Serializable {
                       t))}
       }
 
+      // Viento base
       // Mientras no esté completo el estado nuevo
       while(estadoNuevo.length<(cancha.getDimension()*cancha.getDimension()))
       {
@@ -94,13 +95,17 @@ object WindSimulation extends Serializable {
         aux=aux.distinct
         // 3) Ls muto en función de todos los vecinos que encuentre
         aux.foreach(f=> {
-          val vecinosNuevos=estadoNuevo.filter(p=>Math.abs(p._1._1-f._1._1)<=1 && Math.abs(p._1._2-f._1._2)<=1)
-          val avgAng=(vecinosNuevos.map(b=>b._2).sum)/vecinosNuevos.length.toDouble
-          val avgSpeed=(vecinosNuevos.map(b=>b._3).sum)/vecinosNuevos.length.toDouble
-          estadoNuevo+=((f._1,
-                        f._2+((Random.nextGaussian()*devAngleMod+meanAngleMod)*0.25+0.75*(avgAng-f._2)).intValue(),
-                        f._3+((Random.nextGaussian()*devSpeedMod+meanSpeedMod)*0.25+0.75*(avgSpeed-f._3)).intValue(),
-                        t))          
+            val procesar:Boolean=(if (cancha.getIslas()==null)true else !cancha.getIslas().contains((f._1._1,f._1._2)))
+            if (procesar)
+            {
+              val vecinosNuevos=estadoNuevo.filter(p=>Math.abs(p._1._1-f._1._1)<=1 && Math.abs(p._1._2-f._1._2)<=1)
+              val avgAng=(vecinosNuevos.map(b=>b._2).sum)/vecinosNuevos.length.toDouble
+              val avgSpeed=(vecinosNuevos.map(b=>b._3).sum)/vecinosNuevos.length.toDouble
+              estadoNuevo+=((f._1,
+                            f._2+((Random.nextGaussian()*devAngleMod+meanAngleMod)*0.25+0.75*(avgAng-f._2)).intValue(),
+                            f._3+((Random.nextGaussian()*devSpeedMod+meanSpeedMod)*0.25+0.75*(avgSpeed-f._3)).intValue(),
+                            t))          
+            }
         })
       }
       
@@ -132,7 +137,7 @@ object WindSimulation extends Serializable {
           {
             // Si no es uniforme, uso el vector de probabilidades
             val moneda=Random.nextDouble()
-            val celdaSelec=vectorProbRachas.filter(p=>p._1>=moneda && p._2<moneda)(0)
+            val celdaSelec=vectorProbRachas.filter(p=>p._1<=moneda && p._2>moneda)(0)
             xRacha=celdaSelec._3
             yRacha=celdaSelec._4
           }
@@ -144,31 +149,36 @@ object WindSimulation extends Serializable {
           1 to longitudRachaCeldas foreach(i=>{
               var colaCeldasAux:ListBuffer[(Int,Int)]=ListBuffer()            
               colaCeldas.foreach(celda=>{
-                val celdaVieja=estadoNuevo.filter(p=>p._1._1==celda._1 && p._1._2==celda._2)(0)
-                val celdaNueva=((celdaVieja._1,celdaVieja._2-anguloDesvioRacha,Math.min(35,Math.round(celdaVieja._3+celdaVieja._3*aumentoPorcentualViento/100-((i-1)*(celdaVieja._3*aumentoPorcentualViento/100)/(longitudRachaCeldas+2))).intValue()),t)) 
-                celdasRemover+=celdaVieja
-                celdasAgregar+=celdaNueva
-                if (celdaNueva._2>=330 || celdaNueva._2<30) {if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))}
-                  else  if (celdaNueva._2>=30 && celdaNueva._2<60){
-                            if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
-                            if (celda._1<cancha.getDimension()-1 || celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2+1))
-                            if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))                                                        
-                  }  else if (celdaNueva._2>=60 && celdaNueva._2<120) {if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))}
-                        else if (celdaNueva._2>=120 && celdaNueva._2<150){
-                            if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
-                            if (celda._1<cancha.getDimension()-1 || celda._2>0) colaCeldasAux+=((celda._1+1,celda._2-1))
-                            if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))                          
-                        }  else if (celdaNueva._2>=150 && celdaNueva._2<210) {if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))}
-                              else if (celdaNueva._2>=210 && celdaNueva._2<240){
-                                  if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
-                                  if (celda._1>0 && celda._2>0) colaCeldasAux+=((celda._1-1,celda._2-1))
-                                  if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))                          
-                              }  else if (celdaNueva._2>=240 && celdaNueva._2<300) {if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))}
-                                    else if (celdaNueva._2>=300 && celdaNueva._2<330){
-                                      if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
-                                      if (celda._1>0 && celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1-1,celda._2+1))
-                                      if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
-                                    }
+                // Verificar que la celda no pertenezca a una isla en el caso de que haya islas
+                val procesar:Boolean=(if (cancha.getIslas()==null)true else !cancha.getIslas().contains(celda))
+                if (procesar)
+                {
+                  val celdaVieja=estadoNuevo.filter(p=>p._1._1==celda._1 && p._1._2==celda._2)(0)
+                  val celdaNueva=((celdaVieja._1,celdaVieja._2-anguloDesvioRacha,Math.min(35,Math.round(celdaVieja._3+celdaVieja._3*aumentoPorcentualViento/100-((i-1)*(celdaVieja._3*aumentoPorcentualViento/100)/(longitudRachaCeldas+2))).intValue()),t)) 
+                  celdasRemover+=celdaVieja
+                  celdasAgregar+=celdaNueva
+                  if (celdaNueva._2>=330 || celdaNueva._2<30) {if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))}
+                    else  if (celdaNueva._2>=30 && celdaNueva._2<60){
+                              if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                              if (celda._1<cancha.getDimension()-1 || celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2+1))
+                              if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))                                                        
+                    }  else if (celdaNueva._2>=60 && celdaNueva._2<120) {if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))}
+                          else if (celdaNueva._2>=120 && celdaNueva._2<150){
+                              if (celda._1<cancha.getDimension()-1) colaCeldasAux+=((celda._1+1,celda._2))
+                              if (celda._1<cancha.getDimension()-1 || celda._2>0) colaCeldasAux+=((celda._1+1,celda._2-1))
+                              if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))                          
+                          }  else if (celdaNueva._2>=150 && celdaNueva._2<210) {if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))}
+                                else if (celdaNueva._2>=210 && celdaNueva._2<240){
+                                    if (celda._2>0) colaCeldasAux+=((celda._1,celda._2-1))
+                                    if (celda._1>0 && celda._2>0) colaCeldasAux+=((celda._1-1,celda._2-1))
+                                    if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))                          
+                                }  else if (celdaNueva._2>=240 && celdaNueva._2<300) {if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))}
+                                      else if (celdaNueva._2>=300 && celdaNueva._2<330){
+                                        if (celda._1>0) colaCeldasAux+=((celda._1-1,celda._2))
+                                        if (celda._1>0 && celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1-1,celda._2+1))
+                                        if (celda._2<cancha.getDimension()-1) colaCeldasAux+=((celda._1,celda._2+1))
+                                      }
+                }
               })
             colaCeldas=colaCeldasAux
           })          

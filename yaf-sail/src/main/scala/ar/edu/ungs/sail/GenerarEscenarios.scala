@@ -8,14 +8,17 @@ import ar.edu.ungs.serialization.Deserializador
 
 object ProbRachasNoUniformes50x50 {
   var matriz:Array[Array[Double]]=Array.ofDim[Double](50,50)
+  var totalizador:Double=0
   0 to 49 foreach(i=>{
     0 to 49 foreach(j=>{
       if (i>=12 && i<37 && j>=12 && j<37) 
-        matriz(i)(j)=4d/6625d 
+        matriz(i)(j)=4d/4375d 
       else 
-        matriz(i)(j)=1d/6625d
+        matriz(i)(j)=1d/4375d
+      totalizador=totalizador+matriz(i)(j)
     })
   })  
+
   def getMatriz()=matriz
 }
 
