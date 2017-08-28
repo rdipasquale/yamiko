@@ -27,12 +27,20 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
         else
           MANIOBRAS.values.foreach(m => nodos+=new Nodo("("+x+")"+"("+y+")-"+m.id,armarCuadrantes(x, y),m))
         
-	
+	// Arcos navegacion
   for (x <- 0 to dimension-1)
     for (y <- 0 to dimension-1)
       if (isIslas){if (!islas.contains((x,y))) MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )}
         else MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )  
   
+  // Arcos nodos hermanos
+  nodos.filter(p=>p.getManiobra().equals(MANIOBRAS.CenidaEstribor)).foreach(f=>
+    nodos.filter(l=>l.getId().substring(0,l.getId().indexOf("-")).equals(f.getId().substring(0,f.getId().indexOf("-"))) && (l.getManiobra().equals(MANIOBRAS.CenidaBabor) || l.getManiobra().equals(MANIOBRAS.PopaEstribor)))
+    .foreach(k=>arcos+=WUnDiEdge(f,k)(0l)))
+  nodos.filter(p=>p.getManiobra().equals(MANIOBRAS.PopaBabor)).foreach(f=>
+    nodos.filter(l=>l.getId().substring(0,l.getId().indexOf("-")).equals(f.getId().substring(0,f.getId().indexOf("-"))) && (l.getManiobra().equals(MANIOBRAS.CenidaBabor) || l.getManiobra().equals(MANIOBRAS.PopaEstribor)))
+    .foreach(k=>arcos+=WUnDiEdge(f,k)(0l)))
+        
   val strNodoInicial=nodoInicial.getId().substring(nodoInicial.getId().indexOf("("))
   val strNodoFinal=nodoFinal.getId().substring(nodoFinal.getId().indexOf("("))
       
