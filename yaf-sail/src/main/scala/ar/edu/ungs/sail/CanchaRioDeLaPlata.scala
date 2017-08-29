@@ -76,4 +76,5 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
   override def getNodoInicial():Nodo=nodoInicial
   override def getNodoFinal():Nodo=nodoFinal
   override def getIslas():List[(Int,Int)]=islas
+  
 }
