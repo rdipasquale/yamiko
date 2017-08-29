@@ -21,5 +21,10 @@ object COSTOS_MANIOBRAS {
   valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.PopaEstribor.id)=2 // Derivada
   valores(MANIOBRAS.PopaEstribor.id)(MANIOBRAS.PopaBabor.id)=4      // Trasluchada
   valores(MANIOBRAS.PopaBabor.id)(MANIOBRAS.CenidaBabor.id)=2       // Orzada
-  valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.CenidaEstribor.id)=6  // Virada  
+  valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.CenidaEstribor.id)=6  // Virada
+  
+}
+
+object CONSTANTS {
+  val METROS_POR_MILLA_NAUTICA=1852
 }
