@@ -25,10 +25,10 @@ object ProblemaClasico extends App {
       val ni=g get nodoInicial
       val nf=g get nodoFinal
       
-      println("empieza en " + System.currentTimeMillis())
-      ni.shortestPathTo(nf)
-      println("termina en " + System.currentTimeMillis())
-      
+//      println("empieza en " + System.currentTimeMillis())
+//      ni.shortestPathTo(nf)
+//      println("termina en " + System.currentTimeMillis())
+//      
       def negWeight(e: g.EdgeT): Float = calcCosto(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),t0,carr40)      
       
       println("empieza en " + System.currentTimeMillis())      
