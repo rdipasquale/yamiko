@@ -16,13 +16,14 @@ object ProblemaClasico extends App {
 
 
       println("Armado cancha: empieza en " + System.currentTimeMillis())      
-      val nodoInicial:Nodo=new Nodo(17,0,"Inicial - (17)(0)",List((5,0)),null)
-      val nodoFinal:Nodo=new Nodo(125,150,"Final - (125)(150)",List((41,49)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
-      Serializador.run("RioDeLaPlata50x50.cancha", rioDeLaPlata)
-//      val rioDeLaPlata:Cancha=Deserializador.run("RioDeLaPlata50x50.cancha").asInstanceOf[CanchaRioDeLaPlata]
-//      val nodoInicial:Nodo=rioDeLaPlata.getNodoInicial()
-//      val nodoFinal:Nodo=rioDeLaPlata.getNodoFinal()
+//      val nodoInicial:Nodo=new Nodo(17,0,"Inicial - (17)(0)",List((5,0)),null)
+//      val nodoFinal:Nodo=new Nodo(125,150,"Final - (125)(150)",List((41,49)),null)
+//      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
+//      Serializador.run("RioDeLaPlata50x50.cancha", rioDeLaPlata)
+
+      val rioDeLaPlata:Cancha=Deserializador.run("RioDeLaPlata50x50.cancha").asInstanceOf[CanchaRioDeLaPlata]
+      val nodoInicial:Nodo=rioDeLaPlata.getNodoInicial()
+      val nodoFinal:Nodo=rioDeLaPlata.getNodoFinal()
 
       println("Armado cancha: finaliza en " + System.currentTimeMillis())      
 
@@ -45,9 +46,11 @@ object ProblemaClasico extends App {
       def negWeight(e: g.EdgeT): Float = calcCosto(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), t0,carr40)      
       
       println("Calculo camino: empieza en " + System.currentTimeMillis())      
-      val spNO = ni shortestPathTo (nf, negWeight) // Path(3, 2~3 %2, 2, 1~2 %4, 1)
-      val spN = spNO.get                        // here we know spNO is defined            
+      val spNO = ni shortestPathTo (nf, negWeight) 
+      val spN = spNO.get                                    
       println("Calculo camino: termina " + spN.weight + " en " + System.currentTimeMillis())
+      
+      spN.nodes.foreach(f=>println(f.getId()))
       
      Graficador.draw(rioDeLaPlata, t0, "solucionProblema.png", 35, spN)
      
@@ -86,8 +89,29 @@ object ProblemaClasico extends App {
     val vientos=valores.filter(f=>f._1._1==cuadrante._1 && f._1._2==cuadrante._2)
     // Si es tierra....
     if (vientos==null) Float.MaxValue/2 else if (vientos.isEmpty) Float.MaxValue/2
-    val anguloNormalizado=vientos(0)._2+ (if(u.getX()-v.getX()==0) (if (Math.signum(v.getY()-u.getY())>=0) 0 else 180) else Math.toDegrees(Math.atan((v.getY().doubleValue()-u.getY().doubleValue())/(u.getX().doubleValue()-v.getX().doubleValue()))))
+    
+    var anguloNavegacion:Double=0d
+    if(u.getX-v.getX==0) {
+      if (Math.signum(v.getY-u.getY)>=0) 
+        anguloNavegacion=0d 
+      else 
+        anguloNavegacion=180d}
+    else if(v.getX>u.getX && v.getY>=u.getY) 
+         anguloNavegacion=90d-(Math.toDegrees(Math.atan((v.getY().doubleValue()-u.getY().doubleValue())/(u.getX().doubleValue()-v.getX().doubleValue()))))
+       else if(v.getX>u.getX && v.getY<=u.getY) 
+         anguloNavegacion=90d+Math.abs(Math.toDegrees(Math.atan((v.getY().doubleValue()-u.getY().doubleValue())/(u.getX().doubleValue()-v.getX().doubleValue()))))
+         else if(v.getX<u.getX && v.getY<=u.getY) anguloNavegacion=180d+(Math.toDegrees(Math.atan((v.getY().doubleValue()-u.getY().doubleValue())/(u.getX().doubleValue()-v.getX().doubleValue()))))
+       else if(v.getX<u.getX && v.getY>=u.getY) 360d+(Math.toDegrees(Math.atan((v.getY().doubleValue()-u.getY().doubleValue())/(u.getX().doubleValue()-v.getX().doubleValue()))))
+
+    val anguloNormalizado=(540-vientos(0)._2+Math.round(anguloNavegacion))%360 
     val velocidadMaxima=vmg.getSpeed(anguloNormalizado.toInt, vientos(0)._3)
+
+    // Evaluo si hay que maniobrar
+    if (u.getManiobra().equals(MANIOBRAS.CenidaBabor) && anguloNormalizado>90) return Float.MaxValue/2
+    if (u.getManiobra().equals(MANIOBRAS.PopaBabor) && anguloNormalizado>180 || anguloNormalizado<90) return Float.MaxValue/2
+    if (u.getManiobra().equals(MANIOBRAS.PopaEstribor) && anguloNormalizado>270 || anguloNormalizado<180) return Float.MaxValue/2
+    if (u.getManiobra().equals(MANIOBRAS.CenidaEstribor) && anguloNormalizado<270) return Float.MaxValue/2
+    
     if (velocidadMaxima==0) Float.MaxValue/2
     distancia.floatValue()/(velocidadMaxima*CONSTANTS.METROS_POR_MILLA_NAUTICA).floatValue()    
   }

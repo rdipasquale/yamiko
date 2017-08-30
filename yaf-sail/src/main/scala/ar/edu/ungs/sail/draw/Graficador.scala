@@ -61,10 +61,9 @@ object Graficador {
     g.setColor(new Color(0, 0, 255)) // same as Color.BLUE
     val ancho=pngCelda.image.getWidth.doubleValue()/(n-1).doubleValue()
     val alto=pngCelda.image.getHeight.doubleValue()/(n-1).doubleValue()
-    p.edges.foreach(f=>{
-      println("("+f._1.getX()+","+f._1.getY()+") -> (" +f._2.getX()+","+f._2.getY()+") ["+(f._1.getX*ancho)+","+(a*pngCelda.image.getHeight)+"-"+(f._1.getY*alto)+",10+"+(f._2.getX*ancho)+",(-10)+"+(a*pngCelda.image.getHeight)+"-"+(f._2.getY*alto))
-      g.draw(new Line2D.Double(f._1.getX*ancho,a*pngCelda.image.getHeight-(f._1.getY*alto),f._2.getX*ancho,a*pngCelda.image.getHeight-(f._2.getY*alto)))
-    })
+    p.edges.foreach(f=>g.draw(new Line2D.Double(f._1.getX*ancho,a*pngCelda.image.getHeight-(f._1.getY*alto),f._2.getX*ancho,a*pngCelda.image.getHeight-(f._2.getY*alto))) )
+      //println("("+f._1.getX()+","+f._1.getY()+") -> (" +f._2.getX()+","+f._2.getY()+") ["+(f._1.getX*ancho)+","+(a*pngCelda.image.getHeight)+"-"+(f._1.getY*alto)+",10+"+(f._2.getX*ancho)+",(-10)+"+(a*pngCelda.image.getHeight)+"-"+(f._2.getY*alto))
+
     g.dispose()
     javax.imageio.ImageIO.write(canvas, "png", new java.io.File(archivoSalida))  	
     true

@@ -14,6 +14,15 @@ object MANIOBRAS extends Enumeration {
  */
 object COSTOS_MANIOBRAS {
   val valores=Array.ofDim[Int](8,8)
+//  valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.CenidaBabor.id)=4  // Virada
+//  valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.PopaBabor.id)=1       // Derivada
+//  valores(MANIOBRAS.PopaBabor.id)(MANIOBRAS.PopaEstribor.id)=2      // Trasluchada
+//  valores(MANIOBRAS.PopaEstribor.id)(MANIOBRAS.CenidaEstribor.id)=1 // Orzada
+//  valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.PopaEstribor.id)=1 // Derivada
+//  valores(MANIOBRAS.PopaEstribor.id)(MANIOBRAS.PopaBabor.id)=2      // Trasluchada
+//  valores(MANIOBRAS.PopaBabor.id)(MANIOBRAS.CenidaBabor.id)=1       // Orzada
+//  valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.CenidaEstribor.id)=3  // Virada
+  
   valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.CenidaBabor.id)=6  // Virada
   valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.PopaBabor.id)=2       // Derivada
   valores(MANIOBRAS.PopaBabor.id)(MANIOBRAS.PopaEstribor.id)=4      // Trasluchada
@@ -22,7 +31,8 @@ object COSTOS_MANIOBRAS {
   valores(MANIOBRAS.PopaEstribor.id)(MANIOBRAS.PopaBabor.id)=4      // Trasluchada
   valores(MANIOBRAS.PopaBabor.id)(MANIOBRAS.CenidaBabor.id)=2       // Orzada
   valores(MANIOBRAS.CenidaBabor.id)(MANIOBRAS.CenidaEstribor.id)=6  // Virada
-  
+
+
 }
 
 object CONSTANTS {

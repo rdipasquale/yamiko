@@ -18,6 +18,37 @@ class Car40Test {
   	} 
   	
   	@Test
+  	def testAngulos = {
+       val anguloNavegacion=(if(17-15==0) (if (Math.signum(17-15)>=0) 0 else 180) else Math.toDegrees(Math.atan((0d-1d)/(17d-15d))))
+       println(Math.toDegrees(Math.atan((0d-1d)/(17d-15d))))
+
+       println(Math.toDegrees(Math.atan(Double.MaxValue)))
+       println(Math.toDegrees(Math.atan(1)))
+       println(Math.toDegrees(Math.atan(1d/2d)))
+       println(Math.toDegrees(Math.atan(0)))
+       println(Math.toDegrees(Math.atan(-1)))
+       println(Math.toDegrees(Math.atan(-1d/2d)))
+       println(Math.toDegrees(Math.atan(Double.MinValue)))
+       
+       println("del (2,1) al (3,4) " + Math.toDegrees(Math.atan((4d-1d)/(3d-2d))))
+       println("del (2,1) al (5,4) " + Math.toDegrees(Math.atan((4d-1d)/(5d-2d))))
+       println("del (2,1) al (5,1) " + Math.toDegrees(Math.atan((1d-1d)/(5d-2d))))
+
+       println("del (2,1) al (5,-2) " + Math.toDegrees(Math.atan((-2d-1d)/(5d-2d))))
+       println("del (2,1) al (3,-2) " + Math.toDegrees(Math.atan((-2d-1d)/(3d-2d))))
+
+       println("del (2,1) al (-1,-2) " + Math.toDegrees(Math.atan((-2d-1d)/(-1d-2d))))
+
+       println("1er cuadrantre - if(x2>x1 && y2>=y1) del (2,1) al (3,4) " + (90-Math.toDegrees(Math.atan((4d-1d)/(3d-2d)))))
+       println("2do cuadrante - if (x2>x1 && y2<=y1) del (2,1) al (5,-2) " + (90+Math.abs(Math.toDegrees(Math.atan((-2d-1d)/(5d-2d))))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,1) al (-1,-2) " + (180+Math.toDegrees(Math.atan((-2d-1d)/(-1d-2d)))))
+       println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,1) al (-1,4) " + (360+Math.toDegrees(Math.atan((4d-1d)/(-1d-2d)))))
+       
+       
+       assertEquals(anguloNavegacion,120,0.1)
+  	}
+ 
+  	@Test
   	def testValidValues = {
       assertEquals(vmg.getSpeed(140, 18),8.3,0.001d);
       assertEquals(vmg.getSpeed(90, 11),7.15,0.001d);
