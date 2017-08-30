@@ -17,9 +17,9 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
   var arcos=ListBuffer[WUnDiEdge[Nodo]]()
   
   //Armar grafo
-  for (x <- 0 to dimension*nodosPorCelda-1)
-    for (y <- 0 to dimension*nodosPorCelda-1)      
-      if(x==0 || (x+1)%dimension==0 || y==0 || (y+1)%dimension==0 )
+  for (x <- 0 to (dimension*(nodosPorCelda-1)))
+    for (y <- 0 to (dimension*(nodosPorCelda-1)))      
+      if(x==0 || x%(nodosPorCelda-1)==0 || y==0 || y%(nodosPorCelda-1)==0 )
         if (isIslas){
           if (!islas.contains((x,y))) 
             MANIOBRAS.values.foreach(m => nodos+=new Nodo(x,y,"("+x+")"+"("+y+")-"+m.id,armarCuadrantes(x, y),m))
@@ -41,15 +41,13 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
     nodos.filter(l=>l.getX()==f.getX() && l.getY()==f.getY() && (l.getManiobra().equals(MANIOBRAS.CenidaBabor) || l.getManiobra().equals(MANIOBRAS.PopaEstribor)))
     .foreach(k=>arcos+=WUnDiEdge(f,k)(0l)))
         
-  val strNodoInicial=nodoInicial.getId().substring(nodoInicial.getId().indexOf("("))
-  val strNodoFinal=nodoFinal.getId().substring(nodoFinal.getId().indexOf("("))
-      
+  // 2 +4 *( ((A*(N-1))+1) * (A+1) + 2 * A * (A+1))
   nodos+=nodoInicial
   nodos+=nodoFinal
   
   MANIOBRAS.values.foreach(m => {
-    arcos+=WUnDiEdge(nodoInicial,nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getId().startsWith(strNodoInicial))(0))(0)
-    arcos+=WUnDiEdge(nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getId().startsWith(strNodoFinal))(0),nodoFinal)(0)
+    arcos+=WUnDiEdge(nodoInicial,nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getX==nodoInicial.getX && p.getY==nodoInicial.getY )(0))(0)
+    arcos+=WUnDiEdge(nodos.filter(p=>p.getManiobra()!=null && p.getManiobra().equals(m) && p.getX==nodoFinal.getX && p.getY==nodoFinal.getY)(0),nodoFinal)(0)
   })
   
   val vertex=nodos.toList
@@ -58,12 +56,15 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
   val graph=Graph.from(vertex, edges)
   
   private def armarCuadrantes(x:Int,y:Int):List[(Int,Int)]={
-    val xx=x/dimension
-    val yy=y/dimension
+    val xx=Math.abs((x-1)/(nodosPorCelda-1))
+    val yy=Math.abs((y-1)/(nodosPorCelda-1))
     var salida=ListBuffer((xx,yy))
-    if (x>0 && x<dimension*nodosPorCelda-1 && (x+1)%dimension==0) salida+=((xx+1,yy))
-    if (y>0 && y<dimension*nodosPorCelda-1 && (y+1)%dimension==0) salida+=((xx,yy+1))
-    if (x>0 && x<dimension*nodosPorCelda-1 && (x+1)%dimension==0 && y>0 && y<dimension*nodosPorCelda-1 && (y+1)%dimension==0) salida+=((xx+1,yy+1))    
+    if (x>0 && x<dimension*(nodosPorCelda-1) && x%(nodosPorCelda-1)==0) 
+      salida+=((xx+1,yy))
+    if (y>0 && y<dimension*(nodosPorCelda-1) && y%(nodosPorCelda-1)==0) 
+      salida+=((xx,yy+1))
+    if (x>0 && x<dimension*(nodosPorCelda-1) && x%(nodosPorCelda-1)==0 && y>0 && y<dimension*(nodosPorCelda-1) && y%(nodosPorCelda-1)==0) 
+      salida+=((xx+1,yy+1))    
     salida.toList
   }
   
