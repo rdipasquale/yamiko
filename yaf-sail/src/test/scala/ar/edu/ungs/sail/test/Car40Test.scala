@@ -58,7 +58,17 @@ class Car40Test {
        
        assertEquals(anguloNavegacion,120,0.1)
   	}
- 
+
+  	@Test
+  	def testValidComb = {
+      val l=List(1,2,3)
+      println("Combinations")
+      l.combinations(2).foreach(println(_)) // (f=>f.foreach(f))
+      println("Permutations")
+      l.permutations.foreach(println(_)) // (f=>f.foreach(f))
+  	  assert(true)
+  	}  	
+  	
   	@Test
   	def testValidValues = {
       assertEquals(vmg.getSpeed(140, 18),8.3,0.001d);
