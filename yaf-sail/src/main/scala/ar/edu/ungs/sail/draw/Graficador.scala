@@ -7,6 +7,7 @@ import ar.edu.ungs.sail.Cancha
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.Line2D
+import java.awt.geom.Ellipse2D
 
 object pngCelda{
   def image=ImageIO.read(new File("Celda.png"))
@@ -61,7 +62,18 @@ object Graficador {
     g.setColor(new Color(0, 0, 255)) // same as Color.BLUE
     val ancho=pngCelda.image.getWidth.doubleValue()/(n-1).doubleValue()
     val alto=pngCelda.image.getHeight.doubleValue()/(n-1).doubleValue()
-    p.edges.foreach(f=>g.draw(new Line2D.Double(f._1.getX*ancho,a*pngCelda.image.getHeight-(f._1.getY*alto),f._2.getX*ancho,a*pngCelda.image.getHeight-(f._2.getY*alto))) )
+    p.edges.foreach(f=>{
+      if (!(f._1.getId().startsWith("Ini") || f._2.getId.startsWith("Fin")))
+      if (!f._1.getManiobra().equals(f._2.getManiobra()))
+          {
+            g.setColor(Color.MAGENTA)
+            g.setStroke(new BasicStroke(3f))
+            g.draw(new Ellipse2D.Double(f._1.getX*ancho-10, a*pngCelda.image.getHeight-(f._1.getY*alto)-10, 20,20))
+            g.setStroke(new BasicStroke(5))  // reset to default
+            g.setColor(new Color(0, 0, 255)) // same as Color.BLUE
+          }
+      g.draw(new Line2D.Double(f._1.getX*ancho,a*pngCelda.image.getHeight-(f._1.getY*alto),f._2.getX*ancho,a*pngCelda.image.getHeight-(f._2.getY*alto))) 
+    })
       //println("("+f._1.getX()+","+f._1.getY()+") -> (" +f._2.getX()+","+f._2.getY()+") ["+(f._1.getX*ancho)+","+(a*pngCelda.image.getHeight)+"-"+(f._1.getY*alto)+",10+"+(f._2.getX*ancho)+",(-10)+"+(a*pngCelda.image.getHeight)+"-"+(f._2.getY*alto))
 
     g.dispose()

@@ -22,24 +22,24 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
       if(x==0 || x%(nodosPorCelda-1)==0 || y==0 || y%(nodosPorCelda-1)==0 )
         if (isIslas){
           if (!islas.contains((x,y))) 
-            MANIOBRAS.values.foreach(m => nodos+=new Nodo(x,y,"("+x+")"+"("+y+")-"+m.id,armarCuadrantes(x, y),m))
+            MANIOBRAS.values.foreach(m => nodos+=new Nodo(x,y,"("+x+")"+"("+y+")-"+m,armarCuadrantes(x, y),m))
           }
         else
-          MANIOBRAS.values.foreach(m => nodos+=new Nodo(x,y,"("+x+")"+"("+y+")-"+m.id,armarCuadrantes(x, y),m))
+          MANIOBRAS.values.foreach(m => nodos+=new Nodo(x,y,"("+x+")"+"("+y+")-"+m,armarCuadrantes(x, y),m))
         
 	// Arcos navegacion
   for (x <- 0 to dimension-1)
     for (y <- 0 to dimension-1)
-      if (isIslas){if (!islas.contains((x,y))) MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )}
-        else MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(0l))) )  
+      if (isIslas){if (!islas.contains((x,y))) MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(Long.MaxValue))) )}
+        else MANIOBRAS.values.foreach(m => ((nodos.filter(p=>p.getCuadrante().contains((x,y)) && p.getManiobra().equals(m)).combinations(2)).foreach(f=>arcos+=WUnDiEdge(f(0),f(1))(Long.MaxValue))) )  
   
   // Arcos nodos hermanos
   nodos.filter(p=>p.getManiobra().equals(MANIOBRAS.CenidaEstribor)).foreach(f=>
     nodos.filter(l=>l.getX()==f.getX() && l.getY()==f.getY() && (l.getManiobra().equals(MANIOBRAS.CenidaBabor) || l.getManiobra().equals(MANIOBRAS.PopaEstribor)))
-    .foreach(k=>arcos+=WUnDiEdge(f,k)(0l)))
+    .foreach(k=>arcos+=WUnDiEdge(f,k)(COSTOS_MANIOBRAS.valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.CenidaBabor.id))))
   nodos.filter(p=>p.getManiobra().equals(MANIOBRAS.PopaBabor)).foreach(f=>
     nodos.filter(l=>l.getX()==f.getX() && l.getY()==f.getY() && (l.getManiobra().equals(MANIOBRAS.CenidaBabor) || l.getManiobra().equals(MANIOBRAS.PopaEstribor)))
-    .foreach(k=>arcos+=WUnDiEdge(f,k)(0l)))
+    .foreach(k=>arcos+=WUnDiEdge(f,k)(COSTOS_MANIOBRAS.valores(MANIOBRAS.CenidaEstribor.id)(MANIOBRAS.CenidaBabor.id))))
         
   // 2 +4 *( ((A*(N-1))+1) * (A+1) + 2 * A * (A+1))
   nodos+=nodoInicial

@@ -42,7 +42,18 @@ class Car40Test {
        println("1er cuadrantre - if(x2>x1 && y2>=y1) del (2,1) al (3,4) " + (90-Math.toDegrees(Math.atan((4d-1d)/(3d-2d)))))
        println("2do cuadrante - if (x2>x1 && y2<=y1) del (2,1) al (5,-2) " + (90+Math.abs(Math.toDegrees(Math.atan((-2d-1d)/(5d-2d))))))
        println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,1) al (-1,-2) " + (180+Math.toDegrees(Math.atan((-2d-1d)/(-1d-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (0,0) " + (180+Math.toDegrees(Math.atan((0d-0d)/(0d-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (2,-2) " + (270-Math.toDegrees(Math.atan((-2d-0d)/(2d-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (0,-4) " + (270-Math.toDegrees(Math.atan((-4d-0d)/(-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (0,-3) " + (270-Math.toDegrees(Math.atan((-3d-0d)/(-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (0,-2) " + (270-Math.toDegrees(Math.atan((-2d-0d)/(-2d)))))
+       println("3er cuadrante - if (x2<x1 && y2<=y1) del (2,0) al (0,-1) " + (270-Math.toDegrees(Math.atan((-1d-0d)/(-2d)))))
+       
        println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,1) al (-1,4) " + (360+Math.toDegrees(Math.atan((4d-1d)/(-1d-2d)))))
+       println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,0) al (0,1) " + (270+Math.abs((Math.toDegrees(Math.atan((1d-0d)/(0d-2d)))))))
+       println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,0) al (0,2) " + (270+Math.abs((Math.toDegrees(Math.atan((2d-0d)/(-2d)))))))
+       println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,0) al (0,4) " + (270+Math.abs((Math.toDegrees(Math.atan((4d-0d)/(-2d)))))))
+       println("4to cuadrante - if (x2<x1 && y2>=y1) del (2,0) al (2,2) " + (270+Math.abs((Math.toDegrees(Math.atan((2d-0d)/(2d-2d)))))))
        
        
        assertEquals(anguloNavegacion,120,0.1)

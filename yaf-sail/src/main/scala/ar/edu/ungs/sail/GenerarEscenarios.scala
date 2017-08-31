@@ -25,8 +25,9 @@ object ProbRachasNoUniformes50x50 {
 object GenerarEscenarios extends App {
   
   override def main(args : Array[String]) {
-      val nodoInicial:Nodo=new Nodo(0,0,"Inicial - (0)(1)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(0,0,"Final - (195)(199)",List((3,3)),null)
+      val nodoInicial:Nodo=new Nodo(17,0,"Inicial - (17)(0)",List((5,0)),null)
+      val nodoFinal:Nodo=new Nodo(150,120,"Final - (150)(120)",List((49,39)),null)
+//      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
 //      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
       
       // Generar estado inicial
@@ -56,11 +57,11 @@ object GenerarEscenarios extends App {
       
       // Con rachas no uniformemente distribuidas
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 120, 0, 0, 5.5, 2.3, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
+      val salida=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
       SerializadorEscenario.run("escenario50x50ConRachasNoUniformes_0.txt", "1",salida)
       salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "escenario50x50ConRachasNoUniformes_t" + f._1 + ".png", 35))
       1 to 200 foreach(i=>{
-        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 120, 0, 0, 5.5, 2.3, 10,false,0,0,0,0,false,null)
+        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
         SerializadorEscenario.run("escenario50x50ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
       })
 
