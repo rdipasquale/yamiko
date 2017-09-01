@@ -1,5 +1,8 @@
 package ar.edu.ungs.sail
 
+import ar.edu.ungs.yamiko.ga.domain.Gene
+import ar.edu.ungs.yamiko.ga.domain.impl.BasicGene
+
 object MANIOBRAS extends Enumeration {
         type TipoManiobra = Value
         val 		CenidaEstribor,CenidaBabor,PopaBabor,PopaEstribor= Value
@@ -38,3 +41,5 @@ object COSTOS_MANIOBRAS {
 object CONSTANTS {
   val METROS_POR_MILLA_NAUTICA=1852
 }
+
+object GENES {val GenUnico:Gene=new BasicGene("Gen1", 0, 20)}

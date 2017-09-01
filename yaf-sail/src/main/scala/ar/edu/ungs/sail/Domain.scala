@@ -2,6 +2,7 @@ package ar.edu.ungs.sail
 
 import scalax.collection.edge.WUnDiEdge
 import scalax.collection.immutable.Graph
+import scalax.collection.GraphEdge.DiEdge
 
 /**
  * Este trait modela cualquier especificación de Polar VMG. Cada instancia concreta es la especifiación propia de una embarcación concreta.
@@ -26,12 +27,12 @@ trait VMG extends Serializable{
  */
 @SerialVersionUID(1L)
 trait Cancha extends Serializable{
-  def getGraph():Graph[Nodo,WUnDiEdge]
+  def getGraph():Graph[Nodo,DiEdge]
   def getDimension():Int
   def getNodosPorCelda():Int
   def getMetrosPorLadoCelda():Int
   def getNodos():List[Nodo]
-  def getArcos():List[WUnDiEdge[Nodo]]
+  def getArcos():List[DiEdge[Nodo]]
   def getNodoInicial():Nodo
   def getNodoFinal():Nodo
   def getIslas():List[(Int,Int)]

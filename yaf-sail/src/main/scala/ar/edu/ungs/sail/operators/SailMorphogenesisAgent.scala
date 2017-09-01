@@ -1,19 +1,23 @@
-package ar.edu.ungs.yaf.vrp
+package ar.edu.ungs.sail.operators
 
-import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
+import scala.collection.mutable.ListBuffer
+
+import ar.edu.ungs.sail.Cancha
+import ar.edu.ungs.sail.Costo
+import ar.edu.ungs.sail.VMG
+import ar.edu.ungs.yamiko.ga.domain.Gene
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
-import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped
-import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException
-import ar.edu.ungs.yamiko.ga.exceptions.NullGenotypeException
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicPhenotype
-import ar.edu.ungs.yamiko.ga.domain.Gene
-import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.yamiko.ga.exceptions.IndividualNotDeveloped
+import ar.edu.ungs.yamiko.ga.exceptions.NullGenotypeException
+import ar.edu.ungs.yamiko.ga.exceptions.NullIndividualException
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 
 
 @SerialVersionUID(1L)
-class SailMorphogenesisAgent extends MorphogenesisAgent[List[(Int,Int)]]{
+class SailMorphogenesisAgent(cancha:Cancha,tiempos:List[(Int,List[((Int, Int), Int, Int, Int)])],barco:VMG) extends MorphogenesisAgent[List[(Int,Int)]]{
 
   @throws(classOf[YamikoException])
   override def develop(genome:Genome[List[(Int,Int)]] , ind:Individual[List[(Int,Int)]])=
@@ -22,33 +26,42 @@ class SailMorphogenesisAgent extends MorphogenesisAgent[List[(Int,Int)]]{
 		if (ind==null) throw new NullIndividualException(this.getClass().getSimpleName()+" - develop -> Null Individual");
 		if (ind.getGenotype()==null) throw new NullGenotypeException(this.getClass().getSimpleName()+" - develop -> Null Genotype");
 
+  	val g=cancha.getGraph()
+  	val nodoInicial=g get cancha.getNodoInicial()
+  	val nodoFinal=g get cancha.getNodoFinal()
+  	
+    def negWeight(e: g.EdgeT): Float = Costo.calcCosto(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), tiempos(0)._2 ,barco)		
+		
 		val chromosome= ind.getGenotype().getChromosomes()(0);
 		val allele=chromosome.getFullRawRepresentation()
-		var alleles=Map[Gene, List[Route]]()
-		val g = genome.getStructure().head._2(0)
-		alleles+=( g -> translate(allele))
-		val phenotype=new BasicPhenotype[Array[Int]]( chromosome , alleles);
+		
+		var minCostAux:Float=Float.MaxValue/2-1
+		var nodoAux:g.NodeT=nodoInicial
+		var nodoTemp:g.NodeT=nodoInicial
+		val nodosIntermedios=List((nodoInicial.getX(),nodoInicial.getY())) ++ allele ++ List((nodoFinal.getX(),nodoFinal.getY()))
+		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+		var pathTemp:Traversable[(g.EdgeT, Float)]=null
+		nodosIntermedios.foreach(nodoInt=>
+		  {
+    		cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2).foreach(v=>{
+          val nf=g get v
+    		  val spNO = nodoAux shortestPathTo (nf, negWeight)
+          val spN = spNO.get
+          pathTemp=spN.edges.map(f=>(f,negWeight(f)))
+          val costo=pathTemp.map(_._2).sum
+          if (costo<minCostAux){
+            minCostAux=costo
+            nodoTemp=nf
+          }
+    		})
+        path++=pathTemp
+        nodoAux=nodoTemp		    
+		  })
+
+		val alleles:Map[Gene, List[(g.EdgeT,Float)]]=Map( genome.getStructure().head._2(0) -> path.toList)
+		val phenotype=new BasicPhenotype[List[(Int,Int)]]( chromosome , alleles);
 		ind.setPhenotype(phenotype);
 	}
 
-  def translate(allele:List[(Int,Int)]):List[Route] ={
-		if (allele==null) return null
-		if (allele.length==0) return null
-		var salida=ListBuffer[Route]();
-		var i=0;
-		while (i<allele.length)
-		{
-			if (allele(i)==0) i+=1
-			var visitas=ListBuffer[Int]()
-			visitas.clear()
-			while (i<allele.length && allele(i)!=0)
-			{
-				visitas+=(allele(i))
-				i+=1
-			}
-			//salida.add(new Route(visitas,customers));
-			salida+=(new Route(visitas.toArray));
-		}
-		return salida.toList
-	}  
+  
 }
