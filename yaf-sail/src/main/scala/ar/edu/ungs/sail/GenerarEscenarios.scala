@@ -33,6 +33,8 @@ object GenerarEscenarios extends App {
       // Generar estado inicial
 //      val t0=WindSimulation.generarEstadoInicial(50, 270, 14, 6, 3)
 //      Serializador.run("estadoInicialEscenario50x50.winds", t0)
+//      val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 7, 4)
+//      Serializador.run("estadoInicialEscenario4x4.winds", t0)
       
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      

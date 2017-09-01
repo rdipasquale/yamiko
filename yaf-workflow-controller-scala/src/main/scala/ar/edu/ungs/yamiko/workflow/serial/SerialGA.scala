@@ -71,7 +71,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 				}
 
         // Profiler
-        if (generationNumber%100==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+        if (generationNumber%10==0) Logger.getLogger("profiler").debug(generationNumber+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
 
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((population.size()).intValue(),population)).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
@@ -127,11 +127,12 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			  
 			  //descendants.foreach { x => if (population.getAll().contains(x)) println ("No está " + x.getId()) } 
 			  
-			  if (generationNumber%100==0)
-			  {
-			    Logger.getLogger("file").warn("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
-			    println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness)
-			  }
+//			  if (generationNumber%100==0)
+//			  {
+			    //Logger.getLogger("file").warn
+    		  println("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
+			    println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " - " + bestInd.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+//			  }
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");

@@ -30,9 +30,8 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
 		  val c1=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		  val c2=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		
-		  val r = Random
 		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()
-      val point=r.nextInt(realSize)
+      val point=Random.nextInt(realSize)
 		
       
       val desc1=c1.slice(0, point)++c2.slice(point, c2.length)

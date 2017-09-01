@@ -29,13 +29,14 @@ class SailMutatorSwap(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int
       val len=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().length
       val p1=Random.nextInt(len)
       val p2=Random.nextInt(len)
-      val n1=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation()(p1)
+      val n1=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation()(Math.min(p1,p2))
       val x=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation()
       var salida=x.slice(0, Math.min(p1,p2))++List(x(Math.max(p1,p2)))++x.slice(Math.min(p1,p2)+1,Math.max(p1,p2))++List(x(Math.min(p1,p2)))
       if (Math.min(p1,p2)<len-1) salida=salida++x.slice(Math.max(p1,p2)+1,len)
+      salida=salida.distinct
       ind.getGenotype().getChromosomes()(0).setFullRawRepresentation(salida)          
       ma.develop(ge, ind)      
-		  ind.setFitness(fe.execute(ind))
+		  //ind.setFitness(fe.execute(ind))
       
     }
 }

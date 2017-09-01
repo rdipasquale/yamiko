@@ -42,4 +42,4 @@ object CONSTANTS {
   val METROS_POR_MILLA_NAUTICA=1852
 }
 
-object GENES {val GenUnico:Gene=new BasicGene("Gen1", 0, 20)}
+object GENES {val GenUnico:Gene=new BasicGene("Gen1", 0, 4)}

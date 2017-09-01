@@ -38,15 +38,17 @@ class SailMorphogenesisAgent(cancha:Cancha,tiempos:List[(Int,List[((Int, Int), I
 		var minCostAux:Float=Float.MaxValue/2-1
 		var nodoAux:g.NodeT=nodoInicial
 		var nodoTemp:g.NodeT=nodoInicial
-		val nodosIntermedios=List((nodoInicial.getX(),nodoInicial.getY())) ++ allele ++ List((nodoFinal.getX(),nodoFinal.getY()))
+		val nodosIntermedios=allele ++ List((nodoFinal.getX(),nodoFinal.getY()))
 		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
 		var pathTemp:Traversable[(g.EdgeT, Float)]=null
 		nodosIntermedios.foreach(nodoInt=>
 		  {
-    		cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2).foreach(v=>{
+		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+    		nodosDestino.foreach(v=>{
           val nf=g get v
     		  val spNO = nodoAux shortestPathTo (nf, negWeight)
           val spN = spNO.get
+          val peso=spN.weight
           pathTemp=spN.edges.map(f=>(f,negWeight(f)))
           val costo=pathTemp.map(_._2).sum
           if (costo<minCostAux){
@@ -59,6 +61,8 @@ class SailMorphogenesisAgent(cancha:Cancha,tiempos:List[(Int,List[((Int, Int), I
 		  })
 
 		val alleles:Map[Gene, List[(g.EdgeT,Float)]]=Map( genome.getStructure().head._2(0) -> path.toList)
+		val fit=path.map(_._2).sum
+		ind.setFitness(10000-fit.doubleValue())
 		val phenotype=new BasicPhenotype[List[(Int,Int)]]( chromosome , alleles);
 		ind.setPhenotype(phenotype);
 	}
