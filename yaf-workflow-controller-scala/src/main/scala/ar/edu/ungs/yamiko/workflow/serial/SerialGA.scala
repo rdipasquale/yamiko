@@ -49,7 +49,8 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{
 			  generationNumber+=1
-			  //if (generationNumber%100==0) Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
+			  //if (generationNumber%100==0) 
+			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  
         val t1=System.currentTimeMillis()
 
