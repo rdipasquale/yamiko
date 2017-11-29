@@ -128,12 +128,12 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
 			  
 			  //descendants.foreach { x => if (population.getAll().contains(x)) println ("No está " + x.getId()) } 
 			  
-//			  if (generationNumber%100==0)
-//			  {
+			  if (generationNumber%100==0 || generationNumber==1)
+			  {
 			    //Logger.getLogger("file").warn
     		  println("Generación " + generationNumber + " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generationNumber  + "ms"  )
 			    println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " - " + bestInd.getGenotype().getChromosomes()(0).getFullRawRepresentation())
-//			  }
+			  }
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
