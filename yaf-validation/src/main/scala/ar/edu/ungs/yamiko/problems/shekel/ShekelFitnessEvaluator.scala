@@ -1,9 +1,10 @@
 package ar.edu.ungs.yamiko.problems.shekel
 
-import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
-import ar.edu.ungs.yamiko.ga.domain.Individual
 import java.util.BitSet
+
 import ar.edu.ungs.yamiko.ga.domain.Gene
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 
 class ShekelFitnessEvaluator(genX1:Gene,genX2:Gene,genX3:Gene,genX4:Gene) extends FitnessEvaluator[BitSet]{
 
@@ -26,12 +27,25 @@ class ShekelFitnessEvaluator(genX1:Gene,genX2:Gene,genX3:Gene,genX4:Gene) extend
     
     var z:Double=0
     for (i<-0 to 9)
-      for (j<-0 to 3)
-      {
-        z = z + x(j) 
-      }
-		//val z:Double=100*math.pow(y-math.pow(x,2),2)+math.pow((1-x),2)
-		return 10*(5000-z);    
+    {
+      var zz:Double=0
+      for (j<-0 to 3) zz=zz+( (x(j) - C(j)(i) )*(x(j) - C(j)(i) )) + BETA(i)
+      z = z + 1d/zz  
+    }
+    return (z);    
+  }
+  
+  def optimo():Double={
+    val x= Array ( 4d,4d,4d,4d )    
+    var z:Double=0
+    for (i<-0 to 9)
+    {
+      var zz:Double=0
+      for (j<-0 to 3) zz=zz+( (x(j) - C(j)(i) )*(x(j) - C(j)(i) )) + BETA(i)
+      z = z + 1d/zz  
+    }
+    return -1*(z);    
+ 
   }
 }
 
