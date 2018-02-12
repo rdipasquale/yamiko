@@ -11,7 +11,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.IndividualBitSetJavaFactory
 /**
  * Operador de Crossover en un punto implementado para individuos basados en tiras de bits.
  * FIXME: Funciona para individuos con un cromosoma solo.
- * 
+ * 2017
  * @author ricardo
  *
  */
@@ -44,6 +44,24 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
       
      }
 
+}
+
+/**
+ * Operador de Crossover propuesto por He Fangguo para una tira de nodos de longitud variable (Int,Int)
+ * 2 individuos pueden cruzarse si tienen al menos un par de nodos comunes (que no sean la fuente y el destino)
+ * en su recorrido. Si hay mas de una coincidencia, se elige al azar el par sobre el cual trabajar.
+ * Se pueden formar ciclos al combinar, cuestion que debera ser corregida antes de terminar el proceso de crossover.
+ * Se incluye una estrategia de reparacion dentro del proceso de crossover que consiste en eliminar al indiviuo no factible.
+ * 2018
+ * @author ricardo
+ *
+ */
+@SerialVersionUID(41120L)
+class SailPathOnePointCrossoverHeFangguo extends Crossover[List[(Int,Int)]] {
+
+    override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
+      return null;
+    }
 }
 
 /**
