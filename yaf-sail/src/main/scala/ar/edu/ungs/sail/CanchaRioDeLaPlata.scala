@@ -91,5 +91,15 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
   override def getNodoInicial():Nodo=nodoInicial
   override def getNodoFinal():Nodo=nodoFinal
   override def getIslas():List[(Int,Int)]=islas
+  override def getNodoByCord(x:Int, y:Int):Nodo={
+    val idx:String="("+x.toString()+")("+y.toString()+")-"+MANIOBRAS.CenidaBabor
+    val salida=vertex.find(p=>p.getId().equals(idx))
+    salida.getOrElse(null)
+  }
+  override def isNeighbour(x:Nodo, y:Nodo):Boolean={
+    val salida=edges.find(p=>(p._1.getId().equals(x.getId()) && p._2.getId().equals(y.getId()) )|| (p._1.getId().equals(y.getId()) && p._2.getId().equals(x.getId())))
+    return salida.getOrElse(null) != null    
+  }
+  
   
 }
