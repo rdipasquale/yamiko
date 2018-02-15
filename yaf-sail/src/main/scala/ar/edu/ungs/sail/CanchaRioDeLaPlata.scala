@@ -100,6 +100,14 @@ class CanchaRioDeLaPlata(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda
     val salida=edges.find(p=>(p._1.getId().equals(x.getId()) && p._2.getId().equals(y.getId()) )|| (p._1.getId().equals(y.getId()) && p._2.getId().equals(x.getId())))
     return salida.getOrElse(null) != null    
   }
-  
+  override def simplePath(x:Nodo, y:Nodo):List[Nodo]={
+    val g=getGraph 
+    val xx=g get(x) 
+    val yy=g get(y)
+    val spO =xx shortestPathTo yy
+    val p = spO.get
+    if (p==null) return List[Nodo]()
+    return p.nodes.toList.asInstanceOf[List[Nodo]]
+  }
   
 }

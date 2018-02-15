@@ -38,5 +38,6 @@ trait Cancha extends Serializable{
   def getIslas():List[(Int,Int)]
   def getNodoByCord(x:Int, y:Int):Nodo
   def isNeighbour(x:Nodo, y:Nodo):Boolean
+  def simplePath(x:Nodo, y:Nodo):List[Nodo]
 }
 

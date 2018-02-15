@@ -7,6 +7,8 @@ import scala.util.Random
 import java.util.BitSet
 import ar.edu.ungs.yamiko.ga.toolkit.IndividualBitSetJavaFactory
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
+import ar.edu.ungs.sail.Cancha
+import ar.edu.ungs.sail.Costo
 
 
 /**
@@ -58,7 +60,7 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
  *
  */
 @SerialVersionUID(41120L)
-class SailPathOnePointCrossoverHeFangguo extends Crossover[List[(Int,Int)]] {
+class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(Int,Int)]] {
 
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 		  if (individuals==null) throw new NullIndividualException("SailPathOnePointCrossoverHeFangguo")
@@ -110,6 +112,39 @@ class SailPathOnePointCrossoverHeFangguo extends Crossover[List[(Int,Int)]] {
 	      val p2=desc2.indexOf(ciclomax._1,p1+1)
 		    desc2=desc2.take(p1)++desc2.takeRight(desc2.size-p2)
 		    duplicados2=desc2.groupBy(identity).collect { case (x, List(_,_,_*)) => x }
+		  }
+		  
+		  // Repair
+		  var i=0
+		  while (i < desc1.size-1)
+		  {
+		    val x=cancha.getNodoByCord(desc1(i)_1, desc1(i)_2)
+		    val y=cancha.getNodoByCord(desc1(i+1)_1, desc1(i+1)_2)
+		    
+		    if (cancha.isNeighbour(x,y))
+		      i=i+1
+		    else
+		    {
+		      val subpath=cancha.simplePath(x,y).drop(1).dropRight(1).map(f=>(f.getX(),f.getY()))
+		      desc1=desc1.take(i+1)++subpath++desc1.takeRight(desc1.size-(i+1))
+		      i=i+subpath.length+1
+		    }
+		  }
+		  
+		  i=0
+		  while (i < desc2.size-1)
+		  {
+		    val x=cancha.getNodoByCord(desc2(i)_1, desc2(i)_2)
+		    val y=cancha.getNodoByCord(desc2(i+1)_1, desc2(i+1)_2)
+		    
+		    if (cancha.isNeighbour(x,y))
+		      i=i+1
+		    else
+		    {
+		      val subpath=cancha.simplePath(x,y).drop(1).dropRight(1).map(f=>(f.getX(),f.getY()))
+		      desc2=desc2.take(i+1)++subpath++desc2.takeRight(desc2.size-(i+1))
+		      i=i+subpath.length+1
+		    }
 		  }
 		  
 	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )

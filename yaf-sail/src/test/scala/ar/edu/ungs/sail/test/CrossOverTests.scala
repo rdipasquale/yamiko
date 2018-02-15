@@ -38,7 +38,7 @@ class CrossOverTest {
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo()	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
