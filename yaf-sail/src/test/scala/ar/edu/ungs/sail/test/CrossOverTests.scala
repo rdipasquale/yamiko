@@ -137,5 +137,64 @@ class CrossOverTest {
       println("---------------------");
       
     }
+
+    @Test
+  	def testSailCrossover1000ConFitness= {
+
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val carr40:VMG=new Carr40()
+     //Tomar estado inicial de archivo
+      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
+      
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
+  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
+      val genes=List(GENES.GenUnico)
+    	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
+    	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
+      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
+      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
+  		
+      val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
+      val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,1),(0,2),(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,9),(8,9),(9,9),(10,9),(11,9),(12,9),(12,10),(12,11),(12,12)) )
+  
+  		println("---------------------");
+  
+  		var mejorDesc=0
+  		var mejorParents=0
+  		var unoYUno=0
+			mAgent.develop(genome, i1)
+			mAgent.develop(genome, i2)
+  		fev.execute(i1)
+  		fev.execute(i2)
+  		
+    	val t=System.currentTimeMillis();
+  		for (i<-0 to 10)
+//  		for (i<-0 to CROSSOVERS)
+  		{
+  			val desc = cross.execute(List(i1,i2));
+  			val desc1=desc(0)
+  			val desc2=desc(1)
+  			mAgent.develop(genome, desc1)
+  			mAgent.develop(genome, desc2)
+  			fev.execute(desc1)
+  			fev.execute(desc2)
+  			if ((i1.getFitness()>desc1.getFitness() && i1.getFitness()>desc2.getFitness()) || (i2.getFitness()>desc1.getFitness() && i2.getFitness()>desc2.getFitness()) ) mejorParents=mejorParents+1
+  			else
+    			if ((desc1.getFitness()>=i1.getFitness() && desc1.getFitness()>=i2.getFitness()) || (desc2.getFitness()>=i1.getFitness() && desc2.getFitness()>=i2.getFitness()) ) mejorDesc=mejorDesc+1
+    			else
+    			  unoYUno=unoYUno+1
+  		}
+
+  		val t2=System.currentTimeMillis();
+  		println(CROSSOVERS.toString() + " Sail crossovers con evaluacion in " + (t2-t) + "ms");       
+      println("Mejor ambos padres: "+ mejorParents)
+      println("Mejor ambos hijos: "+ mejorDesc)
+      println("Uno y uno: "+ unoYUno)
+        
+      println("---------------------");
+      
+    }
     
 }      
