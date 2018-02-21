@@ -1,10 +1,39 @@
 package ar.edu.ungs.sail.operators
 
-import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
-import scala.util.Random
-import ar.edu.ungs.yamiko.ga.domain.Population
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.Set
+import scala.util.Random
+
+import ar.edu.ungs.sail.Cancha
 import ar.edu.ungs.sail.Nodo
+import ar.edu.ungs.yamiko.ga.domain.Population
+import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import scalax.collection.GraphTraversal
+
+class SailRandomPathPopulationInitializer(cancha:Cancha)  extends PopulationInitializer[List[(Int,Int)]]{
+
+  override def isOuterInitialized()=true;
+  
+  override def execute(p:Population[List[(Int,Int)]])=
+  {
+      var sets:Set[List[(Int,Int)]]=Set[List[(Int,Int)]]()
+      val g=cancha.getGraph()
+      while (sets.size<p.size())
+      {
+        val path=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).pathTo(g.get(cancha.getNodoFinal()))
+        val path2=g.get(cancha.getNodoInicial()).withKind(GraphTraversal.BreadthFirst).pathUntil(pred=>pred.toOuter.getX()==cancha.getNodoFinal().getX() && pred.toOuter.getY()==cancha.getNodoFinal().getY())
+        val path3=g.get(cancha.getNodoInicial()).withKind(GraphTraversal.DepthFirst).pathUntil(pred=>pred.toOuter.getX()==cancha.getNodoFinal().getX() && pred.toOuter.getY()==cancha.getNodoFinal().getY())
+        sets.add(path.get.nodes.map(f=>(f.getX(),f.getY())).toList)
+        sets.add(path2.get.nodes.map(f=>(f.getX(),f.getY())).toList)
+        sets.add(path3.get.nodes.map(f=>(f.getX(),f.getY())).toList)
+        println(sets.size)
+      }
+      
+      sets.toList.map(f=>IndividualPathFactory.create(p.getGenome().getStructure().head._1,f)).foreach(p.addIndividual(_))
+    
+  }
+
+}
 
 class SailRandomPopulationInitializer(dimension:Int,nodosPorCelda:Int,nodoInicial:Nodo,nodoFinal:Nodo)  extends PopulationInitializer[List[(Int,Int)]]{
 
