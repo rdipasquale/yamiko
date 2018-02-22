@@ -9,6 +9,7 @@ import ar.edu.ungs.sail.Nodo
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import scalax.collection.GraphTraversal
+import ar.edu.ungs.sail.helper.CycleHelper
 
 class SailRandomPathPopulationInitializer(cancha:Cancha)  extends PopulationInitializer[List[(Int,Int)]]{
 
@@ -18,15 +19,41 @@ class SailRandomPathPopulationInitializer(cancha:Cancha)  extends PopulationInit
   {
       var sets:Set[List[(Int,Int)]]=Set[List[(Int,Int)]]()
       val g=cancha.getGraph()
+      val mainPath=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).pathTo(g.get(cancha.getNodoFinal()))
+      val nodosMainPath=mainPath.get.nodes.toList
+      sets.add(CycleHelper.remove(mainPath.get.nodes.map(f=>(f.getX(),f.getY())).toList))
+      
       while (sets.size<p.size())
       {
-        val path=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).pathTo(g.get(cancha.getNodoFinal()))
-        val path2=g.get(cancha.getNodoInicial()).withKind(GraphTraversal.BreadthFirst).pathUntil(pred=>pred.toOuter.getX()==cancha.getNodoFinal().getX() && pred.toOuter.getY()==cancha.getNodoFinal().getY())
-        val path3=g.get(cancha.getNodoInicial()).withKind(GraphTraversal.DepthFirst).pathUntil(pred=>pred.toOuter.getX()==cancha.getNodoFinal().getX() && pred.toOuter.getY()==cancha.getNodoFinal().getY())
-        sets.add(path.get.nodes.map(f=>(f.getX(),f.getY())).toList)
-        sets.add(path2.get.nodes.map(f=>(f.getX(),f.getY())).toList)
-        sets.add(path3.get.nodes.map(f=>(f.getX(),f.getY())).toList)
+        val nodoAExcluir=List(nodosMainPath(Random.nextInt(nodosMainPath.size)),
+            nodosMainPath(Random.nextInt(nodosMainPath.size)),
+            nodosMainPath(Random.nextInt(nodosMainPath.size)),
+            nodosMainPath(Random.nextInt(nodosMainPath.size)))
+        
+        val path=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100)
+                  .withSubgraph(nodes = !_.getId().startsWith("("+nodoAExcluir(0).getX()+")("+nodoAExcluir(0).getY()))
+                  .withSubgraph(nodes = !_.getId().startsWith("("+nodoAExcluir(1).getX()+")("+nodoAExcluir(1).getY()))
+                  .withSubgraph(nodes = !_.getId().startsWith("("+nodoAExcluir(2).getX()+")("+nodoAExcluir(2).getY()))
+                  .withSubgraph(nodes = !_.getId().startsWith("("+nodoAExcluir(3).getX()+")("+nodoAExcluir(3).getY()))
+                  .pathTo(g.get(cancha.getNodoFinal()))
+//        val path=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).withSubgraph(nodes = _.getX()!=nodoAExcluir.getX()).withSubgraph(nodes = _.getY()!=nodoAExcluir.getY()).pathTo(g.get(cancha.getNodoFinal()))
+        if (path.getOrElse(null)!=null) sets.add(CycleHelper.remove(path.get.nodes.map(f=>(f.getX(),f.getY())).toList))
+
+        if (sets.size<p.size())
+        {
+          val nodoAleatorio=cancha.getNodos()(Random.nextInt(cancha.getNodos.size))
+          val path2=g.get(cancha.getNodoInicial())
+                    .withSubgraph(nodes = _.getId().startsWith("("+nodoAleatorio.getX()+")("+nodoAleatorio.getY()))
+                    .pathTo(g.get(cancha.getNodoFinal()))
+          if (path2.getOrElse(null)!=null) sets.add(CycleHelper.remove(path2.get.nodes.map(f=>(f.getX(),f.getY())).toList))
+          
+        }
+//        val path2=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).withSubgraph(nodes = _.getY()!=nodoAExcluir.getY()).pathTo(g.get(cancha.getNodoFinal()))
+//        if (sets.size<p.size())
+//          if (path2.getOrElse(null)!=null) sets.add(CycleHelper.remove(path2.get.nodes.map(f=>(f.getX(),f.getY())).toList))
+
         println(sets.size)
+          
       }
       
       sets.toList.map(f=>IndividualPathFactory.create(p.getGenome().getStructure().head._1,f)).foreach(p.addIndividual(_))

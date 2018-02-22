@@ -17,7 +17,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 @Test
 class PopulationInitializaersTest {
 
-    private val POPULATION_SIZE=10
+    private val POPULATION_SIZE=200
     
   	@Before
   	def setUp()=

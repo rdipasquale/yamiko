@@ -9,6 +9,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.IndividualBitSetJavaFactory
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.sail.Cancha
 import ar.edu.ungs.sail.Costo
+import ar.edu.ungs.sail.helper.CycleHelper
 
 
 /**
@@ -85,34 +86,9 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
 		  var desc1=c1.slice(0, c1.indexOf(intersect(point)) )++c2.slice(c2.indexOf(intersect(point)), c2.length)
 		  var desc2=c2.slice(0, c2.indexOf(intersect(point)) )++c1.slice(c1.indexOf(intersect(point)), c1.length)
 
-		  // Eliminar ciclos)		  
-      var duplicados1=desc1.groupBy(identity).collect { case (x, List(_,_,_*)) => x }
-		  while (duplicados1.size>0)
-		  {
-		    val ciclomax=(duplicados1.map(f => {
-		      val p1=desc1.indexOf(f)
-		      val p2=desc1.indexOf(f,p1+1)
-		      (f,p2-p1)		      
-		    })).maxBy(_._2)
-	      val p1=desc1.indexOf(ciclomax._1)
-	      val p2=desc1.indexOf(ciclomax._1,p1+1)
-		    desc1=desc1.take(p1)++desc1.takeRight(desc1.size-p2)
-		    duplicados1=desc1.groupBy(identity).collect { case (x, List(_,_,_*)) => x }
-		  }
-
-		  var duplicados2=desc2.groupBy(identity).collect { case (x, List(_,_,_*)) => x }
-		  while (duplicados2.size>0)
-		  {
-		    val ciclomax=(duplicados2.map(f => {
-		      val p1=desc2.indexOf(f)
-		      val p2=desc2.indexOf(f,p1+1)
-		      (f,p2-p1)		      
-		    })).maxBy(_._2)
-	      val p1=desc2.indexOf(ciclomax._1)
-	      val p2=desc2.indexOf(ciclomax._1,p1+1)
-		    desc2=desc2.take(p1)++desc2.takeRight(desc2.size-p2)
-		    duplicados2=desc2.groupBy(identity).collect { case (x, List(_,_,_*)) => x }
-		  }
+		  // Eliminar ciclos
+		  desc1=CycleHelper.remove(desc1)
+		  desc2=CycleHelper.remove(desc2)
 		  
 		  // Repair
 		  var i=0
