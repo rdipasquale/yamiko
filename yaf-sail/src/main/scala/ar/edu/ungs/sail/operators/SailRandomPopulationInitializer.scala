@@ -42,11 +42,16 @@ class SailRandomPathPopulationInitializer(cancha:Cancha)  extends PopulationInit
         if (sets.size<p.size())
         {
           val nodoAleatorio=cancha.getNodos()(Random.nextInt(cancha.getNodos.size))
-          val path2=g.get(cancha.getNodoInicial())
-                    .withSubgraph(nodes = _.getId().startsWith("("+nodoAleatorio.getX()+")("+nodoAleatorio.getY()))
-                    .pathTo(g.get(cancha.getNodoFinal()))
-          if (path2.getOrElse(null)!=null) sets.add(CycleHelper.remove(path2.get.nodes.map(f=>(f.getX(),f.getY())).toList))
-          
+          val path21=g.get(cancha.getNodoInicial()).pathTo(g.get(nodoAleatorio))          
+          if (path21.getOrElse(null)!=null)
+          {
+            val path22=g.get(g.get(nodoAleatorio)).pathTo(g.get(cancha.getNodoFinal()))
+            if (path22.getOrElse(null)!=null)
+            {
+              val path2=path21.get.nodes.map(f=>(f.getX(),f.getY())).toList ++ path22.get.nodes.map(f=>(f.getX(),f.getY())).toList.drop(1)
+              sets.add(CycleHelper.remove(path2))
+            }
+          }
         }
 //        val path2=g.get(cancha.getNodoInicial()).withMaxDepth(cancha.getDimension()*4*100).withSubgraph(nodes = _.getY()!=nodoAExcluir.getY()).pathTo(g.get(cancha.getNodoFinal()))
 //        if (sets.size<p.size())
