@@ -2,7 +2,7 @@ package ar.edu.ungs.sail
 
 
 import ar.edu.ungs.sail.operators.ByPassRibosome
-import ar.edu.ungs.sail.operators.SailFitnessEvaluator
+import ar.edu.ungs.sail.operators.SailFitnessEvaluatorUniqueSolution
 import ar.edu.ungs.sail.operators.SailMorphogenesisAgent
 import ar.edu.ungs.sail.operators.SailMutatorSwap
 import ar.edu.ungs.sail.operators.SailOnePointCrossover
@@ -47,7 +47,7 @@ object SailProblem extends App {
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
   
-    	val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
+    	val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
     	val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
     	
     	val par:Parameter[List[(Int,Int)]]=	new Parameter[List[(Int,Int)]](0.15, 1d, POPULATION_SIZE, new DescendantAcceptEvaluator[List[(Int,Int)]](), 

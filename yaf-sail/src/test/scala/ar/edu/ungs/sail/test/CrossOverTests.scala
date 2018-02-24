@@ -12,7 +12,7 @@ import ar.edu.ungs.sail.GENES
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.sail.operators.ByPassRibosome
 import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
-import ar.edu.ungs.sail.operators.SailFitnessEvaluator
+import ar.edu.ungs.sail.operators.SailFitnessEvaluatorUniqueSolution
 import ar.edu.ungs.sail.operators.SailMorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
@@ -22,6 +22,8 @@ import ar.edu.ungs.serialization.Deserializador
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.sail.operators.IndividualPathFactory
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
+import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
+import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
 
 @Test
 class CrossOverTest {
@@ -48,7 +50,7 @@ class CrossOverTest {
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
+      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
       val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
   		
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
@@ -83,7 +85,7 @@ class CrossOverTest {
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
+      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
       val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
   		
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
@@ -116,8 +118,7 @@ class CrossOverTest {
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
-      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
+      val mAgent=new SailAbstractMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
   		
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
       val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,1),(0,2),(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,9),(8,9),(9,9),(10,9),(11,9),(12,9),(12,10),(12,11),(12,12)) )
@@ -126,11 +127,17 @@ class CrossOverTest {
   
   		val t=System.currentTimeMillis();
   		for (i<-0 to CROSSOVERS-1)
-  			cross.execute(List(i1,i2));
+  		{
+  			val d=cross.execute(List(i1,i2));
+  			val desc1=d(0)
+  			val desc2=d(1)
+  			mAgent.develop(genome, desc1)
+  			mAgent.develop(genome, desc2)
+  		}
   		val desc=cross.execute(List(i1,i2));
 
   		val t2=System.currentTimeMillis();
-  		println(CROSSOVERS.toString() + " Sail crossovers in " + (t2-t) + "ms");       
+  		println(CROSSOVERS.toString() + " Sail crossovers and SailAbstractMorphogenesisAgent.develop in " + (t2-t) + "ms");       
       println("desc 1: (" + desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(0).getFitness());
       println("desc 2: (" + desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(1).getFitness());
         
@@ -153,7 +160,7 @@ class CrossOverTest {
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluator(rioDeLaPlata)
+      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
       val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
   		
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
