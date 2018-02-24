@@ -89,10 +89,14 @@ object WindSimulation extends Serializable {
       // Mientras no esté completo el estado nuevo
       while(estadoNuevo.length<(cancha.getDimension()*cancha.getDimension()))
       {
+//        println("Estado anterior size: " + estadoAnterior.map(_._1).size + " - Estado anterior distinct size: " + estadoAnterior.map(_._1).distinct.size)
+//        println("Estado nuevo size: " + estadoNuevo.map(_._1).size + " - Estado Nuevo distinct size: " + estadoNuevo.map(_._1).distinct.size)
         var aux:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
         // 2) Selecciono los vecinos de los puntos seleccionados en el punto anterior siempre y cuando dichos vecinos no estén ya en el estado nuevo
         estadoNuevo.foreach(f=>aux++=estadoAnterior.filter(p=>Math.abs(p._1._1-f._1._1)<=1 && Math.abs(p._1._2-f._1._2)<=1 && estadoNuevo.filter(k=>k._1.equals(p._1)).size==0))
         aux=aux.distinct
+        if (aux.map(_._1).size>aux.map(_._1).distinct.size)
+            println("Duplicados")
         // 3) Ls muto en función de todos los vecinos que encuentre
         aux.foreach(f=> {
             val procesar:Boolean=(if (cancha.getIslas()==null)true else !cancha.getIslas().contains((f._1._1,f._1._2)))
@@ -107,6 +111,7 @@ object WindSimulation extends Serializable {
                             t))          
             }
         })
+//        println("Estado nuevo size: " + estadoNuevo.map(_._1).size + " - Estado Nuevo distinct size: " + estadoNuevo.map(_._1).distinct.size)
       }
       
       // 4) Si el modelo Admite Rachas
@@ -181,9 +186,29 @@ object WindSimulation extends Serializable {
                 }
               })
             colaCeldas=colaCeldasAux
-          })          
-          celdasRemover.foreach(f=>estadoNuevo-=f)
-          estadoNuevo++=celdasAgregar
+          })      
+//          println("Antes de remover, estadoNuevo tiene " + estadoNuevo.size +" - se van a remover " + celdasRemover.distinct.size + " - " + estadoNuevo)
+          celdasRemover.distinct.foreach(f=>estadoNuevo-=f)
+//          println("Despues de remover, estadoNuevo tiene " + estadoNuevo.size +" - se van a agregar" + celdasAgregar.size)
+          val celdasAAgregar=celdasAgregar.distinct.filter(p=>estadoNuevo.count(f=>f._1._1==p._1._1 && f._1._2==p._1._2)==0)
+//          if (celdasAAgregar.size+estadoNuevo.size>cancha.getDimension()*cancha.getDimension())
+//          {
+//            println("Error!")
+//            println(celdasAgregar)
+//            println(celdasAgregar.distinct)            
+//            println(celdasAAgregar)
+//            
+//          }
+          celdasAAgregar.foreach(f=>if(estadoNuevo.count(p=>p._1.equals(f._1))==0) estadoNuevo+=f) 
+//          println("Despues de agregar, estadoNuevo tiene " + estadoNuevo.size )
+//          if (estadoNuevo.size>cancha.getDimension()*cancha.getDimension())
+//          {
+//            println("Error!")
+//            println(celdasRemover)
+//            println(celdasAgregar)
+//            println(estadoNuevo)
+//            
+//          }
         }
       }
 
