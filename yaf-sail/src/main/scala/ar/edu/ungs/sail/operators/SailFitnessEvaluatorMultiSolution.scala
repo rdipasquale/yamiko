@@ -70,7 +70,7 @@ class SailFitnessEvaluatorMultiSolution(cancha:Cancha,barco:VMG,sc:SparkContext,
             t=t+1
     		  })
     
-    		  val fit=10000d-path.map(_._2).sum.doubleValue()
+    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
     		  ind.setFitness(fit)
 	        
     		  parcial+=( (f(0)._3,ind.getId(),fit) )
@@ -80,8 +80,11 @@ class SailFitnessEvaluatorMultiSolution(cancha:Cancha,barco:VMG,sc:SparkContext,
 	        
 	  })
 	  
-	  //val promedios=resultados.remap(f=>f.)
+	  val promedios=resultados.map(f=>(f._2,f._3)).mapValues(g=>(g,1)).reduceByKey({
+	                   case ((sumL, countL), (sumR, countR)) =>  (sumL + sumR, countL + countR)
+	                }).mapValues({case (sum , count) => sum / count.toDouble }).collect()
     
+	  
   }
   
 }	
