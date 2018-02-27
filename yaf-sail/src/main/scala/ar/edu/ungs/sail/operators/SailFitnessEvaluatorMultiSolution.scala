@@ -84,6 +84,10 @@ class SailFitnessEvaluatorMultiSolution(cancha:Cancha,barco:VMG,sc:SparkContext,
 	                   case ((sumL, countL), (sumR, countR)) =>  (sumL + sumR, countL + countR)
 	                }).mapValues({case (sum , count) => sum / count.toDouble }).collect()
     
+    // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking	                	                
+	  val resultorder=resultados.sortBy(s=>(s._1,s._3), true).zipWithIndex()
+	  
+	  //resultorder.map(f=>f._1).distinct().map(g=>resultorder.filter(h=>h._1==g))
 	  
   }
   
