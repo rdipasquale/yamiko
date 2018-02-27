@@ -82,13 +82,22 @@ class SailFitnessEvaluatorMultiSolution(cancha:Cancha,barco:VMG,sc:SparkContext,
 	  
 	  val promedios=resultados.map(f=>(f._2,f._3)).mapValues(g=>(g,1)).reduceByKey({
 	                   case ((sumL, countL), (sumR, countR)) =>  (sumL + sumR, countL + countR)
-	                }).mapValues({case (sum , count) => sum / count.toDouble }).collect()
+	                }).mapValues({case (sum , count) => sum / count.toDouble }).sortBy(_._1).collect()
     
-    // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking	                	                
-	  val resultorder=resultados.sortBy(s=>(s._1,s._3), true).zipWithIndex()
+    // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking (inverso)	                	                
+
+    // En el ranking del peor al mejor (comenzando en 0), hay |e| (escenarios) y |pob| individuos. Por tanto si sumamos los rankings inversos agrupando por individuos
+	  // vamos a repartir un total de |e||pob| puntos. El max que puede obtener cada individuo es (|pob|-1)|e|, por lo que si queremos que un individuo que haya
+	  // sido el mejor en todos los escenarios multiplique por 2 su fitness (ant), deberiamos multiplicar la sumatoria de puntos ranking inversos de cada individuo por
+	  // (|pob|-1)|e|/2
+    val coef=((pop.size()-1)*escenarios.count()).doubleValue()/2d
+    val resultranking=resultados.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2).sum*coef).sortBy(_._1).collect()
 	  
-	  //resultorder.map(f=>f._1).distinct().map(g=>resultorder.filter(h=>h._1==g))
+    val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))
 	  
+		for (p<-0 to pop.size()-1)
+		  pop.getAll()(p).setFitness(salida.find(_._1==pop.getAll()(p).getId()).get._2)
+    
   }
   
 }	
