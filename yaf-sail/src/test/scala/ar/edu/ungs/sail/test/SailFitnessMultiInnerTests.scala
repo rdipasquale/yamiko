@@ -27,6 +27,12 @@ import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
 import ar.edu.ungs.serialization.DeserializadorEscenarios
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.domain.Population
+import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
+import ar.edu.ungs.sail.operators.SailFitnessEvaluatorMultiSolution
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.sail.Costo
 
 @Test
 class SailFitnessMultiInnerTest {
@@ -34,12 +40,20 @@ class SailFitnessMultiInnerTest {
     private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt", 2)
     private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
     private val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-    private val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-    private val carr40:VMG=new Carr40()
+    private val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+    private val barco:VMG=new Carr40()
     private val genes=List(GENES.GenUnico)
     private val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
     private val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-    private val g=rioDeLaPlata.getGraph()
+    private val g=cancha.getGraph()
+    private val mAgent=new SailAbstractMorphogenesisAgent()
+    
+    private val URI_SPARK="local[1]"
+    private val MAX_NODES=4
+    private val MAX_GENERATIONS=10
+
+  	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
+    val sc=new SparkContext(conf)      
     
   	@Before
   	def setUp()=
@@ -51,21 +65,63 @@ class SailFitnessMultiInnerTest {
 
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
       val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,3),(0,6),(0,9),(0,12),(1,12),(2,12),(3,12),(4,12),(5,12),(6,12),(7,12),(8,12),(9,12),(10,12),(11,12),(12,12)) )
-
+      mAgent.develop(genome, i1)
+      mAgent.develop(genome, i2)
+      
       val pop:Population[List[(Int,Int)]]=new DistributedPopulation[List[(Int,Int)]](genome,2)
       pop.addIndividual(i1)
       pop.addIndividual(i2)
+
+      val resultados=escenarios.flatMap(f=>{
+        val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
+	      pop.getAll().par.foreach(ind=>{
+	        val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
+
+	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCosto(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f(t)._2 ,barco)		
+		
+		      val chromosome= ind.getGenotype().getChromosomes()(0);
+		      val allele=chromosome.getFullRawRepresentation()
+		
+      		var minCostAux:Float=Float.MaxValue/2-1
+
+      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
+		      
+		      var t=0
+
+		      allele.drop(1).foreach(nodoInt=>
+    		  {
+    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+        		nodosDestino.foreach(v=>{
+              val nf=g get v
+        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+              val spN = spNO.get
+              val peso=spN.weight
+              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+              val costo=pathTemp.map(_._2).sum
+              if (costo<minCostAux){
+                minCostAux=costo
+                nodoTemp=nf
+              }
+        		})
+            path++=pathTemp
+            nodoAux=nodoTemp
+            t=t+1
+    		  })
+    
+    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+    		  ind.setFitness(fit)
+	        
+    		  parcial+=( (f(0)._3,ind.getId(),fit) )
+	        })
+	        
+	     parcial.toList	       	        	        
+	        
+	  })
       
-      //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
-  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
-      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
-  		
-	
-  
   		println("---------------------");
   
     	try {
@@ -79,138 +135,5 @@ class SailFitnessMultiInnerTest {
       
     }
 
-    @Test
-  	def testSailCrossover1= {
-
-      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-      val carr40:VMG=new Carr40()
-     //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
-      
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
-  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
-      val genes=List(GENES.GenUnico)
-    	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
-    	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
-      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
-  		
-      val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
-      val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,1),(0,2),(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,9),(8,9),(9,9),(10,9),(11,9),(12,9),(12,10),(12,11),(12,12)) )
-	
-  
-  		println("---------------------");
-  
-  		val desc=cross.execute(List(i1,i2));
-      println("desc 1: (" + desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(0).getFitness());
-      println("desc 2: (" + desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(1).getFitness());
-
-      println("---------------------");
-       
-  
-    }
-
-    @Test
-  	def testSailCrossover1000= {
-
-      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-      val carr40:VMG=new Carr40()
-     //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
-      
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
-  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
-      val genes=List(GENES.GenUnico)
-    	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
-    	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val mAgent=new SailAbstractMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
-  		
-      val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
-      val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,1),(0,2),(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,9),(8,9),(9,9),(10,9),(11,9),(12,9),(12,10),(12,11),(12,12)) )
-  
-  		println("---------------------");
-  
-  		val t=System.currentTimeMillis();
-  		for (i<-0 to CROSSOVERS-1)
-  		{
-  			val d=cross.execute(List(i1,i2));
-  			val desc1=d(0)
-  			val desc2=d(1)
-  			mAgent.develop(genome, desc1)
-  			mAgent.develop(genome, desc2)
-  		}
-  		val desc=cross.execute(List(i1,i2));
-
-  		val t2=System.currentTimeMillis();
-  		println(CROSSOVERS.toString() + " Sail crossovers and SailAbstractMorphogenesisAgent.develop in " + (t2-t) + "ms");       
-      println("desc 1: (" + desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(0).getFitness());
-      println("desc 2: (" + desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(1).getFitness());
-        
-      println("---------------------");
-      
-    }
-
-    @Test
-  	def testSailCrossover1000ConFitness= {
-
-      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-      val carr40:VMG=new Carr40()
-     //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
-      
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
-  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
-      val genes=List(GENES.GenUnico)
-    	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
-    	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
-      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
-  		
-      val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
-      val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,1),(0,2),(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,9),(8,9),(9,9),(10,9),(11,9),(12,9),(12,10),(12,11),(12,12)) )
-  
-  		println("---------------------");
-  
-  		var mejorDesc=0
-  		var mejorParents=0
-  		var unoYUno=0
-			mAgent.develop(genome, i1)
-			mAgent.develop(genome, i2)
-  		fev.execute(i1)
-  		fev.execute(i2)
-  		
-    	val t=System.currentTimeMillis();
-  		for (i<-0 to 10)
-//  		for (i<-0 to CROSSOVERS)
-  		{
-  			val desc = cross.execute(List(i1,i2));
-  			val desc1=desc(0)
-  			val desc2=desc(1)
-  			mAgent.develop(genome, desc1)
-  			mAgent.develop(genome, desc2)
-  			fev.execute(desc1)
-  			fev.execute(desc2)
-  			if ((i1.getFitness()>desc1.getFitness() && i1.getFitness()>desc2.getFitness()) || (i2.getFitness()>desc1.getFitness() && i2.getFitness()>desc2.getFitness()) ) mejorParents=mejorParents+1
-  			else
-    			if ((desc1.getFitness()>=i1.getFitness() && desc1.getFitness()>=i2.getFitness()) || (desc2.getFitness()>=i1.getFitness() && desc2.getFitness()>=i2.getFitness()) ) mejorDesc=mejorDesc+1
-    			else
-    			  unoYUno=unoYUno+1
-  		}
-
-  		val t2=System.currentTimeMillis();
-  		println(CROSSOVERS.toString() + " Sail crossovers con evaluacion in " + (t2-t) + "ms");       
-      println("Mejor ambos padres: "+ mejorParents)
-      println("Mejor ambos hijos: "+ mejorDesc)
-      println("Uno y uno: "+ unoYUno)
-        
-      println("---------------------");
-      
-    }
     
 }      

@@ -43,18 +43,23 @@ object SerializadorEscenarios {
   
 }
 
+/**
+ * Devuelve una Lista de Escenearios 
+ */
 object DeserializadorEscenarios {
-  def run(file:String,cant:Int):List[List[(Int, List[((Int, Int), Int, Int, Int)])]]={
+  def run(file:String):List[(Int, List [(Int, List[((Int, Int), Int, Int, Int)])])] ={
     var salida:ListBuffer[(Int, List[((Int, Int), Int, Int, Int)])]=ListBuffer()
-    1 to cant foreach(i=>{
       val bufferedSource = Source.fromFile(file)
-      var aux:ListBuffer[((Int, Int), Int, Int, Int)]=ListBuffer()
+      var aux:ListBuffer[(Int,Int, (Int, Int), Int, Int, Int)]=ListBuffer()
       for (line <- bufferedSource.getLines) {
         val cols = line.split(",").map(_.trim)
-        aux+=(((cols(0).toInt,cols(1).toInt),cols(2).toInt,cols(3).toInt,cols(4).toInt))
+        aux+=((cols(0).toInt,cols(1).toInt, (cols(2).toInt,cols(3).toInt),cols(4).toInt,cols(5).toInt,cols(6).toInt))
       }
-      salida+=((i,aux.toList))
       bufferedSource.close()
+      val x=aux.toList.groupBy(_._1).map(())
+      //.groupBy(_._1).toList
+      //.groupBy(_._1)
+      salida+=((i,aux.toList))
     })
     salida.toList.groupBy(_._1).map(_._2).toList
   }
