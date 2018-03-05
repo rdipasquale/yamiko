@@ -63,7 +63,7 @@ object GenerarEscenarios4x4 extends App {
         //SerializadorEscenario.run("./esc4x4/escenario4x4ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
       })
       
-      SerializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt", escenarios.toList)
+      SerializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
 
   }
 }

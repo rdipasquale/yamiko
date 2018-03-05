@@ -37,7 +37,7 @@ import ar.edu.ungs.sail.Costo
 @Test
 class SailFitnessMultiInnerTest {
 
-    private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt", 2)
+    private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
     private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
     private val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
     private val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
@@ -72,64 +72,58 @@ class SailFitnessMultiInnerTest {
       pop.addIndividual(i1)
       pop.addIndividual(i2)
 
-      val resultados=escenarios.flatMap(f=>{
-        val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
-	      pop.getAll().par.foreach(ind=>{
-	        val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
-
-	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCosto(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f(t)._2 ,barco)		
-		
-		      val chromosome= ind.getGenotype().getChromosomes()(0);
-		      val allele=chromosome.getFullRawRepresentation()
-		
-      		var minCostAux:Float=Float.MaxValue/2-1
-
-      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
-      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
-      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
-		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
-		      
-		      var t=0
-
-		      allele.drop(1).foreach(nodoInt=>
-    		  {
-    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
-        		nodosDestino.foreach(v=>{
-              val nf=g get v
-        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
-              val spN = spNO.get
-              val peso=spN.weight
-              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
-              val costo=pathTemp.map(_._2).sum
-              if (costo<minCostAux){
-                minCostAux=costo
-                nodoTemp=nf
-              }
-        		})
-            path++=pathTemp
-            nodoAux=nodoTemp
-            t=t+1
-    		  })
-    
-    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
-    		  ind.setFitness(fit)
-	        
-    		  parcial+=( (f(0)._3,ind.getId(),fit) )
-	        })
-	        
-	     parcial.toList	       	        	        
-	        
-	  })
+//      val resultados=escenarios.getEscenarios().flatMap(f=>{
+//        val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
+//	      pop.getAll().par.foreach(ind=>{
+//	        val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
+//
+//	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCosto(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
+//		
+//		      val chromosome= ind.getGenotype().getChromosomes()(0);
+//		      val allele=chromosome.getFullRawRepresentation()
+//		
+//      		var minCostAux:Float=Float.MaxValue/2-1
+//
+//      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+//      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+//      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+//		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
+//		      
+//		      var t=0
+//
+//		      allele.drop(1).foreach(nodoInt=>
+//    		  {
+//    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+//        		nodosDestino.foreach(v=>{
+//              val nf=g get v
+//        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+//              val spN = spNO.get
+//              val peso=spN.weight
+//              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+//              val costo=pathTemp.map(_._2).sum
+//              if (costo<minCostAux){
+//                minCostAux=costo
+//                nodoTemp=nf
+//              }
+//        		})
+//            path++=pathTemp
+//            nodoAux=nodoTemp
+//            t=t+1
+//    		  })
+//    
+//    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+//    		  ind.setFitness(fit)
+//	        
+//    		  parcial+=( (f(0)._3,ind.getId(),fit) )
+//	        })
+//	        
+//	     parcial.toList	       	        	        
+//	        
+//	  })
       
       
   		println("---------------------");
   
-    	try {
-    		val desc=cross.execute(List(i1,i2));
-       } catch {
-       case ioe: NotCompatibleIndividualException => println("i1 e i2 no compatibles. OK")
-       case e: Exception => fail("Debiera ser NotCompatibleIndividualException")
-      }
 
       println("---------------------");
       
