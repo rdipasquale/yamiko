@@ -56,7 +56,28 @@ class SerializadoresTest {
       Assert.assertSame(objEscenarios.getEscenarios().keys.size, escenarios.size)
       Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(1).size, escenarios(1)(0)._2.size)
       Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(4).size, escenarios(4)(0)._2.size)
+      Assert.assertSame(objEscenarios.getEscenarioById(3).getEstadoByTiempo(4)(0).getAngulo(), escenarios(2)(3)._2(3)._2)
       
+      objEscenarios.getEscenarios().keys.foreach(f=>{
+        println("Escenario objEscenarios " + f)
+        objEscenarios.getEscenarioById(f).getEstados().foreach(g=>{
+          print("Tiempo " + g)
+          g._2.foreach(h=>print(h))
+          println()
+        })
+      })
+
+      println("-------------------------------")
+
+      escenarios.foreach(f=>{
+        println("Escenario escenarios " + f(0)._1)
+        f.foreach(g=>{
+          print("Tiempo " + g._1)
+          g._2.foreach(h=>print("[t=" + h._4 + " (" + h._1._1 + ", " + h._1._2 + ") Ang: " + h._2 + " Vel: " + h._3 +"]"))
+          println()
+        })
+      })
+
       SerializadorEscenarios.run("./test_001.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
       
       println("")

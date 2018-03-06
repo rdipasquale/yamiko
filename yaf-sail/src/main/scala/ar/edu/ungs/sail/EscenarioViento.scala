@@ -35,4 +35,5 @@ class EstadoEscenarioViento(momento:Int,celda:(Int,Int),angulo:Int,velocidad:Int
   def getCelda()=celda
   def getAngulo()=angulo
   def getVelocidad()=velocidad 
+  override def toString: String ="[t=" + getMomento() + " (" + getCelda._1 + ", " + getCelda._2 + ") Ang: " + getAngulo() + " Vel: " + getVelocidad() +"]"
 }
