@@ -56,7 +56,7 @@ class SerializadoresTest {
       Assert.assertSame(objEscenarios.getEscenarios().keys.size, escenarios.size)
       Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(1).size, escenarios(1)(0)._2.size)
       Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(4).size, escenarios(4)(0)._2.size)
-      Assert.assertSame(objEscenarios.getEscenarioById(3).getEstadoByTiempo(4)(0).getAngulo(), escenarios(2)(3)._2(3)._2)
+      Assert.assertEquals(objEscenarios.getEscenarioById(3).getEstadoByTiempo(3)(1).getAngulo(),escenarios(2)(3)._2(1)._2)
       
       objEscenarios.getEscenarios().keys.foreach(f=>{
         println("Escenario objEscenarios " + f)
