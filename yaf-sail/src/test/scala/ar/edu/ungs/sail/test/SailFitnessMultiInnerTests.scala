@@ -35,7 +35,7 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.sail.Costo
 
 @Test
-class SailFitnessMultiInnerTest {
+class SailFitnessMultiInnerTest extends Serializable{
 
     private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
     private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
@@ -52,8 +52,6 @@ class SailFitnessMultiInnerTest {
     private val MAX_NODES=4
     private val MAX_GENERATIONS=10
 
-  	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
-    val sc=new SparkContext(conf)      
     
   	@Before
   	def setUp()=
@@ -61,7 +59,9 @@ class SailFitnessMultiInnerTest {
   	} 
   	
     @Test
-  	def testSailCrossoverNoCompatible = {
+  	def testCalculo = {
+    	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
+      val sc=new SparkContext(conf)      
 
       val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
       val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,3),(0,6),(0,9),(0,12),(1,12),(2,12),(3,12),(4,12),(5,12),(6,12),(7,12),(8,12),(9,12),(10,12),(11,12),(12,12)) )
@@ -72,54 +72,56 @@ class SailFitnessMultiInnerTest {
       pop.addIndividual(i1)
       pop.addIndividual(i2)
 
-//      val resultados=escenarios.getEscenarios().flatMap(f=>{
-//        val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
-//	      pop.getAll().par.foreach(ind=>{
-//	        val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
-//
-//	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCosto(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
-//		
-//		      val chromosome= ind.getGenotype().getChromosomes()(0);
-//		      val allele=chromosome.getFullRawRepresentation()
-//		
-//      		var minCostAux:Float=Float.MaxValue/2-1
-//
-//      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
-//      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
-//      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
-//		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
-//		      
-//		      var t=0
-//
-//		      allele.drop(1).foreach(nodoInt=>
-//    		  {
-//    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
-//        		nodosDestino.foreach(v=>{
-//              val nf=g get v
-//        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
-//              val spN = spNO.get
-//              val peso=spN.weight
-//              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
-//              val costo=pathTemp.map(_._2).sum
-//              if (costo<minCostAux){
-//                minCostAux=costo
-//                nodoTemp=nf
-//              }
-//        		})
-//            path++=pathTemp
-//            nodoAux=nodoTemp
-//            t=t+1
-//    		  })
-//    
-//    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
-//    		  ind.setFitness(fit)
-//	        
-//    		  parcial+=( (f(0)._3,ind.getId(),fit) )
-//	        })
-//	        
-//	     parcial.toList	       	        	        
-//	        
-//	  })
+      val rdd=sc.parallelize(escenarios.getEscenarios().toSeq)      
+      
+      val resultados=rdd.flatMap(f=>{
+        val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
+	      pop.getAll().par.foreach(ind=>{
+	        val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
+
+	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
+		
+		      val chromosome= ind.getGenotype().getChromosomes()(0);
+		      val allele=chromosome.getFullRawRepresentation()
+		
+      		var minCostAux:Float=Float.MaxValue/2-1
+
+      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
+		      
+		      var t=0
+
+		      allele.drop(1).foreach(nodoInt=>
+    		  {
+    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+        		nodosDestino.foreach(v=>{
+              val nf=g get v
+        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+              val spN = spNO.get
+              val peso=spN.weight
+              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+              val costo=pathTemp.map(_._2).sum
+              if (costo<minCostAux){
+                minCostAux=costo
+                nodoTemp=nf
+              }
+        		})
+            path++=pathTemp
+            nodoAux=nodoTemp
+            t=t+1
+    		  })
+    
+    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+    		  ind.setFitness(fit)
+	        
+    		  parcial+=( (f._1,ind.getId(),fit) )
+	        })
+	        
+	     parcial.toList	       	        	        
+	        
+	  })
       
       
   		println("---------------------");
