@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import org.junit.After
 import org.junit.Assert
+import ar.edu.ungs.serialization.DeserializadorEscenarios
 
 @Test
 class SerializadoresTest {
@@ -80,7 +81,13 @@ class SerializadoresTest {
 
       SerializadorEscenarios.run("./test_001.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
       
-      println("")
+      val escenariosLeidos=DeserializadorEscenarios.run("./test_001.txt")
+      
+      Assert.assertSame(objEscenarios.getEscenarios().keys.size, escenariosLeidos.getEscenarios().keys.size)
+      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(1).size, escenariosLeidos.getEscenarioById(6+1).getEstadoByTiempo(1).size)
+      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(4).size, escenariosLeidos.getEscenarioById(6+1).getEstadoByTiempo(4).size)
+      Assert.assertEquals(objEscenarios.getEscenarioById(3).getEstadoByTiempo(3)(1).getAngulo(),escenariosLeidos.getEscenarioById(6+3).getEstadoByTiempo(3)(1).getAngulo())
+      Assert.assertEquals(objEscenarios.getEscenarioById(4).getEstadoByTiempo(4)(3).getVelocidad(),escenariosLeidos.getEscenarioById(6+4).getEstadoByTiempo(4)(3).getVelocidad())
       
     }
 
