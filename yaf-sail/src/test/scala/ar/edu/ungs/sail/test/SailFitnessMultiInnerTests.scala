@@ -58,6 +58,52 @@ class SailFitnessMultiInnerTest extends Serializable{
   	{
   	} 
   	
+
+    @Test
+  	def testCosto = {
+      val f=escenarios.getEscenarios().take(1).values.toList(0)
+      
+      def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f.getEstadoByTiempo(t) ,barco)		
+      val ind:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
+      mAgent.develop(genome, ind)
+      val x=ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
+      val chromosome= ind.getGenotype().getChromosomes()(0);
+      val allele=chromosome.getFullRawRepresentation()
+	
+  		var minCostAux:Float=Float.MaxValue/2-1
+
+  		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+  		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+  		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+      var pathTemp:Traversable[(g.EdgeT, Float)]=null
+      
+      var t=0
+
+      allele.drop(1).foreach(nodoInt=>
+		  {
+		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+    		nodosDestino.foreach(v=>{
+          val nf=g get v
+    		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+          val spN = spNO.get
+          val peso=spN.weight
+          pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+          val costo=pathTemp.map(_._2).sum
+          if (costo<minCostAux){
+            minCostAux=costo
+            nodoTemp=nf
+          }
+    		})
+        path++=pathTemp
+        nodoAux=nodoTemp
+        t=t+1
+		  })
+
+		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+		  ind.setFitness(fit)
+    		  
+    }
+    
     @Test
   	def testCalculo = {
     	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
@@ -72,7 +118,7 @@ class SailFitnessMultiInnerTest extends Serializable{
       pop.addIndividual(i1)
       pop.addIndividual(i2)
 
-      val rdd=sc.parallelize(escenarios.getEscenarios().toSeq)      
+      val rdd=sc.parallelize(escenarios.getEscenarios().toSeq).take(1)      
       
       val resultados=rdd.flatMap(f=>{
         val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
