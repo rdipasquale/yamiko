@@ -101,6 +101,8 @@ class SailFitnessMultiInnerTest extends Serializable{
 
 		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
 		  ind.setFitness(fit)
+		  
+		  println("Fitness = " + fit)
     		  
     }
     
@@ -171,7 +173,6 @@ class SailFitnessMultiInnerTest extends Serializable{
       
       
   		println("---------------------");
-  
 
       println("---------------------");
       

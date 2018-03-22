@@ -166,7 +166,8 @@ class Carr40 extends VMG{
       ws=ws-4;
       if (an>360) an=an % 360;
       if (an>180) an=360-an
-      speeds(an)(ws)      
+      if (an<32) return 0d;
+      speeds(an)(ws)
   }
   
   override def getMaxSpeed(windspeed:Int):(Int,Double)={
