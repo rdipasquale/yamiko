@@ -33,6 +33,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.sail.Costo
+import org.junit.After
+import scala.collection.mutable.Stack
+import scala.collection.mutable.Set
+import scala.collection.mutable.HashSet
 
 @Test
 class SailFitnessMultiInnerTest extends Serializable{
@@ -51,12 +55,6 @@ class SailFitnessMultiInnerTest extends Serializable{
     private val URI_SPARK="local[1]"
     private val MAX_NODES=4
     private val MAX_GENERATIONS=10
-
-    
-  	@Before
-  	def setUp()=
-  	{
-  	} 
   	
 
     @Test
@@ -175,8 +173,50 @@ class SailFitnessMultiInnerTest extends Serializable{
   		println("---------------------");
 
       println("---------------------");
-      
+
+      sc.stop()
     }
 
+
     
+    @Test
+    def testVerifyAllPaths()=
+    {
+      //def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
+
+  		
+  		val pathResult:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+
+  		var v:g.NodeT=g get cancha.getNodoInicial()
+  		var t:g.NodeT=g get cancha.getNodoFinal()
+
+  		var path  = new Stack[g.NodeT]()
+      var onPath  = new HashSet[g.NodeT]()
+      
+      enumerate(v,t)
+      
+      def enumerate(v:g.NodeT,t:g.NodeT):Boolean={
+        path.push(v)
+        onPath.add(v)
+  
+        if (v.equals(t)) 
+              println(path.reverse);
+        else 
+          if (path.length>300)
+          {
+            path.clear()
+            onPath.clear()
+            return false
+          }
+          else
+            v.diSuccessors.foreach(s=>if (!onPath.contains(s)) if (!enumerate(s, t)) return false)
+  
+          // done exploring from v, so remove from path
+          path.pop()
+          onPath.remove(v)    
+          true
+      }
+    }
+
+
 }      
