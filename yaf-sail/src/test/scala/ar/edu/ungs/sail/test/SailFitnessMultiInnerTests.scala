@@ -37,6 +37,10 @@ import org.junit.After
 import scala.collection.mutable.Stack
 import scala.collection.mutable.Set
 import scala.collection.mutable.HashSet
+import scala.annotation.tailrec
+import scala.collection.mutable.Map
+import scala.collection.mutable.HashMap
+import ar.edu.ungs.sail.CanchaRioDeLaPlataUniManiobra
 
 @Test
 class SailFitnessMultiInnerTest extends Serializable{
@@ -177,46 +181,106 @@ class SailFitnessMultiInnerTest extends Serializable{
       sc.stop()
     }
 
-
     
+    
+    // StackOverflowError
     @Test
     def testVerifyAllPaths()=
     {
-      //def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
+      val t1=System.currentTimeMillis()
 
-  		
-  		val pathResult:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
-
-  		var v:g.NodeT=g get cancha.getNodoInicial()
-  		var t:g.NodeT=g get cancha.getNodoFinal()
-
-  		var path  = new Stack[g.NodeT]()
-      var onPath  = new HashSet[g.NodeT]()
+      val cancha2:Cancha=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null);
+      val g2=cancha2.getGraph()
+  		val path  = new Stack[g2.NodeT]()
+      var seen = new HashSet[g2.NodeT]()
+      val cache= new HashMap[g2.NodeT,Boolean]()
       
-      enumerate(v,t)
+      println(cancha2.getArcos().size)
       
-      def enumerate(v:g.NodeT,t:g.NodeT):Boolean={
-        path.push(v)
-        onPath.add(v)
-  
-        if (v.equals(t)) 
-              println(path.reverse);
-        else 
-          if (path.length>300)
-          {
-            path.clear()
-            onPath.clear()
-            return false
-          }
-          else
-            v.diSuccessors.foreach(s=>if (!onPath.contains(s)) if (!enumerate(s, t)) return false)
-  
-          // done exploring from v, so remove from path
-          path.pop()
-          onPath.remove(v)    
-          true
+  		val v:g2.NodeT=g2 get cancha2.getNodoInicial()
+  		val t:g2.NodeT=g2 get cancha2.getNodoFinal()
+      
+          
+      def stuck(x:g2.NodeT):Boolean={
+  		   if (x.equals(v)) return false
+         if (x.equals(t)) return false
+//         if (cache.contains(x)) return cache.get(x).get
+//         if (x.neighbors.contains(t))
+//         {
+//           cache.put(x, false)
+//           return false
+//         }         
+         for (y <- x.neighbors.toList.sortWith((x, y) => math.abs(t.getX()-x.getX())+math.abs(t.getY()-x.getY()) < math.abs(t.getX()-y.getX())+math.abs(t.getY()-y.getY())))
+         {
+           if (!seen.contains(y)) seen.add(y)
+           if (!stuck(y)) 
+             {
+               cache.put(x, false)
+               return false
+             }
+         }
+  		   cache.put(x, true)
+         true
       }
+
+      def search(x:g2.NodeT):Unit={
+         if (x.equals(t)) println(path)          
+         seen = new HashSet[g2.NodeT]()
+         path.foreach(f=>seen.add(f))
+         if (stuck(x)) return
+         for (y <- x.neighbors--seen)
+         {
+          path.push(y)
+          search(y)
+          path.pop
+         }
+      }
+    
+//      g.nodes.toList.sortWith((x, y) => math.abs(t.getX()-x.getX())+math.abs(t.getY()-x.getY()) < math.abs(t.getX()-y.getX())+math.abs(t.getY()-y.getY())).foreach(f=>stuck(f))
+      
+      path.push(v)
+      search(v)
     }
+
+    
+//    @Test
+//    def testVerifyAllPaths()=
+//    {
+//      //def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f._2.getEstadoByTiempo(t) ,barco)		
+//
+//  		
+//  		val pathResult:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+//
+//  		var v:g.NodeT=g get cancha.getNodoInicial()
+//  		var t:g.NodeT=g get cancha.getNodoFinal()
+//
+//  		var path  = new Stack[g.NodeT]()
+//      var onPath  = new HashSet[g.NodeT]()
+//      
+//      enumerate(v,t)
+//      
+//      def enumerate(v:g.NodeT,t:g.NodeT):Boolean={
+//        path.push(v)
+//        onPath.add(v)
+//  
+//        if (v.equals(t)) 
+//              println(path.reverse);
+//        else 
+//          if (path.length>300)
+//          {
+//            path.clear()
+//            onPath.clear()
+//            return false
+//          }
+//          else
+//            v.diSuccessors.foreach(s=>if (!onPath.contains(s)) if (!enumerate(s, t)) return false)
+//  
+//          // done exploring from v, so remove from path
+//          path.pop()
+//          onPath.remove(v)    
+//          true
+//      }
+//    }
 
 
 }      
