@@ -13,6 +13,8 @@ syntax: glob
 .project
 .manager
 .scala_dependencies
+.cache-tests
+.cache-main
 
 # idea
 .idea
