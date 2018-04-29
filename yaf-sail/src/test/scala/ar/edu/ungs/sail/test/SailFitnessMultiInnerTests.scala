@@ -262,19 +262,32 @@ class SailFitnessMultiInnerTest extends Serializable{
 		  val app:AllPossiblePaths= new AllPossiblePaths(arrNodos.length);
    		for (i<-0 to arrNodos.length-1)
    		{
-   		  cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>println("app.addEdge(" + i + ", " + arrNodos.indexOf(f._2)+ ")" ))
-   		  cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>
-   		    app.addEdge(i, arrNodos.indexOf(f._2)))
+   		  //cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>println("app.addEdge(" + i + ", " + arrNodos.indexOf(f._2)+ ")" ))
+   		  cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>{
+   		      if (i!=arrNodos.indexOf(f._2))
+   		        app.addEdge(i, arrNodos.indexOf(f._2))
+     		  })
+
    		}
 
-      app.findPath(arrNodos.indexOf(nodoInicial),arrNodos.indexOf(nodoFinal))
+   		val iNodoIni=arrNodos.indexOf(nodoInicial)
+   		val iNodoFin=arrNodos.indexOf(nodoFinal)
+   		
+      app.findPath(iNodoIni,iNodoFin)
       
       
-      val lista=app.getPathToNode()
+      val lista=app.getPathToNode().get(0)
       
+      val lb1=ListBuffer[Nodo]()
+      lb1+=nodoInicial
+      for (i<-0 to lista.size()-1) lb1+=arrNodos(i)
+      lb1+=nodoFinal
+      lb1.foreach(print(_))
+      println()
 
       app.findAllpaths(arrNodos.indexOf(nodoInicial),arrNodos.indexOf(nodoFinal))
-		 
+
+      
     }
     
     

@@ -15,10 +15,11 @@ public class AllPossiblePaths {
     private List<Integer>[] adj;
     //to find a path you need to store the path that lead to it
     private List<Integer>[] pathToNode;
+    private List<List<Integer>> pathToNodePosta=new ArrayList<List<Integer>>();
 
-    public List<Integer>[] getPathToNode()
+    public List<List<Integer>> getPathToNode()
     {
-    	return pathToNode;
+    	return pathToNodePosta;
     }
     
     public AllPossiblePaths(int numberOfNodes) {
@@ -26,7 +27,8 @@ public class AllPossiblePaths {
         this.numberOfNodes = numberOfNodes;
         adj = new ArrayList[numberOfNodes];
         pathToNode = new ArrayList[numberOfNodes];
-
+        pathToNodePosta= new ArrayList<List<Integer>>();
+        
         for (int i = 0; i < numberOfNodes; i++) {
             adj[i] = new ArrayList<>();
         }
@@ -37,12 +39,12 @@ public class AllPossiblePaths {
         adj[from].add(to);
         //unless unidirectional: //if a is connected to b
         //than b should be connected to a
-        adj[to].add(from);
+        //adj[to].add(from);
         return this; //makes it convenient to add multiple edges
     }
 
     public void findPath(int source, int destination) {
-
+        pathToNodePosta.clear();
     	List<List<Integer[]>> salida=new ArrayList<List<Integer[]>>();
         System.out.println("------------Single path search---------------");
         initializeSearch(source);
@@ -55,6 +57,7 @@ public class AllPossiblePaths {
             if (src == destination) {
                 System.out.println("Path from "+source+" to "
                         + destination+ " :- "+ pathToNode[src]);
+                pathToNodePosta.add(pathToNode[src]);
                 break; //exit loop if target found
             }
 
@@ -73,6 +76,8 @@ public class AllPossiblePaths {
     public void findAllpaths(int source, int destination) {
 
         System.out.println("-----------Multiple path search--------------");
+        pathToNodePosta.clear();
+
         includedInPath = new boolean[numberOfNodes];
         initializeSearch(source);
         int pathCounter = 0;
@@ -88,6 +93,7 @@ public class AllPossiblePaths {
 
                     System.out.println("Path " + ++pathCounter + " from "+source+" to "
                             + destination+ " :- "+ pathToNode[src]);
+                    pathToNodePosta.add(pathToNode[src]);
                     //mark nodes that are included in the path, so they will not be included
                     //in any other path
                     for(int i=1; i < pathToNode[src].size(); i++) {
