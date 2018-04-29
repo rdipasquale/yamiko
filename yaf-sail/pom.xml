@@ -84,6 +84,14 @@
 	  <version>1.10.1</version>
 	</dependency>
 
+    <dependency>
+	  	<groupId>ar.edu.ungs.yamiko.problems</groupId>
+		<artifactId>yaf-java-helper</artifactId>
+  		<version>1.0.0</version>
+        <scope>test</scope>
+	</dependency>
+	
+
   </dependencies>
 
   <build>

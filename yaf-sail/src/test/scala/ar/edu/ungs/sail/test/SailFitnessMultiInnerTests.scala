@@ -41,7 +41,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable.Map
 import scala.collection.mutable.HashMap
 import ar.edu.ungs.sail.CanchaRioDeLaPlataUniManiobra
-import ar.edu.ungs.sail.test.java.AllPossiblePaths
+import ar.edu.ungs.sail.java.AllPossiblePaths
 
 @Test
 class SailFitnessMultiInnerTest extends Serializable{

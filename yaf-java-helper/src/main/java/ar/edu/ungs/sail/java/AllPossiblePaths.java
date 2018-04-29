@@ -1,4 +1,4 @@
-package ar.edu.ungs.sail.test.java;
+package ar.edu.ungs.sail.java;
 
 import java.util.ArrayList;
 import java.util.Iterator;
