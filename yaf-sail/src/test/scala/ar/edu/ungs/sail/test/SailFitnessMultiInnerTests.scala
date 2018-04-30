@@ -262,7 +262,9 @@ class SailFitnessMultiInnerTest extends Serializable{
 		  val app:AllPossiblePaths= new AllPossiblePaths(arrNodos.length);
    		for (i<-0 to arrNodos.length-1)
    		{
-   		  //cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>println("app.addEdge(" + i + ", " + arrNodos.indexOf(f._2)+ ")" ))
+   		  println("El nodo Nro " + i + " del array, representando a " + cancha.getGraph().get(arrNodos(i)) + " tiene los siguientes adyacentes: ")
+   		  cancha.getGraph().get(arrNodos(i)).edges.toList.distinct.foreach(f=>println(f._2))
+   		  
    		  cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>{
    		      if (i!=arrNodos.indexOf(f._2))
    		        app.addEdge(i, arrNodos.indexOf(f._2))
