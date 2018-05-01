@@ -42,6 +42,8 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.HashMap
 import ar.edu.ungs.sail.CanchaRioDeLaPlataUniManiobra
 import ar.edu.ungs.sail.java.AllPossiblePaths
+import ar.edu.ungs.sail.java.TestingGraph
+import scala.util.Random
 
 @Test
 class SailFitnessMultiInnerTest extends Serializable{
@@ -257,44 +259,96 @@ class SailFitnessMultiInnerTest extends Serializable{
 		  
 		  assertTrue(fit<fitM)
 
-		  val arrNodos=cancha.getNodos().toArray
+		  
+      
+      val canchaUni=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null)
+//		  val arrNodos=cancha.getNodos().toArray
+		  val arrNodos=canchaUni.getNodos().toArray
 		  println("Son " + arrNodos.length + " nodos")
-		  val app:AllPossiblePaths= new AllPossiblePaths(arrNodos.length);
+
+      //val app:AllPossiblePaths= new AllPossiblePaths(arrNodos.length);
+//      val testingGraph:TestingGraph= new TestingGraph(arrNodos.length,8); // Buscamos todos los paths de hasta 8 de longitud
+      val testingGraph:TestingGraph= new TestingGraph(arrNodos.length,9); // Buscamos todos los paths de hasta 9 de longitud
+      
    		for (i<-0 to arrNodos.length-1)
    		{
-   		  val vecindad=cancha.getArcos().filter(f=>f._1.getId().equals(arrNodos(i).getId()))
+   		  //val vecindad=cancha.getArcos().filter(f=>f._1.getId().equals(arrNodos(i).getId()))
+   		  val vecindad=canchaUni.getArcos().filter(f=>f._1.getId().equals(arrNodos(i).getId()))
 //   		  println("El nodo Nro " + i + " del array, representando a " + cancha.getGraph().get(arrNodos(i)) + " tiene los siguientes adyacentes: ")
 //   		  vecindad.foreach(println(_))
    		  vecindad.foreach(f=>
    		    {
-   		      println("Agregando un arco desde " + i + " a " + arrNodos.indexOf(f._2) + " ((( " + arrNodos(i).getId() + " a " + arrNodos(arrNodos.indexOf(f._2)).getId() + " ))) siendo que " + f._2.getId() + " es igual a " + arrNodos(arrNodos.indexOf(f._2)).getId() )
-   		      app.addEdge(i, arrNodos.indexOf(f._2))
+   		      //println("Agregando un arco desde " + i + " a " + arrNodos.indexOf(f._2) + " ((( " + arrNodos(i).getId() + " a " + arrNodos(arrNodos.indexOf(f._2)).getId() + " ))) siendo que " + f._2.getId() + " es igual a " + arrNodos(arrNodos.indexOf(f._2)).getId() )
+   		      //app.addEdge(i, arrNodos.indexOf(f._2))
+   		      testingGraph.addEdge(i, arrNodos.indexOf(f._2))
    		    })
    		}
 
-   		val iNodoIni=arrNodos.indexOf(nodoInicial)
-   		val iNodoFin=arrNodos.indexOf(nodoFinal)
+   		val t1=System.currentTimeMillis()
+		  val salida=testingGraph.getAllPaths(arrNodos.indexOf(nodoInicial),arrNodos.indexOf(nodoFinal))
+		  val t2=System.currentTimeMillis()
+		  println()
+		  println("Se encontraron " + salida.size() + " paths de longitud <=9 en " + ((t2-t1).doubleValue()/1000d) + " segundos")
+
+		  // Vamos a usar 9, ya que en 10:
+		  // Se encontraron 3066803 paths de longitud <=10 en 191.035 segundos
+		  println("A buscar paths mejores.... (fit=" + fitM + ")")
+
+		  val alleles=ListBuffer[ListBuffer[Int]]()
+		  
+      for (i<-0 to salida.size()-1)
+      {
+        var aux11=ListBuffer[Int]()
+        for (j<-0 to salida.get(i).size()-1) aux11+=(salida.get(i).get(j))
+        alleles+=aux11
+      }
+		  
+   		val fitnessResults=ListBuffer[(ListBuffer[Int],Double)]()
+   		val t3=System.currentTimeMillis()
+
    		
-      app.findPath(iNodoIni,iNodoFin)
+   		//alleles.take(1000).par.foreach(allele=>
+   		Random.shuffle(alleles).take(2000).par.foreach(allele=>
+		    {
+  		    var minCostAux2:Float=Float.MaxValue/2-1
+      		var nodoAux2:g.NodeT=g get cancha.getNodoInicial()
+      		var nodoTemp2:g.NodeT=g get cancha.getNodoFinal()
+      		val path2:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+          var pathTemp2:Traversable[(g.EdgeT, Float)]=null
+          var tt=0
+		      
+        allele.drop(1).foreach(nodoInt=>
+  		  {
+  		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==arrNodos(nodoInt).getX() && n.getY==arrNodos(nodoInt).getY())
+      		nodosDestino.foreach(v=>{
+            val nf=g get v
+      		  val spNO = nodoAux2 shortestPathTo (nf, negWeight(_,tt))
+            val spN = spNO.get
+            val peso=spN.weight
+            pathTemp2=spN.edges.map(f=>(f,negWeight(f,tt)))
+            val costo=pathTemp2.map(_._2).sum
+            if (costo<minCostAux2){
+              minCostAux2=costo
+              nodoTemp2=nf
+            }
+      		})
+          path2++=pathTemp2
+          nodoAux2=nodoTemp2
+          tt=tt+1
+  		  })
+		    
+  		  val fitN=math.max(10000d-path2.map(_._2).sum.doubleValue(),0d)
+        fitnessResults+=((allele,fitN))
+		    })
 
-//      println(app.getAdjacency()(420))
-//      println(app.getAdjacency()(72))
-//      println(app.getAdjacency()(12))
-//      println(app.getAdjacency()(116))
-//      println(app.getAdjacency()(220))
-//      println(app.getAdjacency()(324))
-      
-      val lista=app.getPathToNode().get(0)
-      
-      val lb1=ListBuffer[Nodo]()
-      lb1+=nodoInicial
-      for (i<-0 to lista.size()-1)  lb1+=arrNodos(lista.get(i))
-      lb1.foreach(f=>print(f.getId() + " => "))
-      println(nodoFinal.getId())
-      lb1+=nodoFinal
+     		val t4=System.currentTimeMillis()
+     		println("Evaluar 2000 toma " + (t4-t3) + "ms")
+		    val fitnessResults2=fitnessResults.sortBy(f=>f._2)
 
-      app.findAllpaths(arrNodos.indexOf(nodoInicial),arrNodos.indexOf(nodoFinal))
-
+		    // Tomo los 100 mejores
+		    fitnessResults2.reverse.take(100).foreach(f=>println(f._2 + " - " + f._1))
+		    
+		    assertTrue(fitM>=fitnessResults2.reverse.take(1)(0)._2)
       
     }
     
