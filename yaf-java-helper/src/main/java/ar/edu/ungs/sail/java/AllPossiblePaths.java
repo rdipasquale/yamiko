@@ -22,6 +22,11 @@ public class AllPossiblePaths {
     	return pathToNodePosta;
     }
     
+    public List<Integer>[] getAdjacency()
+    {
+    	return adj;
+    }
+    
     public AllPossiblePaths(int numberOfNodes) {
 
         this.numberOfNodes = numberOfNodes;

@@ -262,30 +262,36 @@ class SailFitnessMultiInnerTest extends Serializable{
 		  val app:AllPossiblePaths= new AllPossiblePaths(arrNodos.length);
    		for (i<-0 to arrNodos.length-1)
    		{
-   		  println("El nodo Nro " + i + " del array, representando a " + cancha.getGraph().get(arrNodos(i)) + " tiene los siguientes adyacentes: ")
-   		  cancha.getGraph().get(arrNodos(i)).edges.toList.distinct.foreach(f=>println(f._2))
-   		  
-   		  cancha.getGraph().get(arrNodos(i)).edges.foreach(f=>{
-   		      if (i!=arrNodos.indexOf(f._2))
-   		        app.addEdge(i, arrNodos.indexOf(f._2))
-     		  })
-
+   		  val vecindad=cancha.getArcos().filter(f=>f._1.getId().equals(arrNodos(i).getId()))
+//   		  println("El nodo Nro " + i + " del array, representando a " + cancha.getGraph().get(arrNodos(i)) + " tiene los siguientes adyacentes: ")
+//   		  vecindad.foreach(println(_))
+   		  vecindad.foreach(f=>
+   		    {
+   		      println("Agregando un arco desde " + i + " a " + arrNodos.indexOf(f._2) + " ((( " + arrNodos(i).getId() + " a " + arrNodos(arrNodos.indexOf(f._2)).getId() + " ))) siendo que " + f._2.getId() + " es igual a " + arrNodos(arrNodos.indexOf(f._2)).getId() )
+   		      app.addEdge(i, arrNodos.indexOf(f._2))
+   		    })
    		}
 
    		val iNodoIni=arrNodos.indexOf(nodoInicial)
    		val iNodoFin=arrNodos.indexOf(nodoFinal)
    		
       app.findPath(iNodoIni,iNodoFin)
-      
+
+//      println(app.getAdjacency()(420))
+//      println(app.getAdjacency()(72))
+//      println(app.getAdjacency()(12))
+//      println(app.getAdjacency()(116))
+//      println(app.getAdjacency()(220))
+//      println(app.getAdjacency()(324))
       
       val lista=app.getPathToNode().get(0)
       
       val lb1=ListBuffer[Nodo]()
       lb1+=nodoInicial
-      for (i<-0 to lista.size()-1) lb1+=arrNodos(i)
+      for (i<-0 to lista.size()-1)  lb1+=arrNodos(lista.get(i))
+      lb1.foreach(f=>print(f.getId() + " => "))
+      println(nodoFinal.getId())
       lb1+=nodoFinal
-      lb1.foreach(print(_))
-      println()
 
       app.findAllpaths(arrNodos.indexOf(nodoInicial),arrNodos.indexOf(nodoFinal))
 
