@@ -343,7 +343,7 @@ class SailFitnessMultiInnerTest extends Serializable{
 
      		val t4=System.currentTimeMillis()
      		println("Evaluar 2000 toma " + (t4-t3) + "ms")
-		    val fitnessResults2=fitnessResults.sortBy(f=>f._2)
+		    val fitnessResults2=fitnessResults.sortBy(f=>if (f._2==null) 0d else f._2)
 
 		    // Tomo los 100 mejores
 		    fitnessResults2.reverse.take(100).foreach(f=>println(f._2 + " - " + f._1))
