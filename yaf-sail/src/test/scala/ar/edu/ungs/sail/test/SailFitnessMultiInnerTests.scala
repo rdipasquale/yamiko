@@ -65,6 +65,71 @@ class SailFitnessMultiInnerTest extends Serializable{
   	
 
     /**
+     * Busca el optimo en el escenario 0 y lo compara con los optimos del resto de los escenarios
+     */
+    @Test
+  	def testOptimoEsc0VsOptimosResto = {
+
+      var esce=0
+      val diagonal:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((2,0),(3,3),(6,6),(9,9),(12,12)) )
+      mAgent.develop(genome, diagonal)
+      val x=diagonal.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
+      val chromosome= diagonal.getGenotype().getChromosomes()(0);
+      val allele=chromosome.getFullRawRepresentation()
+      
+      escenarios.getEscenarios().values.foreach(f=>
+        {
+          esce=esce+1
+          def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), f.getEstadoByTiempo(t) ,barco)		
+    	
+      		var minCostAux:Float=Float.MaxValue/2-1
+    
+      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+          var pathTemp:Traversable[(g.EdgeT, Float)]=null
+          
+          var t=0
+    
+          allele.drop(1).foreach(nodoInt=>
+    		  {
+    		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+        		nodosDestino.foreach(v=>{
+              val nf=g get v
+        		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+              val spN = spNO.get
+              val peso=spN.weight
+              pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+              val costo=pathTemp.map(_._2).sum
+              if (costo<minCostAux){
+                minCostAux=costo
+                nodoTemp=nf
+              }
+        		})
+            path++=pathTemp
+            nodoAux=nodoTemp
+            t=t+1
+    		  })
+    
+    		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+    		  diagonal.setFitness(fit)
+    		  
+    		  val sMejorCamino = g get cancha.getNodoInicial() shortestPathTo (g get cancha.getNodoFinal(), negWeight(_,t))
+    		  val costoMejorCamino=sMejorCamino.get.edges.map(f=>(f,negWeight(f,t))).map(_._2).sum.doubleValue()
+    
+    		  val fitM=math.max(10000d-costoMejorCamino,0d)
+
+    		  
+    		  println("Escenario " + esce + " - Fitness del individio 'diagonal'= " + fit + " Fitness del mejor camino = " +fitM )
+    		  
+    		  assertTrue(fit<fitM)
+          
+        })
+      
+
+    }    
+    
+    /**
      * Verifica que la mejor solucion fijando t0 sea mejor que el camino diagonal fijado por List((2,0),(3,3),(6,6),(9,9),(12,12)) Evaluados para el primer escenario encontrado en el file "./esc4x4/escenario4x4ConRachasNoUniformes.txt"
      */
     @Test
@@ -206,6 +271,9 @@ class SailFitnessMultiInnerTest extends Serializable{
     }
 
 
+    /**
+     * Busca todos los paths posibles de una longitud especifica (cota superior) y los evalua, verificando que su fitness sea siempre menor o igual al optimo.
+     */
     @Test
   	def testVerifyAllPaths = {
       val f=escenarios.getEscenarios().take(1).values.toList(0)
