@@ -47,7 +47,7 @@ import scala.util.Random
 import ar.edu.ungs.sail.operators.SailRandomPathPopulationInitializer
 
 @Test
-class Evol10Ind100EscTest {
+class Evol10Ind100EscTest extends Serializable {
 
     private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
     private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
@@ -78,7 +78,9 @@ class Evol10Ind100EscTest {
       val pi=new SailRandomPathPopulationInitializer(cancha)
       val p=new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE)
       pi.execute(p)
-    	
+
+      // Quede aca: No puedo paralelizar... Parece que el problema es la funcion negWeight
+
     	sparkEscenerarios.map(esc=>{
     	  val salidaMap=Map[Individual[List[(Int, Int)]],Double]()
     	  p.getAll().foreach(i=>{
