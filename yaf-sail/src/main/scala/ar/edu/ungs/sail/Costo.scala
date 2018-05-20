@@ -1,6 +1,6 @@
 package ar.edu.ungs.sail
 
-object Costo {
+object Costo extends Serializable{
   
   def calcCosto(u:Nodo,v:Nodo,metrosPorCelda:Int,nodosPorCelda:Int,valores:List[((Int, Int), Int, Int, Int)],vmg:VMG):Float={
     if (u.getId().startsWith("Inicial") || v.getId().startsWith("Inicial")) return 0f

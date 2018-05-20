@@ -45,21 +45,12 @@ import ar.edu.ungs.sail.java.AllPossiblePaths
 import ar.edu.ungs.sail.java.TestingGraph
 import scala.util.Random
 import ar.edu.ungs.sail.operators.SailRandomPathPopulationInitializer
+import org.apache.spark.broadcast.Broadcast
+import org.apache.http.impl.client.DefaultHttpClient
 
 @Test
 class Evol10Ind100EscTest extends Serializable {
 
-    private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
-    private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-    private val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-    private val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-    private val barco:VMG=new Carr40()
-    private val genes=List(GENES.GenUnico)
-    private val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
-    private val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-    private val g=cancha.getGraph()
-    private val mAgent=new SailAbstractMorphogenesisAgent()
-    
     private val URI_SPARK="local[1]"
     private val MAX_NODES=4
     private val MAX_GENERATIONS=10
@@ -72,28 +63,46 @@ class Evol10Ind100EscTest extends Serializable {
     def testEvol10Ind100Esc = {
     	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
       val sc=new SparkContext(conf)      
-    	
+
+      val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val canchaAux:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val barco:VMG=new Carr40()
+      val genes=List(GENES.GenUnico)
+      val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
+      val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
+      val mAgent=new SailAbstractMorphogenesisAgent()    	
     	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
     	
-      val pi=new SailRandomPathPopulationInitializer(cancha)
+      val pi=new SailRandomPathPopulationInitializer(canchaAux)
       val p=new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE)
       pi.execute(p)
 
-      // Quede aca: No puedo paralelizar... Parece que el problema es la funcion negWeight
+      // Quede aca: Problema de Spark resuelto. Tengo que generar una cancah en cada nodo.... feo...
 
     	sparkEscenerarios.map(esc=>{
-    	  val salidaMap=Map[Individual[List[(Int, Int)]],Double]()
-    	  p.getAll().foreach(i=>{
+
+          val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+          val g=cancha.getGraph()
+    	  
+    	    val salidaMap=Map[Individual[List[(Int, Int)]],Double]()
+    	    p.getAll().foreach(i=>{
+    	    
+      		var minCostAux:Float=Float.MaxValue/2-1
+
+    	    
 	        val x=i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
 	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc.getEstadoByTiempo(t) ,barco)		
 		      val chromosome= i.getGenotype().getChromosomes()(0);
 		      val allele=chromosome.getFullRawRepresentation()
 	
-      		var minCostAux:Float=Float.MaxValue/2-1
-
-      		var nodoAux:g.NodeT=g get cancha.getNodoInicial()
-      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+      		
+      		
+ 	        var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+   	  		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
       		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+      		
 		      var pathTemp:Traversable[(g.EdgeT, Float)]=null
 		      
 		      var t=0
@@ -101,12 +110,17 @@ class Evol10Ind100EscTest extends Serializable {
 		      allele.drop(1).foreach(nodoInt=>
     		  {
     		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+    		     	        
+
         		nodosDestino.foreach(v=>{
               val nf=g get v
+              
         		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
               val spN = spNO.get
               val peso=spN.weight
               pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+              
+              
               val costo=pathTemp.map(_._2).sum
               if (costo<minCostAux){
                 minCostAux=costo
