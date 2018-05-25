@@ -67,7 +67,7 @@ object DeserializadorEscenarios {
       xx2.keys.foreach(f=>{
         val a1=xx2.get(f).getOrElse(null)
         val a2=a1.map(q=>(q._1._2,q._2.map(w=>w._3)))
-        mapEsc+=(f->new EscenarioViento(a2))
+        mapEsc+=(f->new EscenarioViento(f,a2))
       })
       return new EscenariosViento(mapEsc)
   }

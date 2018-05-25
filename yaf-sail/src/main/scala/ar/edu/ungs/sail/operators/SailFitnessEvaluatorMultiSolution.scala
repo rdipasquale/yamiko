@@ -16,10 +16,12 @@ import scala.collection.mutable.ListBuffer
 
 /**
  * Evaluador de fitness para individuos que poseen multiples soluciones desarrolladas por el agente de morfogenesis
+
  * 
  * @author ricardo
- *
+ * Deprecated => Modificar.
  */
+@deprecated
 class SailFitnessEvaluatorMultiSolution(cancha:Cancha,barco:VMG,sc:SparkContext,escenarios:RDD[List[(Int, List[((Int, Int), Int, Int, Int)],Int)]]) extends DistributedFitnessEvaluator[List[(Int,Int)]]{
 
   // Not implemented

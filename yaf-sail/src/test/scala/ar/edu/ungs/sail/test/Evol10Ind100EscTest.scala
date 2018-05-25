@@ -139,7 +139,6 @@ class Evol10Ind100EscTest extends Serializable {
     	  })
     	  println(salidaMap)
     	})
-		  //assertTrue(pop.getAll()(1).getFitness()<pop.getAll()(0).getFitness())
       
       sc.stop()    	
     }

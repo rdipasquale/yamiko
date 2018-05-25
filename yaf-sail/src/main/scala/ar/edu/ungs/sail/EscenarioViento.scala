@@ -3,7 +3,7 @@ package ar.edu.ungs.sail
 
 object EscenariosVientoFactory {
   def createEscenariosViento(esc: List[List[(Int, List[((Int, Int), Int, Int, Int)])]]):EscenariosViento= {
-    val temp=esc.map(f=>new EscenarioViento( f.map(g=>(g._1, g._2.map(h=>new EstadoEscenarioViento(h._4,h._1,h._2,h._3)))).toMap))
+    val temp=esc.map(f=>new EscenarioViento(esc.indexOf(f), f.map(g=>(g._1, g._2.map(h=>new EstadoEscenarioViento(h._4,h._1,h._2,h._3)))).toMap))
     val temp2=temp.map(f=>(getNextId(),f)).toMap
     new EscenariosViento(temp2)
   }
@@ -23,10 +23,10 @@ class EscenariosViento(escenarios:Map[Int,EscenarioViento]) extends Serializable
 }
 
 @SerialVersionUID(100L)
-class EscenarioViento(estados:Map[Int,List[EstadoEscenarioViento]]) extends Serializable  {
+class EscenarioViento(id:Int,estados:Map[Int,List[EstadoEscenarioViento]]) extends Serializable  {
   def getEstados()=estados
   def getEstadoByTiempo(t:Int)=estados.getOrElse(t, null)
-  
+  def getId()=id
 }
 
 @SerialVersionUID(100L)
