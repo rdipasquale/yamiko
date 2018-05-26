@@ -18,7 +18,7 @@ import ar.edu.ungs.yamiko.ga.operators.Mutator
  * @author ricardo
  */
 @SerialVersionUID(141103L)
-class SailMutatorSwap(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int,Int)]],fe:FitnessEvaluator[List[(Int,Int)]]) extends Mutator[List[(Int,Int)]]{
+class SailMutatorSwap(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int,Int)]]) extends Mutator[List[(Int,Int)]]{
     
     private val r=new Random(System.currentTimeMillis())
     

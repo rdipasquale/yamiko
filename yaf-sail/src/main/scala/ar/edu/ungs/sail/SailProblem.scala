@@ -21,6 +21,7 @@ import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.serial.SerialGA
 
+@deprecated
 object SailProblem extends App {
  
   
@@ -51,7 +52,7 @@ object SailProblem extends App {
     	val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
     	
     	val par:Parameter[List[(Int,Int)]]=	new Parameter[List[(Int,Int)]](0.15, 1d, POPULATION_SIZE, new DescendantAcceptEvaluator[List[(Int,Int)]](), 
-        						fev, new SailOnePointCrossover().asInstanceOf[Crossover[List[(Int,Int)]]], new SailMutatorSwap(mAgent,genome,fev).asInstanceOf[Mutator[List[(Int,Int)]]], 
+        						fev, new SailOnePointCrossover().asInstanceOf[Crossover[List[(Int,Int)]]], new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]], 
         						new SailRandomPopulationInitializer(rioDeLaPlata.getDimension(),rioDeLaPlata.getNodosPorCelda(),nodoInicial,nodoFinal).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],  
         						new ProbabilisticRouletteSelector(), 
         						new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE), MAX_GENERATIONS, 2d,mAgent,genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,null);

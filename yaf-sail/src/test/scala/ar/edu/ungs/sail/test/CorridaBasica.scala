@@ -102,7 +102,7 @@ object SailProblem {
         new DescendantAcceptEvaluator[List[(Int,Int)]](), 
         fev, 
         new SailOnePointCrossover().asInstanceOf[Crossover[List[(Int,Int)]]], 
-        new SailMutatorSwap(mAgent,genome,fev).asInstanceOf[Mutator[List[(Int,Int)]]], 
+        new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]], 
         new SailRandomPopulationInitializer(rioDeLaPlata.getDimension(),rioDeLaPlata.getNodosPorCelda(),nodoInicial,nodoFinal).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],  
         new ProbabilisticRouletteSelector(), 
         new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE), 
