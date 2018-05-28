@@ -16,6 +16,8 @@ import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.WorkFlowForSimulationOpt
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
 object SailProblem2 extends App {
  
@@ -24,7 +26,7 @@ object SailProblem2 extends App {
 
     	val URI_SPARK="local[1]"
       val MAX_GENERATIONS=10
-      val POPULATION_SIZE=100
+      val POPULATION_SIZE=10
       val DIMENSION=4
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
@@ -39,7 +41,10 @@ object SailProblem2 extends App {
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
     	val mAgent=new SailAbstractMorphogenesisAgent()
 
-      val ga=new WorkFlowForSimulationOpt(URI_SPARK,
+      val conf=new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
+      val sc:SparkContext=new SparkContext(conf)
+      
+      val ga=new WorkFlowForSimulationOpt(
           new SailRandomPopulationInitializer(DIMENSION,NODOS_POR_CELDA,nodoInicial,nodoFinal).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
@@ -56,7 +61,9 @@ object SailProblem2 extends App {
           nodoInicial,
           nodoFinal,
           DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,
-          0.15
+          0.15,
+          sc,
+          true
           )
       
 	    val t1=System.currentTimeMillis()
@@ -80,5 +87,7 @@ object SailProblem2 extends App {
       
 			println("Tiempo -> " + (t2-t1)/1000 + " seg");
 			println("Promedio -> " + ((t2-t1)/(MAX_GENERATIONS.toDouble))+ " ms/generacion");
+			
+			sc.stop()
   }
 }

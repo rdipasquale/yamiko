@@ -1,31 +1,35 @@
 package ar.edu.ungs.yamiko.workflow.parallel.spark.scala
 
-import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
-import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
-import org.apache.spark.SparkContext
-import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import ar.edu.ungs.yamiko.ga.domain.Individual
-import org.apache.spark.SparkConf
-import ar.edu.ungs.sail.EscenariosViento
-import ar.edu.ungs.sail.VMG
-import ar.edu.ungs.yamiko.ga.domain.Genome
-import ar.edu.ungs.yamiko.ga.domain.Gene
-import ar.edu.ungs.yamiko.ga.domain.Ribosome
-import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
-import ar.edu.ungs.yamiko.ga.domain.impl.BasicIndividual
-import ar.edu.ungs.sail.Cancha
-import ar.edu.ungs.sail.CanchaRioDeLaPlata
-import ar.edu.ungs.sail.Nodo
-import ar.edu.ungs.sail.Costo
+import java.text.DecimalFormat
+
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Map
-import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
-import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
-import ar.edu.ungs.yamiko.ga.operators.Mutator
-import ar.edu.ungs.yamiko.ga.operators.Crossover
-import ar.edu.ungs.yamiko.ga.operators.Selector
-import java.text.DecimalFormat
 import scala.util.Random
+
+import org.apache.spark.SparkContext
+
+import ar.edu.ungs.sail.Cancha
+import ar.edu.ungs.sail.CanchaRioDeLaPlata
+import ar.edu.ungs.sail.Costo
+import ar.edu.ungs.sail.EscenariosViento
+import ar.edu.ungs.sail.Nodo
+import ar.edu.ungs.sail.VMG
+import ar.edu.ungs.yamiko.ga.domain.Gene
+import ar.edu.ungs.yamiko.ga.domain.Genome
+import ar.edu.ungs.yamiko.ga.domain.Individual
+import ar.edu.ungs.yamiko.ga.domain.Ribosome
+import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
+import ar.edu.ungs.yamiko.ga.operators.Crossover
+import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
+import ar.edu.ungs.yamiko.ga.operators.Mutator
+import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.Selector
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 
 /**
  * En esta clase se modela un workflow orientado a evaluar escenarios simulados. Es decir, donde el fitness del proceso del GA se evalua de manera
@@ -33,8 +37,7 @@ import scala.util.Random
  * La dejamos en el proyecto yaf-sail dado que vamos a utilizar clases propias. De lograr un buen nivel de abstraccion, lo pasamos a yaf-workflow.
  */
 @SerialVersionUID(1L)
-class WorkFlowForSimulationOpt(uriSpark:String, 
-                                  pi:PopulationInitializer[List[(Int,Int)]],
+class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   po:DistributedPopulation[List[(Int,Int)]],
                                   acceptEv:AcceptEvaluator[List[(Int,Int)]],
                                   mutator:Mutator[List[(Int,Int)]],
@@ -52,16 +55,17 @@ class WorkFlowForSimulationOpt(uriSpark:String,
                                   dimension:Int,
                                   nodosPorCelda:Int, 
                                   metrosPorLadoCelda:Int,
-                                  mutationProbability:Double) extends Serializable{
+                                  mutationProbability:Double,
+                                  sc:SparkContext,
+                                  profiler:Boolean) extends Serializable{
   
-  val conf=new SparkConf().setMaster(uriSpark).setAppName("SailProblem")
-  val sc:SparkContext=new SparkContext(conf)
  	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
   val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   val r:Random=new Random(System.currentTimeMillis())
   var _finalpop=po.getAll()
 	val startTime=System.currentTimeMillis()
+  var taux1=0L
   
   def bestInds()=holder
   def finalPopulation()=_finalpop
@@ -73,19 +77,35 @@ class WorkFlowForSimulationOpt(uriSpark:String,
   def run( ):Individual[List[(Int,Int)]] =
   {
     // Inicializa poblacion
-    if (po.size()==0) pi.execute(po)
+    if (po.getAll().size==0) pi.execute(po)
     
     while (generation<maxGenerations)
     {
+      generation=generation+1
+      // Desarrolla los individuos
+      if (profiler) taux1=System.currentTimeMillis()
+      po.getAll().par.foreach(i=>mAgent.develop(genome, i))
+      if (profiler) println("Desarrolla los " + po.getAll().size + " individuos - " + (System.currentTimeMillis()-taux1) + "ms (" + ( (System.currentTimeMillis()-taux1).toDouble / po.getAll().size.toDouble) + "ms/ind). Listo para correr los " + escenarios.getEscenarios().size + " escenarios.")
+
+      if (profiler) taux1=System.currentTimeMillis()
+      
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
-          val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null);
+
+    	    // Armado de la cancha
+          if (profiler) taux1=System.currentTimeMillis()
+    	    val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null);
           val g=cancha.getGraph()
+//          if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
+          
           val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
 
-    	    po.getAll().foreach(i=>{
+          // Evalua el fitness de cada individuo
+    	    po.getAll().par.foreach(i=>{
       	    // Por cada individuo en la poblacion
+//            if (profiler) taux1=System.currentTimeMillis()
+    	      
         		var minCostAux:Float=Float.MaxValue/2-1
       	    
   	        val x=i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
@@ -129,18 +149,22 @@ class WorkFlowForSimulationOpt(uriSpark:String,
       		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
       		  //i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
+      	    
+//            if (profiler) println("Evalua el fitness del individuo " + i.getId() + ": " +(System.currentTimeMillis()-taux1) + "ms")
 
     	  })
     	  //println(parcial)
+        if (profiler) println("Evaluada la poblacion para el escenario en : " +(System.currentTimeMillis()-taux1) + "ms")
     	  parcial
-    	})      
-    
+    	}).cache()     
+
+    if (profiler) taux1=System.currentTimeMillis()
+     
 	  val promedios=performanceEnEscenarios.map(f=>(f._2,f._3)).mapValues(g=>(g,1)).reduceByKey({
 	                   case ((sumL, countL), (sumR, countR)) =>  (sumL + sumR, countL + countR)
 	                }).mapValues({case (sum , count) => sum / count.toDouble }).sortBy(_._1).collect()
     
     // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking (inverso)	                	                
-
     // En el ranking del peor al mejor (comenzando en 0), hay |e| (escenarios) y |pob| individuos. Por tanto si sumamos los rankings inversos agrupando por individuos
 	  // vamos a repartir un total de |e||pob| puntos. El max que puede obtener cada individuo es (|pob|-1)|e|, por lo que si queremos que un individuo que haya
 	  // sido el mejor en todos los escenarios multiplique por 2 su fitness (ant), deberiamos multiplicar la sumatoria de puntos ranking inversos de cada individuo por
@@ -154,11 +178,18 @@ class WorkFlowForSimulationOpt(uriSpark:String,
 		holder.+=((generation,bestOfGeneration))
 		
     // Profiler
-    println(generation+";"+bestOfGeneration.getId()+";"+notScientificFormatter.format(bestOfGeneration.getFitness())+";"+System.currentTimeMillis())
+    if (profiler) println("Evaluar el fitness de la poblacion: " +(System.currentTimeMillis()-taux1) + "ms")
+		println(generation+";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
 
+    if (profiler) taux1=System.currentTimeMillis()		
+		
     val candidates=selector.executeN(po.size(),po)
 		val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 		val tuplasSerC=tuplasSer.size
+
+    if (profiler) println("Seleccion: " +(System.currentTimeMillis()-taux1) + "ms")
+		
+    if (profiler) taux1=System.currentTimeMillis()
 		
 		val descendants=ListBuffer[Individual[List[(Int,Int)]]]()
 		for (t <- tuplasSer)
@@ -166,7 +197,16 @@ class WorkFlowForSimulationOpt(uriSpark:String,
 //      if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
 //      if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
       val parentsJ=List(t._1,t._2)
-  	  val desc=crossover.execute(parentsJ)
+  	  //val desc=crossover.execute(parentsJ)
+  	  val desc=Try(crossover.execute(parentsJ)) match {
+        case Success(c) => c
+        case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) {
+          println("Cruza no compatible")
+          parentsJ.foreach(p=>mutator.execute(p))
+          parentsJ
+        } else throw e
+      }  	  
+  	  
 //		  for (d <- desc)
 //		  {
 //        if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
@@ -186,10 +226,16 @@ class WorkFlowForSimulationOpt(uriSpark:String,
 		  descendants+=(bestOfGeneration)
 		}
 
+    if (profiler) println("Crossover: " +(System.currentTimeMillis()-taux1) + "ms")		
+		
+    if (profiler) taux1=System.currentTimeMillis()
+		
 	  for(iii<-descendants)
       if (r.nextDouble()<=mutationProbability) 
           mutator.execute(iii)
-			  
+
+    if (profiler) println("Mutacion: " +(System.currentTimeMillis()-taux1) + "ms")		
+          
     po.replacePopulation(descendants)
 		
     val bestInd=(holder.maxBy(f=>f._2.getFitness())) ._2
