@@ -92,7 +92,7 @@ class VientosTest {
       Serializador.run("escenario4x4ConRachas.winds", salida)
       salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "escenario4x4ConRachas_t" + f._1 + ".png", 35))
     }    
-    
+
     @Test
     def simular50x50SinRafagas={
       val nodoInicial:Nodo=new Nodo(0,0,"Inicial - (0)(1)",List((0,0)),null)
