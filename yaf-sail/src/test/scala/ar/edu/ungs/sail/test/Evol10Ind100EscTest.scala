@@ -81,7 +81,7 @@ class Evol10Ind100EscTest extends Serializable {
 
       // Quede aca: Problema de Spark resuelto. Tengo que generar una cancah en cada nodo.... feo...
 
-    	sparkEscenerarios.map(esc=>{
+    	val salida=sparkEscenerarios.map(esc=>{
 
           val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
           val g=cancha.getGraph()
@@ -91,7 +91,7 @@ class Evol10Ind100EscTest extends Serializable {
     	    
       		var minCostAux:Float=Float.MaxValue/2-1
 
-    	    
+    	    if (i.getPhenotype()==null) mAgent.develop(genome,i)
 	        val x=i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]
 	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc.getEstadoByTiempo(t) ,barco)		
 		      val chromosome= i.getGenotype().getChromosomes()(0);
@@ -134,12 +134,15 @@ class Evol10Ind100EscTest extends Serializable {
     
     		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
     		  i.setFitness(fit)
-    	    
+    	  
+    		  println("El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+    		  
     	    salidaMap.+=( (i,fit) )
     	  })
     	  println(salidaMap)
     	})
       
+    	salida.collect()
       sc.stop()    	
     }
 
