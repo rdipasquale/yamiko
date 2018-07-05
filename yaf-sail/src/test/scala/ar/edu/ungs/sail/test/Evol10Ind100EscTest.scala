@@ -51,8 +51,8 @@ import org.apache.http.impl.client.DefaultHttpClient
 @Test
 class Evol10Ind100EscTest extends Serializable {
 
-    private val URI_SPARK="local[1]"
-    private val MAX_NODES=4
+    private val URI_SPARK="local[8]"
+    //private val MAX_NODES=4
     private val MAX_GENERATIONS=10
     private val POPULATION_SIZE=10
 
@@ -73,13 +73,16 @@ class Evol10Ind100EscTest extends Serializable {
       val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
       val mAgent=new SailAbstractMorphogenesisAgent()    	
-    	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
+    	// tomo 10 para probar
+      // val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
+      val sparkEscenerarios2=sc.parallelize(escenarios.getEscenarios.values.toList).collect().take(10)
+      val sparkEscenerarios = sc.parallelize(sparkEscenerarios2)
     	
       val pi=new SailRandomPathPopulationInitializer(canchaAux)
       val p=new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE)
       pi.execute(p)
 
-      // Quede aca: Problema de Spark resuelto. Tengo que generar una cancah en cada nodo.... feo...
+      // Quede aca: Problema de Spark resuelto. Tengo que generar una cancha en cada nodo.... feo...
 
     	val salida=sparkEscenerarios.map(esc=>{
 
@@ -135,11 +138,11 @@ class Evol10Ind100EscTest extends Serializable {
     		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
     		  i.setFitness(fit)
     	  
-    		  println("El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+    		  println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
     		  
     	    salidaMap.+=( (i,fit) )
     	  })
-    	  println(salidaMap)
+    	  println("Escenario " + esc.getId() + salidaMap)
     	})
       
     	salida.collect()
