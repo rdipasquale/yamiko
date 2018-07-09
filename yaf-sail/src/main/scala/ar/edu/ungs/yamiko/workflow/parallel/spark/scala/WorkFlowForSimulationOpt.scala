@@ -170,7 +170,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	  // sido el mejor en todos los escenarios multiplique por 2 su fitness (ant), deberiamos multiplicar la sumatoria de puntos ranking inversos de cada individuo por
 	  // (|pob|-1)|e|/2
     val coef=((po.size()-1)*escenarios.getEscenarios().size).doubleValue()/2d
-    val resultranking=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2).sum*coef).sortBy(_._1).collect()	  
+    val resultranking=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2 % po.size()+1).sum*coef).sortBy(_._1).collect()	  
+  
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
 		for (p<-0 to po.size()-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
 	
