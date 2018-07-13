@@ -48,24 +48,43 @@ import ar.edu.ungs.sail.operators.SailRandomPathPopulationInitializer
 import org.apache.spark.broadcast.Broadcast
 import org.apache.http.impl.client.DefaultHttpClient
 import java.text.DecimalFormat
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
+import ar.edu.ungs.yamiko.ga.operators.Selector
+import scala.util.Success
+import scala.util.Failure
+import scala.util.Try
+import ar.edu.ungs.yamiko.ga.operators.Crossover
+import ar.edu.ungs.yamiko.ga.operators.Mutator
+import ar.edu.ungs.sail.operators.SailMutatorSwap
+import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
+import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
+import org.apache.log4j.Logger
 
 @Test
 class Evol10Ind100EscTest extends Serializable {
 
-    private val URI_SPARK="local[8]"
+    private val URI_SPARK="local[1]"
     //private val MAX_NODES=4
     private val MAX_GENERATIONS=10
     private val POPULATION_SIZE=10
+    private val maxGenerations=10
+    private val mutationProbability=0.05
+    private val log=Logger.getLogger("file")
 
+    
+    // FIXME: Voy por aca: Me convergieron todos al mejor de la primera generacion....
+    
     /**
      * Inicializa una poblacion de 10 individuos y los evoluciona evaluando en 100 escenarios
      */
     @Test
     def testEvol10Ind100Esc = {
-    	val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
+      
+      val conf = new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
       val sc=new SparkContext(conf)      
       val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
-
+    	
+      val r:Random=new Random(System.currentTimeMillis())
       val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
@@ -74,17 +93,27 @@ class Evol10Ind100EscTest extends Serializable {
       val genes=List(GENES.GenUnico)
       val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
-      val mAgent=new SailAbstractMorphogenesisAgent()    	
+      val mAgent=new SailAbstractMorphogenesisAgent()
+      val selector:Selector[List[(Int,Int)]]=new ProbabilisticRouletteSelector()
+      val canchaLocal:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val crossover:Crossover[List[(Int,Int)]]=new SailPathOnePointCrossoverHeFangguo(canchaLocal)
+      val mutator:Mutator[List[(Int,Int)]]=new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]]
+      val acceptEv:AcceptEvaluator[List[(Int,Int)]]=new DescendantAcceptEvaluator[List[(Int,Int)]]()
     	// tomo 10 para probar
       // val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
-      val sparkEscenerarios2=sc.parallelize(escenarios.getEscenarios.values.toList).collect().take(10)
+      val sparkEscenerarios2=sc.parallelize(escenarios.getEscenarios.values.toList).collect().take(2)
       val sparkEscenerarios = sc.parallelize(sparkEscenerarios2)
     	
       val pi=new SailRandomPathPopulationInitializer(canchaAux)
-      val p=new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE)
+      val p:Population[List[(Int,Int)]]=new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE)
       pi.execute(p)
 
-      // Quede aca: Problema de Spark resuelto. Tengo que generar una cancha en cada nodo.... feo...
+      var generation=0
+      
+      log.warn("Iniciando generacion 0")
+      
+      while (generation<maxGenerations)
+      {
 
 //    	val salida=sparkEscenerarios.map(esc=>{
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
@@ -144,7 +173,8 @@ class Evol10Ind100EscTest extends Serializable {
        	    parcial+=(( esc.getId(),i.getId(),fit ))
      	  
       		  println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
-      		  
+		        //log.warn("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+
       	    salidaMap.+=( (i,fit) )
     	  })
     	  //println("Escenario " + esc.getId() + salidaMap)
@@ -162,26 +192,76 @@ class Evol10Ind100EscTest extends Serializable {
   	  // (|pob|-1)|e|/2
       val coef=((p.size()-1)*escenarios.getEscenarios().size).doubleValue()/2d
       
-      performanceEnEscenarios.collect().foreach(f=>println(f))
-      println()
-      performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().foreach(println(_))
-      println()
-      performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).foreach(println(_))
-      println()      
+//      performanceEnEscenarios.collect().foreach(f=>println(f))
+//      println()
+//      performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().foreach(println(_))
+//      println()
+//      performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).foreach(println(_))
+//      println()      
       
       val resultranking=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2 % p.size()+1).sum*coef).sortBy(_._1).collect()
       
-      resultranking.foreach(println(_))
+      resultranking.foreach(log.warn(_))
       
       val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
   		for (pi<-0 to p.size()-1) p.getAll()(pi).setFitness(salida.find(_._1==p.getAll()(pi).getId()).get._2)
   	
-  		p.getAll().foreach(pi=>println("Final => Individuo " + pi.getId() +": " + notScientificFormatter.format(pi.getFitness())))
+  		p.getAll().foreach(pi=>log.warn("Final => Individuo " + pi.getId() +": " + notScientificFormatter.format(pi.getFitness())))
       val bestOfGeneration=p.getAll().maxBy { x => x.getFitness }    			        
   		
       // Profiler
-  		println(";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+  		//println(";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+  		log.warn(";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
     	
+      val candidates=selector.executeN(p.size(),p)
+  		val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
+  		val tuplasSerC=tuplasSer.size
+  
+  		val descendants=ListBuffer[Individual[List[(Int,Int)]]]()
+  		for (t <- tuplasSer)
+  		{
+  //      if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
+  //      if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
+        val parentsJ=List(t._1,t._2)
+    	  //val desc=crossover.execute(parentsJ)
+    	  val desc=Try(crossover.execute(parentsJ)) match {
+          case Success(c) => c
+          case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) {
+            log.warn("Cruza no compatible")
+            parentsJ.foreach(p=>mutator.execute(p))
+            parentsJ
+          } else throw e
+        }  	  
+    	  
+  //		  for (d <- desc)
+  //		  {
+  //        if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
+  //        if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator().execute(d))
+  //		  }
+  		  for (d <- acceptEv.execute(desc,parentsJ))
+  		  {
+  //        if (d.getPhenotype==null) 
+  //          parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
+  //        if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
+          descendants+=d
+  		  }      				    
+  		}
+  		if (!descendants.contains(bestOfGeneration))
+  		{
+  		  descendants.dropRight(1)
+  		  descendants+=(bestOfGeneration)
+  		}
+  
+  	  for(iii<-descendants)
+        if (r.nextDouble()<=mutationProbability) 
+            mutator.execute(iii)
+  
+      p.replacePopulation(descendants)
+  		
+  		
+      }  		
+  		
+  		
        sc.stop()    	
     }
 
