@@ -1,3 +1,6 @@
 /target
 /.settings/
 /.classpath
+/.cache-main
+/.project
+/.cache-test
