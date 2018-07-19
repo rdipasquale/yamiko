@@ -63,10 +63,10 @@ import org.apache.log4j.Logger
 @Test
 class Evol10Ind100EscTest extends Serializable {
 
-    private val URI_SPARK="local[1]"
+    private val URI_SPARK="local[6]"
     //private val MAX_NODES=4
-    private val MAX_GENERATIONS=10
-    private val POPULATION_SIZE=10
+    private val MAX_GENERATIONS=100
+    private val POPULATION_SIZE=50
     private val maxGenerations=10
     private val mutationProbability=0.05
     private val log=Logger.getLogger("file")
@@ -101,7 +101,7 @@ class Evol10Ind100EscTest extends Serializable {
       val acceptEv:AcceptEvaluator[List[(Int,Int)]]=new DescendantAcceptEvaluator[List[(Int,Int)]]()
     	// tomo 10 para probar
       // val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
-      val sparkEscenerarios2=sc.parallelize(escenarios.getEscenarios.values.toList).collect().take(2)
+      val sparkEscenerarios2=sc.parallelize(escenarios.getEscenarios.values.toList).collect().take(10)
       val sparkEscenerarios = sc.parallelize(sparkEscenerarios2)
     	
       val pi=new SailRandomPathPopulationInitializer(canchaAux)
@@ -114,7 +114,7 @@ class Evol10Ind100EscTest extends Serializable {
       
       while (generation<maxGenerations)
       {
-
+        generation=generation+1
 //    	val salida=sparkEscenerarios.map(esc=>{
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
  
@@ -190,7 +190,8 @@ class Evol10Ind100EscTest extends Serializable {
   	  // vamos a repartir un total de |e||pob| puntos. El max que puede obtener cada individuo es (|pob|-1)|e|, por lo que si queremos que un individuo que haya
   	  // sido el mejor en todos los escenarios multiplique por 2 su fitness (ant), deberiamos multiplicar la sumatoria de puntos ranking inversos de cada individuo por
   	  // (|pob|-1)|e|/2
-      val coef=((p.size()-1)*escenarios.getEscenarios().size).doubleValue()/2d
+      //val coef=((p.size()-1)*escenarios.getEscenarios().size).doubleValue()/2d
+      val coef=((p.size()-1)*escenarios.getEscenarios().size).doubleValue()/2000d // pruebo 2000
       
 //      performanceEnEscenarios.collect().foreach(f=>println(f))
 //      println()
@@ -201,7 +202,7 @@ class Evol10Ind100EscTest extends Serializable {
       
       val resultranking=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2 % p.size()+1).sum*coef).sortBy(_._1).collect()
       
-      resultranking.foreach(log.warn(_))
+     //resultranking.foreach(log.warn(_))
       
       val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
   		for (pi<-0 to p.size()-1) p.getAll()(pi).setFitness(salida.find(_._1==p.getAll()(pi).getId()).get._2)
@@ -211,7 +212,8 @@ class Evol10Ind100EscTest extends Serializable {
   		
       // Profiler
   		//println(";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
-  		log.warn(";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+  		val prom=p.getAll().map(_.getFitness()).sum/p.getAll().size
+    	log.warn("Generacion " + generation +";"+bestOfGeneration.getId()+"; Finess="+notScientificFormatter.format(bestOfGeneration.getFitness())+"; Fitness Promedio="+notScientificFormatter.format(prom))
     	
       val candidates=selector.executeN(p.size(),p)
   		val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList

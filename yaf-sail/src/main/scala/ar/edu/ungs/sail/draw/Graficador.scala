@@ -8,6 +8,8 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.Line2D
 import java.awt.geom.Ellipse2D
+import ar.edu.ungs.sail.EstadoEscenarioViento
+import scala.collection.mutable.ListBuffer
 
 object pngCelda{
   def image=ImageIO.read(new File("Celda.png"))
@@ -38,6 +40,12 @@ object Graficador {
     g.dispose()
     javax.imageio.ImageIO.write(canvas, "png", new java.io.File(archivoSalida))  	
     true
+  }
+
+  def draw(cancha:Cancha,vientos: List[EstadoEscenarioViento],archivoSalida:String,maxWindSpeed:Int,path:Any,diff:Any):Boolean={
+      val vientos2:ListBuffer[((Int, Int), Int, Int,Int)]=ListBuffer()
+      vientos.foreach(v=>vientos2.+=:(v.getCelda(),v.getAngulo(),v.getVelocidad(),v.getMomento()))
+      return draw(cancha,vientos2.toList,archivoSalida:String,maxWindSpeed,path)
   }
   
   def draw(cancha:Cancha,vientos: List[((Int, Int), Int, Int,Int)],archivoSalida:String,maxWindSpeed:Int,path:Any):Boolean={

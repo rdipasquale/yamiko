@@ -18,15 +18,18 @@ import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.WorkFlowForSimulationOpt
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.sail.draw.Graficador
+import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
 
 object SailProblem2 extends App {
  
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[1]"
-      val MAX_GENERATIONS=10
-      val POPULATION_SIZE=10
+    	val URI_SPARK="local[8]"
+      val MAX_GENERATIONS=100
+      val POPULATION_SIZE=100
       val DIMENSION=4
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
@@ -44,8 +47,12 @@ object SailProblem2 extends App {
       val conf=new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
       val sc:SparkContext=new SparkContext(conf)
       
+      // Primero resuelvo en t0 el problema clasico para tener una referencia
+      val e=escenarios.getEscenarios().values.toList.take(1)(0).getEstadoByTiempo(0)
+      val individuosAgregados=List(problemaClasico(nodoInicial,nodoFinal,cancha,e,barco))
+      
       val ga=new WorkFlowForSimulationOpt(
-          new SailRandomPopulationInitializer(DIMENSION,NODOS_POR_CELDA,nodoInicial,nodoFinal).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],
+          new SailRandomMixedPopulationInitializer(DIMENSION,NODOS_POR_CELDA,nodoInicial,nodoFinal,individuosAgregados).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]],
@@ -89,5 +96,22 @@ object SailProblem2 extends App {
 			println("Promedio -> " + ((t2-t1)/(MAX_GENERATIONS.toDouble))+ " ms/generacion");
 			
 			sc.stop()
+  }
+   
+  def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG):List[(Int,Int)]={
+     val salida:ListBuffer[(Int,Int)]=ListBuffer()
+     val g=cancha.getGraph()
+     def negWeightClasico(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
+     val ni=g get nodoInicial
+     val nf=g get nodoFinal     
+     val spNO = ni shortestPathTo (nf, negWeightClasico(_, 0)) 
+     val spN = spNO.get                                    
+     var costo:Float=0
+     spN.edges.foreach(f=>costo=costo+negWeightClasico(f,0))
+     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+     spN.nodes.foreach(f=>println(f.getId()))
+     Graficador.draw(cancha, est, "./esc4x4/solucionT0.png", 35, spN,0)
+     spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
+     salida.toList
   }
 }
