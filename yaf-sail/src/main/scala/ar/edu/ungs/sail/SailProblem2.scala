@@ -68,7 +68,7 @@ object SailProblem2 extends App {
           nodoInicial,
           nodoFinal,
           DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,
-          0.15,
+          0.2,
           sc,
           true
           )
@@ -112,6 +112,6 @@ object SailProblem2 extends App {
      spN.nodes.foreach(f=>println(f.getId()))
      Graficador.draw(cancha, est, "./esc4x4/solucionT0.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
-     salida.toList
+     salida.toList.reverse
   }
 }

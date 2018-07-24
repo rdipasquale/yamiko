@@ -81,6 +81,12 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
 		  
 		  if (intersect.size<=2) {println("SailPathOnePointCrossoverHeFangguo - No son compatibles los individuos " + c1 + " ---- " + c2 ); throw new NotCompatibleIndividualException("SailPathOnePointCrossoverHeFangguo")}
 		  
+		  if (c1.equals(c2)) 
+		  {
+		    println("SailPathOnePointCrossoverHeFangguo - Son iguales los individuos " + c1 + " ---- " + c2 );
+		    return individuals
+		  }
+		      
 		  println("SailPathOnePointCrossoverHeFangguo - SI son compatibles los individuos " + c1 + " ---- " + c2 ); 
 		  
 		  val point=1+Random.nextInt(intersect.size-2)

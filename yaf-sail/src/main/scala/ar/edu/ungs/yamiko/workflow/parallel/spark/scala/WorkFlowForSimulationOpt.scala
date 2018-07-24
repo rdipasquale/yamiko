@@ -130,6 +130,13 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                 val nf=g get v
                 
           		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+                if (spNO.isEmpty) 
+                {
+                  allele.foreach(println(_))
+                  println(nodoInt)
+                  println(v)
+                  println("nulo")
+                }
                 val spN = spNO.get
                 val peso=spN.weight
                 pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
@@ -154,7 +161,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 
     	  })
     	  //println(parcial)
-        if (profiler) println("Evaluada la poblacion para el escenario en : " +(System.currentTimeMillis()-taux1) + "ms")
+        //if (profiler) println("Evaluada la poblacion para el escenario en : " +(System.currentTimeMillis()-taux1) + "ms")
     	  parcial
     	}).cache()     
 
