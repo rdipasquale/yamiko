@@ -59,7 +59,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
+ 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(6))
+// FIXME! PTUEBA
+ 	// 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
   val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   val r:Random=new Random(System.currentTimeMillis())
@@ -88,6 +90,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       if (profiler) println("Desarrolla los " + po.getAll().size + " individuos - " + (System.currentTimeMillis()-taux1) + "ms (" + ( (System.currentTimeMillis()-taux1).toDouble / po.getAll().size.toDouble) + "ms/ind). Listo para correr los " + escenarios.getEscenarios().size + " escenarios.")
 
       if (profiler) taux1=System.currentTimeMillis()
+      
+      if (profiler) po.getAll().par.foreach(i=>println("Poblacion - ind "+i.getId()+ " - " + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
       
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
@@ -156,8 +160,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
       		  //i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
-      	    
-//            if (profiler) println("Evalua el fitness del individuo " + i.getId() + ": " +(System.currentTimeMillis()-taux1) + "ms")
+
+      		  //if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 
     	  })
     	  //println(parcial)
@@ -187,7 +191,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		
     // Profiler
     if (profiler) println("Evaluar el fitness de la poblacion: " +(System.currentTimeMillis()-taux1) + "ms")
-		println(generation+";"+bestOfGeneration.getId()+"; Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+		println("Generacion " + generation+" - Mejor ind "+bestOfGeneration.getId()+" Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
 
     if (profiler) taux1=System.currentTimeMillis()		
 		
@@ -204,22 +208,34 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		{
 //      if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
 //      if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
-      val parentsJ=List(t._1,t._2)
+      var parentsJ=List(t._1,t._2)
+      var cuentaProteccion=0
+		  while (cuentaProteccion<10 && parentsJ(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().equals(parentsJ(1).getGenotype().getChromosomes()(0).getFullRawRepresentation()))
+		  {
+		        cuentaProteccion=cuentaProteccion+1
+		        parentsJ=List(t._1,selector.executeN(1,po)(0))
+  	  }
+      
   	  //val desc=crossover.execute(parentsJ)
-  	  val desc=Try(crossover.execute(parentsJ)) match {
-        case Success(c) => c
-        case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) {
-          println("Cruza no compatible")
-          parentsJ.foreach(p=>mutator.execute(p))
-          parentsJ
-        } else throw e
-      }  	  
+  	  cuentaProteccion=0
+  	  var booleanNotCompatible=true
+  	  var desc:List[Individual[List[(Int, Int)]]]=null
+  	  while (cuentaProteccion<10 && booleanNotCompatible)
+  	  {
+  	    booleanNotCompatible=false
+        cuentaProteccion=cuentaProteccion+1
+        desc=Try(crossover.execute(parentsJ)) match {
+          case Success(c) => c
+          case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) {booleanNotCompatible=true; parentsJ} else throw e
+        }  	  
+  	  }
   	  
-//		  for (d <- desc)
-//		  {
-//        if (d.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
-//        if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator().execute(d))
-//		  }
+  	  if (booleanNotCompatible)
+  	  {
+            println("Cruza no compatible")
+            desc.foreach(p=>mutator.execute(p))  	    
+  	  }
+            
 		  for (d <- acceptEv.execute(desc,parentsJ))
 		  {
 //        if (d.getPhenotype==null) 

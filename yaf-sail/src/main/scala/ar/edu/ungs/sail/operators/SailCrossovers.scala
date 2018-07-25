@@ -10,6 +10,7 @@ import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.sail.Cancha
 import ar.edu.ungs.sail.Costo
 import ar.edu.ungs.sail.helper.CycleHelper
+import ar.edu.ungs.sail.exceptions.SameIndividualException
 
 
 /**
@@ -79,15 +80,12 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
       
 		  val intersect=c1.intersect(c2)
 		  
-		  if (intersect.size<=2) {println("SailPathOnePointCrossoverHeFangguo - No son compatibles los individuos " + c1 + " ---- " + c2 ); throw new NotCompatibleIndividualException("SailPathOnePointCrossoverHeFangguo")}
+		  if (intersect.size<=2) throw new NotCompatibleIndividualException("SailPathOnePointCrossoverHeFangguo")
+//		  if (intersect.size<=2) {println("SailPathOnePointCrossoverHeFangguo - No son compatibles los individuos " + c1 + " ---- " + c2 ); throw new NotCompatibleIndividualException("SailPathOnePointCrossoverHeFangguo")}
 		  
-		  if (c1.equals(c2)) 
-		  {
-		    println("SailPathOnePointCrossoverHeFangguo - Son iguales los individuos " + c1 + " ---- " + c2 );
-		    return individuals
-		  }
+		  if (c1.equals(c2)) throw new SameIndividualException("SailPathOnePointCrossoverHeFangguo") 
 		      
-		  println("SailPathOnePointCrossoverHeFangguo - SI son compatibles los individuos " + c1 + " ---- " + c2 ); 
+		 // println("SailPathOnePointCrossoverHeFangguo - SI son compatibles los individuos " + c1 + " ---- " + c2 ); 
 		  
 		  val point=1+Random.nextInt(intersect.size-2)
 

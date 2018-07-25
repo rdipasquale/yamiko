@@ -112,6 +112,6 @@ object SailProblem2 extends App {
      spN.nodes.foreach(f=>println(f.getId()))
      Graficador.draw(cancha, est, "./esc4x4/solucionT0.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
-     salida.toList.reverse
+     salida.toList.reverse.drop(2).dropRight(2)
   }
 }
