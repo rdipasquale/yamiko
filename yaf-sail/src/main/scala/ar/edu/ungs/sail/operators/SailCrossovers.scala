@@ -11,6 +11,12 @@ import ar.edu.ungs.sail.Cancha
 import ar.edu.ungs.sail.Costo
 import ar.edu.ungs.sail.helper.CycleHelper
 import ar.edu.ungs.sail.exceptions.SameIndividualException
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+import ar.edu.ungs.sail.Nodo
+import ar.edu.ungs.sail.VMG
+import scala.collection.mutable.ListBuffer
 
 
 /**
@@ -52,6 +58,59 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
 }
 
 /**
+ * Similar a SailOnePointCrossover, pero reconstruye el camino en el punto de cruza
+ * 2018
+ * @author ricardo
+ *
+ */
+
+@SerialVersionUID(1L)
+class SailOnePointReconstructCrossover(cancha:Cancha) extends Crossover[List[(Int,Int)]] {
+     
+    override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
+
+		  if (individuals==null) throw new NullIndividualException("SailOnePointCrossover")
+		  if (individuals.length<2) throw new NullIndividualException("SailOnePointCrossover")
+		  if (individuals(0)==null || individuals(1)==null) throw new NullIndividualException("SailOnePointCrossover");
+		
+		  val i1 = individuals(0)
+		  val i2 = individuals(1)
+		
+		  val c1=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+		  val c2=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+		
+		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()
+      val point=Random.nextInt(realSize)
+		
+
+      val desc1Parte1=c1.slice(0, point)
+      val desc1Parte2=c2.slice(point, c2.length)
+		  
+      if (desc1Parte1.length>0)
+      {
+        val vinc1=desc1Parte1.takeRight(1)(0)
+        val vinc2=desc1Parte2.take(1)(0)
+        val nodoVinc1=cancha.getNodoByCord(vinc1._1, vinc1._2)
+        val nodoVinc2=cancha.getNodoByCord(vinc2._1, vinc2._2)
+        
+      }
+      val desc2=c2.slice(0, point)++c1.slice(point, c2.length)
+      
+      
+      val desc1=c1.slice(0, point)++c2.slice(point, c2.length)
+		 // val desc2=c2.slice(0, point)++c1.slice(point, c2.length)
+		
+		  
+	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
+	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
+		
+		  return List(d1,d2)		      
+      
+     }
+
+}
+
+/**
  * Operador de Crossover propuesto por He Fangguo para una tira de nodos de longitud variable (Int,Int)
  * 2 individuos pueden cruzarse si tienen al menos un par de nodos comunes (que no sean la fuente y el destino)
  * en su recorrido. Si hay mas de una coincidencia, se elige al azar el par sobre el cual trabajar.
@@ -62,7 +121,7 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
  *
  */
 @SerialVersionUID(41120L)
-class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(Int,Int)]] {
+class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crossover[List[(Int,Int)]] {
 
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 		  if (individuals==null) throw new NullIndividualException("SailPathOnePointCrossoverHeFangguo")
@@ -100,15 +159,47 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
 		  var i=0
 		  while (i < desc1.size-1)
 		  {
-		    val x=cancha.getNodoByCord(desc1(i)_1, desc1(i)_2)
-		    val y=cancha.getNodoByCord(desc1(i+1)_1, desc1(i+1)_2)
+		    val x:Nodo=cancha.getNodoByCord(desc1(i)_1, desc1(i)_2)
+		    val y:Nodo=cancha.getNodoByCord(desc1(i+1)_1, desc1(i+1)_2)
+		    
 		    
 		    if (cancha.isNeighbour(x,y))
 		      i=i+1
 		    else
 		    {
-		      val subpath=cancha.simplePath(x,y).drop(1).dropRight(1).map(f=>(f.getX(),f.getY()))
-		      desc1=desc1.take(i+1)++subpath++desc1.takeRight(desc1.size-(i+1))
+      		var minCostAux:Float=Float.MaxValue/2-1
+		      val g=cancha.getGraph()
+	        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+   	      var nodoAux:g.NodeT=g get x
+     	  	var nodoTemp:g.NodeT=g get y
+          val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+  		    var pathTemp:Traversable[(g.EdgeT, Float)]=null
+		      var t=0
+		      val nodosOrigen=cancha.getNodos().filter(n=>n.getX==x.getX() && n.getY==x.getY())
+		      val nodosDestino=cancha.getNodos().filter(n=>n.getX==y.getX() && n.getY==y.getY())
+          nodosOrigen.foreach(nodoInt=>
+      		  {
+          		nodosDestino.foreach(v=>{
+                val nf=g get v
+                
+          		  val spNO = nodoAux shortestPathTo (nf, negWeight(_))
+                val spN = spNO.get
+                val peso=spN.weight
+                pathTemp=spN.edges.map(f=>(f,negWeight(f)))
+                val costo=pathTemp.map(_._2).sum
+                if (costo<minCostAux){
+                  minCostAux=costo
+                  nodoTemp=nf
+                }
+          		})
+              path++=pathTemp
+              nodoAux=nodoTemp
+              t=t+1
+      		  })
+      		val subpath2=path.map(f=>(f._1.from.getX(),f._1.from.getY()))
+      		subpath2.+=((path.takeRight(1)(0)._1.to.getX(),path.takeRight(1)(0)._1.to.getY()))      		
+      		val subpath=subpath2.distinct
+	        desc1=desc1.take(i)++subpath++desc1.takeRight(desc1.size-(i+2))
 		      i=i+subpath.length+1
 		    }
 		  }
@@ -116,15 +207,48 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
 		  i=0
 		  while (i < desc2.size-1)
 		  {
-		    val x=cancha.getNodoByCord(desc2(i)_1, desc2(i)_2)
-		    val y=cancha.getNodoByCord(desc2(i+1)_1, desc2(i+1)_2)
+		    val x:Nodo=cancha.getNodoByCord(desc2(i)_1, desc2(i)_2)
+		    val y:Nodo=cancha.getNodoByCord(desc2(i+1)_1, desc2(i+1)_2)
 		    
 		    if (cancha.isNeighbour(x,y))
 		      i=i+1
 		    else
 		    {
-		      val subpath=cancha.simplePath(x,y).drop(1).dropRight(1).map(f=>(f.getX(),f.getY()))
-		      desc2=desc2.take(i+1)++subpath++desc2.takeRight(desc2.size-(i+1))
+
+      		var minCostAux:Float=Float.MaxValue/2-1
+		      val g=cancha.getGraph()
+	        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+   	      var nodoAux:g.NodeT=g get x
+     	  	var nodoTemp:g.NodeT=g get y
+          val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()
+  		    var pathTemp:Traversable[(g.EdgeT, Float)]=null
+		      var t=0
+		      val nodosOrigen=cancha.getNodos().filter(n=>n.getX==x.getX() && n.getY==x.getY())
+		      val nodosDestino=cancha.getNodos().filter(n=>n.getX==y.getX() && n.getY==y.getY())
+          nodosOrigen.foreach(nodoInt=>
+      		  {
+          		nodosDestino.foreach(v=>{
+                val nf=g get v
+                
+          		  val spNO = nodoAux shortestPathTo (nf, negWeight(_))
+                val spN = spNO.get
+                val peso=spN.weight
+                pathTemp=spN.edges.map(f=>(f,negWeight(f)))
+                val costo=pathTemp.map(_._2).sum
+                if (costo<minCostAux){
+                  minCostAux=costo
+                  nodoTemp=nf
+                }
+          		})
+              path++=pathTemp
+              nodoAux=nodoTemp
+              t=t+1
+      		  })
+
+      		val subpath2=path.map(f=>(f._1.from.getX(),f._1.from.getY()))
+      		subpath2.+=((path.takeRight(1)(0)._1.to.getX(),path.takeRight(1)(0)._1.to.getY()))
+      		val subpath=subpath2.distinct
+	        desc2=desc2.take(i)++subpath++desc2.takeRight(desc2.size-(i+2))
 		      i=i+subpath.length+1
 		    }
 		  }
@@ -136,3 +260,26 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha) extends Crossover[List[(
     }
 }
 
+/**
+ * Combina los crossovers para sail
+ */
+@SerialVersionUID(1L)
+class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG) extends Crossover[List[(Int,Int)]] {
+   val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco)
+   val onePoint=new SailOnePointCrossover()
+   
+   override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
+
+      Try(heFanguo.execute(individuals)) match {
+          case Success(c) => c
+          case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) 
+                                onePoint.execute(individuals) 
+                            else 
+                              {
+                                heFanguo.execute(individuals)
+                                throw e
+                              }
+        }  	  
+       
+   }
+}

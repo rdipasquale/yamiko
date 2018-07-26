@@ -40,12 +40,12 @@ class CrossOverTest {
 
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val carr40:VMG=new Carr40()
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -75,12 +75,12 @@ class CrossOverTest {
 
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val carr40:VMG=new Carr40()
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -108,12 +108,12 @@ class CrossOverTest {
 
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val carr40:VMG=new Carr40()
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -150,12 +150,12 @@ class CrossOverTest {
 
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val carr40:VMG=new Carr40()
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap

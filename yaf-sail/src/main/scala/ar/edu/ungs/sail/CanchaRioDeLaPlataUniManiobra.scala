@@ -7,7 +7,7 @@ import scalax.collection.edge.WUnDiEdge
 import scalax.collection.GraphEdge.DiEdge
 
 @SerialVersionUID(1L)
-class CanchaRioDeLaPlataUniManiobra(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda:Int,nodoInicial:Nodo,nodoFinal:Nodo,islas:List[(Int,Int)]) extends Cancha
+class CanchaRioDeLaPlataUniManiobra(_dimension:Int, _nodosPorCelda:Int, _metrosPorLadoCelda:Int,nodoInicial:Nodo,nodoFinal:Nodo,islas:List[(Int,Int)],viento:List[EstadoEscenarioViento]) extends Cancha
 {
   val dimension=_dimension
   val nodosPorCelda=_nodosPorCelda
@@ -84,5 +84,7 @@ class CanchaRioDeLaPlataUniManiobra(_dimension:Int, _nodosPorCelda:Int, _metrosP
     if (p==null) return List[Nodo]()
     return p.nodes.toList.asInstanceOf[List[Nodo]]
   }
+  
+  override def getVientoReferencia()=viento  
   
 }

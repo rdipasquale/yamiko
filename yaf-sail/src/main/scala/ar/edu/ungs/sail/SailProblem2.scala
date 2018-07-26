@@ -4,7 +4,7 @@ package ar.edu.ungs.sail
 import ar.edu.ungs.sail.operators.ByPassRibosome
 import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
 import ar.edu.ungs.sail.operators.SailMutatorSwap
-import ar.edu.ungs.sail.operators.SailPathOnePointCrossoverHeFangguo
+import ar.edu.ungs.sail.operators.SailOnePointCombinedCrossover
 import ar.edu.ungs.sail.operators.SailRandomPopulationInitializer
 import ar.edu.ungs.serialization.DeserializadorEscenarios
 import ar.edu.ungs.yamiko.ga.domain.Genome
@@ -37,7 +37,7 @@ object SailProblem2 extends App {
       val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null);
+      val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
       val barco:VMG=new Carr40()
       val genes=List(GENES.GenUnico)
       val translators=genes.map { x => (x,new ByPassRibosome().asInstanceOf[Ribosome[List[(Int, Int)]]]) }.toMap
@@ -56,7 +56,7 @@ object SailProblem2 extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailPathOnePointCrossoverHeFangguo(cancha),
+          new SailOnePointCombinedCrossover(cancha,barco),
           new ProbabilisticRouletteSelector(),
           escenarios,
           barco,

@@ -15,7 +15,7 @@ object GenerateAllPaths extends App {
      
     val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
     val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-    val cancha:Cancha=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null);
+    val cancha:Cancha=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null,null);
 //    private val barco:VMG=new Carr40()
 //    private val genes=List(GENES.GenUnico)
 //    private val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap

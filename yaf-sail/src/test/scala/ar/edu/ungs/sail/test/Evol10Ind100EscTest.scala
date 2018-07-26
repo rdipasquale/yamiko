@@ -88,15 +88,15 @@ class Evol10Ind100EscTest extends Serializable {
       val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val canchaAux:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val canchaAux:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val barco:VMG=new Carr40()
       val genes=List(GENES.GenUnico)
       val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
       val mAgent=new SailAbstractMorphogenesisAgent()
       val selector:Selector[List[(Int,Int)]]=new ProbabilisticRouletteSelector()
-      val canchaLocal:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
-      val crossover:Crossover[List[(Int,Int)]]=new SailPathOnePointCrossoverHeFangguo(canchaLocal)
+      val canchaLocal:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
+      val crossover:Crossover[List[(Int,Int)]]=new SailPathOnePointCrossoverHeFangguo(canchaLocal,barco)
       val mutator:Mutator[List[(Int,Int)]]=new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]]
       val acceptEv:AcceptEvaluator[List[(Int,Int)]]=new DescendantAcceptEvaluator[List[(Int,Int)]]()
     	// tomo 10 para probar
@@ -118,7 +118,7 @@ class Evol10Ind100EscTest extends Serializable {
 //    	val salida=sparkEscenerarios.map(esc=>{
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
  
-          val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+          val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,esc.getEstadoByTiempo(0));
           val g=cancha.getGraph()
           val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
    	  

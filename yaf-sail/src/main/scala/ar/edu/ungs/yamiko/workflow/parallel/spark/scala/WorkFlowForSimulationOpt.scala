@@ -99,7 +99,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 
     	    // Armado de la cancha
           if (profiler) taux1=System.currentTimeMillis()
-    	    val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null);
+    	    val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null,esc.getEstadoByTiempo(0));
           val g=cancha.getGraph()
 //          if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
           
@@ -191,7 +191,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		
     // Profiler
     if (profiler) println("Evaluar el fitness de la poblacion: " +(System.currentTimeMillis()-taux1) + "ms")
-		println("Generacion " + generation+" - Mejor ind "+bestOfGeneration.getId()+" Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+		println("Generacion " + generation+" - Mejor ind: "+bestOfGeneration.getId()+" Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
 
     if (profiler) taux1=System.currentTimeMillis()		
 		
@@ -216,25 +216,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		        parentsJ=List(t._1,selector.executeN(1,po)(0))
   	  }
       
-  	  //val desc=crossover.execute(parentsJ)
-  	  cuentaProteccion=0
-  	  var booleanNotCompatible=true
-  	  var desc:List[Individual[List[(Int, Int)]]]=null
-  	  while (cuentaProteccion<10 && booleanNotCompatible)
-  	  {
-  	    booleanNotCompatible=false
-        cuentaProteccion=cuentaProteccion+1
-        desc=Try(crossover.execute(parentsJ)) match {
-          case Success(c) => c
-          case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) {booleanNotCompatible=true; parentsJ} else throw e
-        }  	  
-  	  }
-  	  
-  	  if (booleanNotCompatible)
-  	  {
-            println("Cruza no compatible")
-            desc.foreach(p=>mutator.execute(p))  	    
-  	  }
+  	  val desc=crossover.execute(parentsJ)
             
 		  for (d <- acceptEv.execute(desc,parentsJ))
 		  {

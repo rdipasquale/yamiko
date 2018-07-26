@@ -45,7 +45,7 @@ object GenerarEscenarios4x4 extends App {
   override def main(args : Array[String]) {
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
 
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
@@ -104,7 +104,7 @@ object GenerarEscenarios extends App {
 //      })
       
       // Con rachas no uniformemente distribuidas
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null,null);
       val salida=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
       SerializadorEscenario.run("escenario50x50ConRachasNoUniformes_0.txt", "1",salida)
       salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "escenario50x50ConRachasNoUniformes_t" + f._1 + ".png", 35))
@@ -127,7 +127,7 @@ object Generar10Escenarios4x4 extends App {
   override def main(args : Array[String]) {
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
 
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      

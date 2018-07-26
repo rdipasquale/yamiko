@@ -51,7 +51,7 @@ class SailFitnessMultiInnerTest extends Serializable{
     private val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
     private val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
     private val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-    private val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+    private val cancha:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
     private val barco:VMG=new Carr40()
     private val genes=List(GENES.GenUnico)
     private val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -329,7 +329,7 @@ class SailFitnessMultiInnerTest extends Serializable{
 
 		  
       
-      val canchaUni=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null)
+      val canchaUni=new CanchaRioDeLaPlataUniManiobra(4,4,50,nodoInicial,nodoFinal,null,null)
 //		  val arrNodos=cancha.getNodos().toArray
 		  val arrNodos=canchaUni.getNodos().toArray
 		  println("Son " + arrNodos.length + " nodos")

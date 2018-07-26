@@ -62,7 +62,7 @@ object SailProblem {
       		
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null);
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
 //      println("Armado cancha: finaliza en " + System.currentTimeMillis())      
       val carr40:VMG=new Carr40()
      //Tomar estado inicial de archivo
