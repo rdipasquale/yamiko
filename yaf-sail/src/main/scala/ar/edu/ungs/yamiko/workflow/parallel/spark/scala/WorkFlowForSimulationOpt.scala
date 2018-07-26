@@ -87,11 +87,11 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       // Desarrolla los individuos
       if (profiler) taux1=System.currentTimeMillis()
       po.getAll().par.foreach(i=>mAgent.develop(genome, i))
-      if (profiler) println("Desarrolla los " + po.getAll().size + " individuos - " + (System.currentTimeMillis()-taux1) + "ms (" + ( (System.currentTimeMillis()-taux1).toDouble / po.getAll().size.toDouble) + "ms/ind). Listo para correr los " + escenarios.getEscenarios().size + " escenarios.")
+      //if (profiler) println("Desarrolla los " + po.getAll().size + " individuos - " + (System.currentTimeMillis()-taux1) + "ms (" + ( (System.currentTimeMillis()-taux1).toDouble / po.getAll().size.toDouble) + "ms/ind). Listo para correr los " + escenarios.getEscenarios().size + " escenarios.")
 
       if (profiler) taux1=System.currentTimeMillis()
       
-      if (profiler) po.getAll().par.foreach(i=>println("Poblacion - ind "+i.getId()+ " - " + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
+      //if (profiler) po.getAll().par.foreach(i=>println("Poblacion - ind "+i.getId()+ " - " + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
       
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
