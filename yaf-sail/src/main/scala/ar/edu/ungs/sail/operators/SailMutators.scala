@@ -26,6 +26,9 @@ class SailMutatorSwap(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int
     @throws(classOf[YamikoException])  
     override def execute(ind:Individual[List[(Int,Int)]])=  {
       if (ind==null) throw new NullIndividualException("SailMutatorSwap -> Individuo Null")
+
+//      println("Prev ind.getGenotype().getChromosomes()(0).getFullRawRepresentation() " + ind.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+//      println("Prev ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0) " + ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0))
       
       val len=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().length
       val p1=Random.nextInt(len)
@@ -38,6 +41,9 @@ class SailMutatorSwap(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int
       ind.getGenotype().getChromosomes()(0).setFullRawRepresentation(salida)          
       ma.develop(ge, ind)      
 		  //ind.setFitness(fe.execute(ind))
+
+//      println("Post ind.getGenotype().getChromosomes()(0).getFullRawRepresentation() " + ind.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+ //     println("Post ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0) " + ind.getPhenotype().getAlleleMap().values.toList(0).values.toList(0))
       
     }
 }

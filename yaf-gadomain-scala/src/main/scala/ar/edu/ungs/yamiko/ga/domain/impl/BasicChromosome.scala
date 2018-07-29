@@ -10,12 +10,13 @@ import ar.edu.ungs.yamiko.ga.domain.Chromosome
  */
 
 @SerialVersionUID(1119L)
-class BasicChromosome[T](name:String , chromosomeRep:T, _fullSize:Int) extends Chromosome[T]{
+class BasicChromosome[T](name:String , chromosomeRepO:T, _fullSize:Int) extends Chromosome[T]{
 
+  var chromosomeRep:T=chromosomeRepO
   override def getFullRawRepresentation():T=chromosomeRep
   override def name():String=name
   override def getFullSize():Int=_fullSize  
-  override def setFullRawRepresentation(a:T)={}
+  override def setFullRawRepresentation(a:T)={chromosomeRep=a}
 
   def canEqual(a: Any) = a.isInstanceOf[BasicChromosome[T]]
 

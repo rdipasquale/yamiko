@@ -21,6 +21,7 @@ import org.apache.spark.SparkContext
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
+import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 
 object SailProblem2 extends App {
  
@@ -55,7 +56,7 @@ object SailProblem2 extends App {
           new SailRandomMixedPopulationInitializer(DIMENSION,NODOS_POR_CELDA,nodoInicial,nodoFinal,individuosAgregados).asInstanceOf[PopulationInitializer[List[(Int,Int)]]],
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
-          new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]],
+          new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
           new SailOnePointCombinedCrossover(cancha,barco),
           new ProbabilisticRouletteSelector(),
           escenarios,
@@ -90,7 +91,7 @@ object SailProblem2 extends App {
       ga.finalPopulation.foreach { x =>
 //              mAgent.develop(genome, x)
 //              x.setFitness(fev.execute(x))
-              println(x.toString() + " -> " + x.getFitness()) }
+              println(x.toString() + " -> " + x.getFitness() + x.getGenotype().getChromosomes()(0).getFullRawRepresentation()) }
       
 			println("Tiempo -> " + (t2-t1)/1000 + " seg");
 			println("Promedio -> " + ((t2-t1)/(MAX_GENERATIONS.toDouble))+ " ms/generacion");
