@@ -30,6 +30,7 @@ import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
+import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
 
 /**
  * En esta clase se modela un workflow orientado a evaluar escenarios simulados. Es decir, donde el fitness del proceso del GA se evalua de manera
@@ -68,7 +69,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
   var _finalpop=po.getAll()
 	val startTime=System.currentTimeMillis()
   var taux1=0L
-  
+  val convergenteAnalysis=new ConvergenceAnalysis[List[(Int,Int)]]()    
   def bestInds()=holder
   def finalPopulation()=_finalpop
   
@@ -249,6 +250,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	  println("Generación " + generation+ " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generation + "ms"  )
     println("Generación " + generation+ " - Mejor Elemento total " + bestInd.getFitness + " - " + bestInd.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 		
+    convergenteAnalysis.printAnalysis(po.getAll())
+    
     }
 
     _finalpop=po.getAll()
