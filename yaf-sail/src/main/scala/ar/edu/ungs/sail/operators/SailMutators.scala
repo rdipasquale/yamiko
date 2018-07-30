@@ -78,21 +78,78 @@ class SailMutatorEmpujador(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List
       val nodoReferencia=if(distIni<distFin) nodoInicial else nodoFinal
       var nodo=nodoAMutarN
       nodoAMutarNG.outNeighbors.foreach(f=>{
-        val distRef=Math.sqrt((Math.abs(f.getX()-nodoReferencia.getX())*Math.abs(f.getX()-nodoReferencia.getX())+Math.abs(f.getY()-nodoReferencia.getY())*Math.abs(f.getY()-nodoReferencia.getY())).doubleValue())
-        if (distRef<distanciaAux)
+        if (!fullRep.contains((f.getX(),f.getY())))
         {
-          distanciaAux=distRef
-          nodo=f
+          val distRef=Math.sqrt((Math.abs(f.getX()-nodoReferencia.getX())*Math.abs(f.getX()-nodoReferencia.getX())+Math.abs(f.getY()-nodoReferencia.getY())*Math.abs(f.getY()-nodoReferencia.getY())).doubleValue())
+          if (distRef<distanciaAux)
+          {
+            distanciaAux=distRef
+            nodo=f
+          }
         }
       })
       
-      var salida=fullRep.slice(0, p)++List((nodo.getX(),nodo.getY())) ++fullRep.slice(p+1, len)
-      salida=salida.distinct
+      val salida=fullRep.slice(0, p)++List((nodo.getX(),nodo.getY())) ++fullRep.slice(p+1, len)
+      //salida=salida.distinct
       ind.getGenotype().getChromosomes()(0).setFullRawRepresentation(salida)          
       ma.develop(ge, ind)      
 		  //ind.setFitness(fe.execute(ind))      
     }
 }
+
+
+
+
+
+/**
+ * Operador de Mutación que toma al azar un nodo y lo reemplaza por el vecino que mas cerca este de la meta o de la salida (dependiendo de la posicion del nodo en el camino,
+ * si esta despues del 20% del camino, lo acerca al final, sino, al principio)
+ * 
+ *
+ * @author ricardo
+ */
+@SerialVersionUID(1L)
+class SailMutatorEmpujadorCamino(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List[(Int,Int)]],cancha:Cancha) extends Mutator[List[(Int,Int)]]{
+    
+    private val r=new Random(System.currentTimeMillis())
+    
+    @throws(classOf[YamikoException])  
+    override def execute(ind:Individual[List[(Int,Int)]])=  {
+      if (ind==null) throw new NullIndividualException("SailMutatorEmpujador -> Individuo Null")
+      val fullRep=ind.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+      val len=fullRep.length
+      val p=Random.nextInt(len)
+      val nodoAMutar=fullRep(p)
+      // Ver si esta mas cerca de la salida o de la meta
+      val nodoInicial=cancha.getNodoInicial()
+      val nodoFinal=cancha.getNodoFinal()
+//      val distIni=Math.sqrt((Math.abs(nodoAMutar._1-nodoInicial.getX())*Math.abs(nodoAMutar._1-nodoInicial.getX())+Math.abs(nodoAMutar._2-nodoInicial.getY())*Math.abs(nodoAMutar._2-nodoInicial.getY())).doubleValue())
+//      val distFin=Math.sqrt((Math.abs(nodoAMutar._1-nodoFinal.getX())*Math.abs(nodoAMutar._1-nodoFinal.getX())+Math.abs(nodoAMutar._2-nodoFinal.getY())*Math.abs(nodoAMutar._2-nodoFinal.getY())).doubleValue())
+      val nodoAMutarN=cancha.getNodoByCord(nodoAMutar._1, nodoAMutar._2)
+      val g=cancha.getGraph()
+      val nodoAMutarNG=g get(nodoAMutarN)
+      var distanciaAux=Double.MaxValue
+      val nodoReferencia=if(p.doubleValue()<0.2*len) nodoInicial else nodoFinal
+      var nodo=nodoAMutarN
+      nodoAMutarNG.outNeighbors.foreach(f=>{
+        if (!fullRep.contains((f.getX(),f.getY())))
+        {
+        val distRef=Math.sqrt((Math.abs(f.getX()-nodoReferencia.getX())*Math.abs(f.getX()-nodoReferencia.getX())+Math.abs(f.getY()-nodoReferencia.getY())*Math.abs(f.getY()-nodoReferencia.getY())).doubleValue())
+        if (distRef<distanciaAux)
+        {
+          distanciaAux=distRef
+          nodo=f
+        }}
+      })
+      
+      val salida=fullRep.slice(0, p)++List((nodo.getX(),nodo.getY())) ++fullRep.slice(p+1, len)
+      //salida=salida.distinct
+      ind.getGenotype().getChromosomes()(0).setFullRawRepresentation(salida)          
+      ma.develop(ge, ind)      
+		  //ind.setFitness(fe.execute(ind))      
+    }
+}
+
 
 
 

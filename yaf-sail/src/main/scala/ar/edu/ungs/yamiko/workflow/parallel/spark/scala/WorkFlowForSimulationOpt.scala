@@ -59,7 +59,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(6))
+ 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(2))
 // FIXME! PTUEBA
  	// 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
@@ -137,19 +137,20 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                 if (spNO.isEmpty) 
                 {
                   allele.foreach(println(_))
-                  println(nodoInt)
-                  println(v)
-                  println("nulo")
+                  println(nodoInt + " - " + println(v) + " no hay path")
                 }
-                val spN = spNO.get
-                val peso=spN.weight
-                pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
-                
-                
-                val costo=pathTemp.map(_._2).sum
-                if (costo<minCostAux){
-                  minCostAux=costo
-                  nodoTemp=nf
+                else
+                {
+                  val spN = spNO.get
+                  val peso=spN.weight
+                  pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+                  
+                  
+                  val costo=pathTemp.map(_._2).sum
+                  if (costo<minCostAux){
+                    minCostAux=costo
+                    nodoTemp=nf
+                  }
                 }
           		})
               path++=pathTemp
@@ -161,7 +162,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       		  //i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
 
-      		  //if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+      		  if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 
     	  })
     	  //println(parcial)
