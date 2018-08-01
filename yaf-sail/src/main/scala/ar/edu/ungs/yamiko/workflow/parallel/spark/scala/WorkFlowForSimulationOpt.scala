@@ -31,6 +31,7 @@ import scala.util.Success
 import scala.util.Failure
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
+import org.apache.log4j.Logger
 
 /**
  * En esta clase se modela un workflow orientado a evaluar escenarios simulados. Es decir, donde el fitness del proceso del GA se evalua de manera
@@ -60,7 +61,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(2))
+ 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(8))
 // FIXME! PTUEBA
  	// 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
@@ -92,8 +93,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 
       if (profiler) taux1=System.currentTimeMillis()
       
-      //if (profiler) po.getAll().par.foreach(i=>println("Poblacion - ind "+i.getId()+ " - " + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
-      
+      if (profiler) po.getAll().par.foreach(i=>Logger.getLogger("poblaciones").info(generation + "; "+i.getId()+ ";" + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
+
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
@@ -102,7 +103,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           if (profiler) taux1=System.currentTimeMillis()
     	    val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null,esc.getEstadoByTiempo(0));
           val g=cancha.getGraph()
-//          if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
+          if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
           
           val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
 
@@ -137,8 +138,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
                 if (spNO.isEmpty) 
                 {
-                  allele.foreach(println(_))
-                  println(nodoInt + " - " + println(v) + " no hay path")
+//                  allele.foreach(println(_))
+//                  println(nodoInt + " - " + println(v) + " no hay path")
                 }
                 else
                 {
@@ -163,7 +164,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       		  //i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
 
-      		  if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+      		  //if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 
     	  })
     	  //println(parcial)
@@ -193,7 +194,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		
     // Profiler
     if (profiler) println("Evaluar el fitness de la poblacion: " +(System.currentTimeMillis()-taux1) + "ms")
-		println("Generacion " + generation+" - Mejor ind: "+bestOfGeneration.getId()+" Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
+		
+    println("Generacion " + generation+" - Mejor ind: "+bestOfGeneration.getId()+" Finess="+bestOfGeneration.getFitness()+"("+notScientificFormatter.format(bestOfGeneration.getFitness())+");")
 
     if (profiler) taux1=System.currentTimeMillis()		
 		
@@ -208,8 +210,6 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 		val descendants=ListBuffer[Individual[List[(Int,Int)]]]()
 		for (t <- tuplasSer)
 		{
-//      if (t._1.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._1 )
-//      if (t._2.getPhenotype==null) parameter.getMorphogenesisAgent().develop(parameter.getGenome(), t._2 )
       var parentsJ=List(t._1,t._2)
       var cuentaProteccion=0
 		  while (cuentaProteccion<10 && parentsJ(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().equals(parentsJ(1).getGenotype().getChromosomes()(0).getFullRawRepresentation()))
@@ -220,13 +220,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       
   	  val desc=crossover.execute(parentsJ)
             
-		  for (d <- acceptEv.execute(desc,parentsJ))
-		  {
-//        if (d.getPhenotype==null) 
-//          parameter.getMorphogenesisAgent().develop(parameter.getGenome(), d )
-//        if (d.getFitness==0) d.setFitness(parameter.getFitnessEvaluator.execute(d))
-        descendants+=d
-		  }      				    
+		  for (d <- acceptEv.execute(desc,parentsJ)) descendants+=d
 		}
 		if (!descendants.contains(bestOfGeneration))
 		{
@@ -250,8 +244,15 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	  println("Generación " + generation+ " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generation + "ms"  )
     println("Generación " + generation+ " - Mejor Elemento total " + bestInd.getFitness + " - " + bestInd.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 		
-    convergenteAnalysis.printAnalysis(po.getAll())
     
+  	  if (profiler) 
+  	  {
+  	    val impr=convergenteAnalysis.analysisCSV(po.getAll())
+  	    impr.foreach(f=>Logger.getLogger("profiler").info("Generation;" + generation+ ";" + f))
+  	  }	    
+  	  else
+  	    convergenteAnalysis.printAnalysis(po.getAll())
+	    
     }
 
     _finalpop=po.getAll()

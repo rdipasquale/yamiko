@@ -1,6 +1,7 @@
 package ar.edu.ungs.yamiko.ga.tools
 
 import ar.edu.ungs.yamiko.ga.domain.Individual
+import scala.collection.mutable.ListBuffer
 
 @SerialVersionUID(1L)
 class ConvergenceAnalysis[T] extends Serializable{
@@ -24,5 +25,13 @@ class ConvergenceAnalysis[T] extends Serializable{
     an._2.foreach(f=>println(f._2 + ": " + f._1))
     println("----Fin Histograma")
   }
-  
+
+  def analysisCSV(l:List[Individual[T]]):List[String]={
+    val an=getAnalysis(l)
+    val salida=ListBuffer[String]()
+    salida.+=("Repetidos;" + an._1 + "%")
+    an._2.foreach(f=>salida.+=("Histograma;"+f._2 + "; " + f._1))
+    salida.toList
+    
+  }
 }
