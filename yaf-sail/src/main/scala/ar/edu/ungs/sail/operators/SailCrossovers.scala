@@ -110,6 +110,73 @@ class SailOnePointReconstructCrossover(cancha:Cancha) extends Crossover[List[(In
 
 }
 
+
+/**
+ * Similar a SailOnePointReconstructCrossover, pero cruza en el punto mas cercano entre los caminos de la siguiente manera
+ * 1) Si hay intercepcion en los paths elige uno de los puntos de interseccion al azar siempre que no sean el primero ni el ultimo
+ * 2) Calcula todas las distancias entre los puntos de los caminos (uno contra el otro) y busca el punto mas cercano, si hay varios con la minima distancia, desempata al azar (siempre que no sean el primero ni el ultimo)
+ * 2018
+ * @author ricardo
+ *
+ */
+
+@SerialVersionUID(1L)
+class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
+     
+    override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
+
+		  if (individuals==null) throw new NullIndividualException("SailOnePointCrossover")
+		  if (individuals.length<2) throw new NullIndividualException("SailOnePointCrossover")
+		  if (individuals(0)==null || individuals(1)==null) throw new NullIndividualException("SailOnePointCrossover");
+		
+		  val i1 = individuals(0)
+		  val i2 = individuals(1)
+		
+		  val c1=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+		  val c2=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
+		
+		  
+		  val intersec=c1.drop(1).dropRight(1).intersect(c2.drop(1).dropRight(1))
+		  val punto=
+		  if (intersec.isEmpty)
+		  {
+  		  val dist=c1.drop(1).dropRight(1).flatMap(f=>c2.drop(1).dropRight(1).map(g=>(f,g,Math.sqrt(((f._1-g._1)*(f._1-g._1)).doubleValue()+((f._2-g._2)*(f._2-g._2)).doubleValue()))))
+  		  val distOrd=dist.sortBy(f=>{f._3})
+  		  val candidatos=distOrd.filter(_._3==distOrd.take(1)(0)._3)
+  		  
+  		  if (candidatos.length>1) 
+  		  {
+  		    val i=Random.nextInt(candidatos.length) 
+  		    (candidatos(i)._1,candidatos(i)._2)
+  		  } else (candidatos(0)._1,candidatos(0)._2)
+		  }
+		  else
+		  {
+		    if (intersec.length>1){
+		      val i=Random.nextInt(intersec.length)
+		      (intersec(i),intersec(i)) 
+		    }
+		    else (intersec(0),intersec(0))		    
+		  }
+		  
+		  
+      val desc1Parte1=c1.slice(0, 1+Math.max(c1.indexOf(punto._1),0))
+      val desc1Parte2=c2.slice(Math.min(c2.indexOf(punto._2),c2.length-1), c2.length)
+      val desc1=CycleHelper.remove(desc1Parte1++desc1Parte2).distinct
+      val desc2Parte1=c2.slice(0, 1+Math.max(c2.indexOf(punto._2),0))
+      val desc2Parte2=c1.slice(Math.min(c1.indexOf(punto._1),c1.length-1), c1.length)
+      val desc2=CycleHelper.remove(desc2Parte1++desc2Parte2).distinct
+
+	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
+	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
+		
+		  return List(d1,d2)		      
+      
+     }
+
+}
+
+
 /**
  * Operador de Crossover propuesto por He Fangguo para una tira de nodos de longitud variable (Int,Int)
  * 2 individuos pueden cruzarse si tienen al menos un par de nodos comunes (que no sean la fuente y el destino)
@@ -266,14 +333,16 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crosso
 @SerialVersionUID(1L)
 class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG) extends Crossover[List[(Int,Int)]] {
    val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco)
-   val onePoint=new SailOnePointCrossover()
+   //val onePoint=new SailOnePointCrossover()
+   val onePointInter=new SailOnePointIntersectCrossover()
    
    override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 
       Try(heFanguo.execute(individuals)) match {
           case Success(c) => c
           case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) 
-                                onePoint.execute(individuals) 
+                                onePointInter.execute(individuals) 
+//                                onePoint.execute(individuals) 
                             else 
                               {
                                 heFanguo.execute(individuals)

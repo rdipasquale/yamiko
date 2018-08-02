@@ -24,6 +24,7 @@ import ar.edu.ungs.sail.operators.IndividualPathFactory
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
 import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
+import ar.edu.ungs.sail.operators.SailOnePointIntersectCrossover
 
 @Test
 class CrossOverTest {
@@ -35,6 +36,46 @@ class CrossOverTest {
   	{
   	} 
   	
+    @Test
+  	def testSailOnePointIntersectCrossover = {
+    
+      
+      
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
+      val carr40:VMG=new Carr40()
+     //Tomar estado inicial de archivo
+      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
+      
+      val cross=new SailOnePointIntersectCrossover()	    
+  	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
+      val genes=List(GENES.GenUnico)
+    	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
+    	val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
+      val fev:FitnessEvaluator[List[(Int,Int)]]=new SailFitnessEvaluatorUniqueSolution(rioDeLaPlata)
+      val mAgent=new SailMorphogenesisAgent(rioDeLaPlata,List((0,t0)),carr40).asInstanceOf[MorphogenesisAgent[List[(Int,Int)]]]
+  		
+      val i1:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(3,3),(6,6),(9,9),(12,12)) )
+      val i2:Individual[List[(Int,Int)]]= IndividualPathFactory.create("Chromosome 1", List((0,0),(0,3),(0,6),(0,9),(0,12),(1,12),(2,12),(3,12),(4,12),(5,12),(6,12),(7,12),(8,12),(9,12),(10,12),(11,12),(12,12)) )
+	
+  
+  		println("---------------------");
+  
+    	try {
+    		val desc=cross.execute(List(i1,i2));
+        println("desc 1: (" + desc(0).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(0).getFitness());
+        println("desc 2: (" + desc(1).getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + desc(1).getFitness());
+       } catch {
+       case ioe: NotCompatibleIndividualException => println("i1 e i2 no compatibles. OK")
+       case e: Exception => fail("Debiera ser NotCompatibleIndividualException")
+      }
+
+      println("---------------------");
+      
+      
+    }
+    
     @Test
   	def testSailCrossoverNoCompatible = {
 
