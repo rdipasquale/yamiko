@@ -32,6 +32,7 @@ import scala.util.Failure
 import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
 import org.apache.log4j.Logger
+import ar.edu.ungs.sail.Cache
 
 /**
  * En esta clase se modela un workflow orientado a evaluar escenarios simulados. Es decir, donde el fitness del proceso del GA se evalua de manera
@@ -61,9 +62,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- 	//val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(8))
+ 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(2))
 // FIXME! PTUEBA
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
+ 	//val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
   val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   val r:Random=new Random(System.currentTimeMillis())
@@ -95,6 +96,10 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       
       if (profiler) po.getAll().par.foreach(i=>Logger.getLogger("poblaciones").info(generation + "; "+i.getId()+ ";" + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
 
+      val cacheados=Cache.getCache(po.getAll())
+      po.replacePopulation(po.getAll().diff(cacheados))
+      if (profiler) Logger.getLogger("profiler").info(generation + "; cacheados;"+cacheados.size)
+      
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
@@ -103,7 +108,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           if (profiler) taux1=System.currentTimeMillis()
     	    val cancha:Cancha=new CanchaRioDeLaPlata(dimension,nodosPorCelda,metrosPorLadoCelda,nodoInicial,nodoFinal,null,esc.getEstadoByTiempo(0));
           val g=cancha.getGraph()
-          if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
+          //if (profiler) println("Armado de la cancha " + (System.currentTimeMillis()-taux1) + "ms")
           
           val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
 
@@ -189,6 +194,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
 		for (p<-0 to po.size()-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
 	
+		Cache.setCache(po.getAll())
+		po.replacePopulation(po.getAll()++cacheados)
+		
     val bestOfGeneration=po.getAll().maxBy { x => x.getFitness }    			        
 		holder.+=((generation,bestOfGeneration))
 		

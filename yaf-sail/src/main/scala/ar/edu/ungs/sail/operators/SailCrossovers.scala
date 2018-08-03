@@ -135,7 +135,7 @@ class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
 		  val c1=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		  val c2=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		
-		  
+		  if (c1.length<3 || c2.length<3) return individuals		  
 		  val intersec=c1.drop(1).dropRight(1).intersect(c2.drop(1).dropRight(1))
 		  val punto=
 		  if (intersec.isEmpty)
@@ -143,7 +143,7 @@ class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
   		  val dist=c1.drop(1).dropRight(1).flatMap(f=>c2.drop(1).dropRight(1).map(g=>(f,g,Math.sqrt(((f._1-g._1)*(f._1-g._1)).doubleValue()+((f._2-g._2)*(f._2-g._2)).doubleValue()))))
   		  val distOrd=dist.sortBy(f=>{f._3})
   		  val candidatos=distOrd.filter(_._3==distOrd.take(1)(0)._3)
-  		  
+
   		  if (candidatos.length>1) 
   		  {
   		    val i=Random.nextInt(candidatos.length) 
