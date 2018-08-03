@@ -23,7 +23,7 @@ import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
 import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 
-object SailProblem2 extends App {
+object SailProblem50 extends App {
  
   
    override def main(args : Array[String]) {

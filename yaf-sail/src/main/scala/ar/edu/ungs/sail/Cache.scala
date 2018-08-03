@@ -3,19 +3,26 @@ package ar.edu.ungs.sail
 import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.yamiko.ga.domain.Individual
 
-object Cache {
+@SerialVersionUID(1L)
+object Cache extends Serializable{
   
-  val cache=ListBuffer[Individual[List[(Int,Int)]]]()
+  var cache=Map[Int,ListBuffer[Individual[List[(Int,Int)]]]]()
   
-  def setCache(inds:List[Individual[List[(Int,Int)]]])=
+  def setCache(escenarioId:Int,inds:List[Individual[List[(Int,Int)]]])=
   {
-    val inter=cache.toList.intersect(inds)
-    cache.++=(inds.diff(inter))
+    if (cache.get(escenarioId).isEmpty)
+      cache=cache.+((escenarioId,inds.to[ListBuffer]))
+    else
+    {
+      val inter=cache.get(escenarioId).get.toList.intersect(inds)
+      cache=cache.+((escenarioId,cache.get(escenarioId).get++inds.diff(inter).to[ListBuffer]))
+    }
   }
   
-  def getCache(inds:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]]=
+  def getCache(escenarioId:Int,inds:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]]=
   {
-    val extCache=cache.toList.map(f=>f.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+    if (cache.get(escenarioId).isEmpty) return List()
+    val extCache=cache.get(escenarioId).get.toList.map(f=>f.getGenotype().getChromosomes()(0).getFullRawRepresentation())
     val salida=inds.filter(f=>extCache.contains(f.getGenotype().getChromosomes()(0).getFullRawRepresentation()))
     salida
   }

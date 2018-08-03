@@ -298,14 +298,18 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crosso
                 val nf=g get v
                 
           		  val spNO = nodoAux shortestPathTo (nf, negWeight(_))
-                val spN = spNO.get
-                val peso=spN.weight
-                pathTemp=spN.edges.map(f=>(f,negWeight(f)))
-                val costo=pathTemp.map(_._2).sum
-                if (costo<minCostAux){
-                  minCostAux=costo
-                  nodoTemp=nf
-                }
+                if (!spNO.isEmpty) 
+                {
+                  val spN = spNO.get
+                  
+                  val peso=spN.weight
+                  pathTemp=spN.edges.map(f=>(f,negWeight(f)))
+                  val costo=pathTemp.map(_._2).sum
+                  if (costo<minCostAux){
+                    minCostAux=costo
+                    nodoTemp=nf
+                  }
+            		}
           		})
               path++=pathTemp
               nodoAux=nodoTemp
@@ -342,8 +346,14 @@ class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG) extends Crossover[L
           case Success(c) => c
           case Failure(e) => if (e.isInstanceOf[NotCompatibleIndividualException]) 
                                 onePointInter.execute(individuals) 
-//                                onePoint.execute(individuals) 
+//                                onePoint.execute(individuals)                                 
                             else 
+                              if (e.isInstanceOf[SameIndividualException])
+                              {
+                                println("Mismo individuo")
+                                onePointInter.execute(individuals)
+                              }
+                              else
                               {
                                 heFanguo.execute(individuals)
                                 throw e

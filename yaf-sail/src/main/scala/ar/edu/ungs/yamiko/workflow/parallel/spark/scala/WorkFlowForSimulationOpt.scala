@@ -62,7 +62,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(2))
+ val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(8))
 // FIXME! PTUEBA
  	//val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
@@ -96,9 +96,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       
       if (profiler) po.getAll().par.foreach(i=>Logger.getLogger("poblaciones").info(generation + "; "+i.getId()+ ";" + i.getPhenotype().getAlleleMap().values.toList(0).values.toList(0).asInstanceOf[List[(Int,Int)]]) )
 
-      val cacheados=Cache.getCache(po.getAll())
-      po.replacePopulation(po.getAll().diff(cacheados))
-      if (profiler) Logger.getLogger("profiler").info(generation + "; cacheados;"+cacheados.size)
+//      val cacheados=Cache.getCache(po.getAll())
+//      po.replacePopulation(po.getAll().diff(cacheados))
+//      if (profiler) Logger.getLogger("profiler").info(generation + "; cacheados;"+cacheados.size)
       
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
@@ -113,7 +113,13 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           val parcial:ListBuffer[(Int,Int,Double)]=ListBuffer()
 
           // Evalua el fitness de cada individuo
-    	    po.getAll().par.foreach(i=>{
+          
+          val cacheados=Cache.getCache(esc.getId(), po.getAll())
+          val sinCachear=po.getAll().diff(cacheados)
+          if (profiler) println("Generacion " + generation + " - Escenario " + esc.getId() + " - " + cacheados.size + "/" +  po.getAll().size + " ind. cacheados sobre individuos totales")
+          
+    	    //po.getAll().par.foreach(i=>{
+          sinCachear.par.foreach(i=>{
       	    // Por cada individuo en la poblacion
 //            if (profiler) taux1=System.currentTimeMillis()
     	      
@@ -166,7 +172,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       		  })
       
       		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
-      		  //i.setFitness(fit)      	    
+      		  i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
 
       		  //if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
@@ -174,6 +180,8 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     	  })
     	  //println(parcial)
         //if (profiler) println("Evaluada la poblacion para el escenario en : " +(System.currentTimeMillis()-taux1) + "ms")
+    	  Cache.setCache(esc.getId(), sinCachear)
+    	  cacheados.foreach(f=> parcial+=(( esc.getId(),f.getId(),f.getFitness() )) )
     	  parcial
     	}).cache()     
 
@@ -188,14 +196,22 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	  // vamos a repartir un total de |e||pob| puntos. El max que puede obtener cada individuo es (|pob|-1)|e|, por lo que si queremos que un individuo que haya
 	  // sido el mejor en todos los escenarios multiplique por 2 su fitness (ant), deberiamos multiplicar la sumatoria de puntos ranking inversos de cada individuo por
 	  // (|pob|-1)|e|/2
-    val coef=((po.size()-1)*escenarios.getEscenarios().size).doubleValue()/2000d
-    val resultranking=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true).zipWithIndex().groupBy(_._1._2).mapValues(_.map(_._2 % po.size()+1).sum*coef).sortBy(_._1).collect()	  
+    val coef=((po.size-1)*escenarios.getEscenarios().size).doubleValue()/2000d
+    val performanceEnEscenariosOrd=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true)
+//    val performanceEnEscenariosOrdcol=performanceEnEscenariosOrd.collect()
+    val performanceEnEscenariosOrdZip=performanceEnEscenariosOrd.zipWithIndex()
+//    val performanceEnEscenariosOrdZipcol=performanceEnEscenariosOrdZip.collect()
+    val performanceEnEscenariosOrdZipGroup=performanceEnEscenariosOrdZip.groupBy(_._1._2)
+//    val performanceEnEscenariosOrdZipGroupcol=performanceEnEscenariosOrdZipGroup.collect()
+    val performanceEnEscenariosOrdZipGroupPond=performanceEnEscenariosOrdZipGroup.mapValues(_.map(_._2 % po.getAll().size+1).sum*coef)
+//    val performanceEnEscenariosOrdZipGroupPondcol=performanceEnEscenariosOrdZipGroupPond.collect()
+    val resultranking=performanceEnEscenariosOrdZipGroupPond.sortBy(_._1).collect()	  
   
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
-		for (p<-0 to po.size()-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
+		for (p<-0 to po.getAll().size-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
 	
-		Cache.setCache(po.getAll())
-		po.replacePopulation(po.getAll()++cacheados)
+//		Cache.setCache(po.getAll())
+//		po.replacePopulation(po.getAll()++cacheados)
 		
     val bestOfGeneration=po.getAll().maxBy { x => x.getFitness }    			        
 		holder.+=((generation,bestOfGeneration))
@@ -245,8 +261,15 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           mutator.execute(iii)
 
     if (profiler) println("Mutacion: " +(System.currentTimeMillis()-taux1) + "ms")		
-          
-    po.replacePopulation(descendants)
+    
+    val detalles=po.getAll().map(f=>f.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+    val nonuevos=descendants.toList.filter(p=>detalles.contains(p.getGenotype().getChromosomes()(0).getFullRawRepresentation()))
+    val nonuevosdet=nonuevos.map(f=>(f,po.getAll().find(p=>p.getGenotype().getChromosomes()(0).getFullRawRepresentation().equals(f.getGenotype().getChromosomes()(0).getFullRawRepresentation())).get))
+    val nonuevosdetDist=nonuevosdet.filter(p=>p._1.getId()!=p._2.getId())
+    val nonuevosdetDist1=nonuevosdetDist.map(_._1)
+    val nonuevosdetDist2=nonuevosdetDist.map(_._2)
+    val descendantsFinal=descendants.diff(nonuevosdetDist1)++nonuevosdetDist2
+    po.replacePopulation(descendantsFinal)
 		
     val bestInd=(holder.maxBy(f=>f._2.getFitness())) ._2
 	  println("Generación " + generation+ " - Finalizada - Transcurridos " + (System.currentTimeMillis()-startTime)/1000d + "'' - 1 Generación cada " + (System.currentTimeMillis().doubleValue()-startTime.doubleValue())/generation + "ms"  )
