@@ -154,7 +154,9 @@ class SailRandomMixedPopulationInitializer(dimension:Int,nodosPorCelda:Int,nodoI
       }
       
       val listaFinal=listaIni++listaFin.reverse
-      
+      // FIXME! 
+      // 1) Sacar nodos iniciales y finales
+      // 2) Evitar individuos asi: ListBuffer((0,1), (2,3), (0,3), (9,8))
 		  p.addIndividual(IndividualPathFactory.create(p.getGenome().getStructure().head._1,listaFinal.toList))
      })
   }

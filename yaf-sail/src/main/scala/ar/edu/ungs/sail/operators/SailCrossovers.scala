@@ -188,7 +188,7 @@ class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
  *
  */
 @SerialVersionUID(41120L)
-class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crossover[List[(Int,Int)]] {
+class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
 
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 		  if (individuals==null) throw new NullIndividualException("SailPathOnePointCrossoverHeFangguo")
@@ -324,9 +324,85 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crosso
 		    }
 		  }
 		  
+		  // Si el tamaño es menor al minimo, incorporo un nodo en el trayecto mas largo.
+		  if (desc1.size<nodosMinimo)
+		  {
+		    // Busco el trayecto más largo
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    var puntos=sliding(0)
+		    var maxDist=0d
+		    sliding.foreach(s=>{
+		      val dist=Math.sqrt(((s(0)._1-s(1)._1)*(s(0)._1-s(1)._1)).doubleValue()+((s(0)._2-s(1)._2)*(s(0)._2-s(1)._2)).doubleValue())		    
+		      if(dist>maxDist) 
+		      {
+		        puntos=s
+		        maxDist=dist
+		      }
+		    })
+		    val isInicial=sliding.indexOf(puntos)==0
+		    val isFinal=sliding.indexOf(puntos)>=sliding.size-1		    
+	      val g=cancha.getGraph()
+        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+		    val x:Nodo=cancha.getNodoByCord(puntos(0)._1,puntos(0)._2)
+		    val y:Nodo=cancha.getNodoByCord(puntos(1)._1,puntos(1)._2)
+	      val nx=g get x
+	      val ny=g get y
+  		  val spNO = nx shortestPathTo (ny, negWeight(_))
+        if (!spNO.isEmpty) 
+        {
+          val spN = spNO.get
+          if (isInicial)
+            desc1=(spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc1).distinct
+          else
+            if (isFinal)
+              desc1=(desc1++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)).distinct
+            else
+            {
+              val elem=spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)
+              desc1=desc1.slice(0, desc1.indexOf(puntos(0)))++elem++desc1.slice(desc1.indexOf(puntos(1)),desc1.length).distinct
+            }
+        }	    
+		  }
+		  if (desc2.size<nodosMinimo)
+		  {
+		    // Busco el trayecto más largo
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    var puntos=sliding(0)
+		    var maxDist=0d
+		    sliding.foreach(s=>{
+		      val dist=Math.sqrt(((s(0)._1-s(1)._1)*(s(0)._1-s(1)._1)).doubleValue()+((s(0)._2-s(1)._2)*(s(0)._2-s(1)._2)).doubleValue())		    
+		      if(dist>maxDist) 
+		      {
+		        puntos=s
+		        maxDist=dist
+		      }
+		    })
+		    val isInicial=sliding.indexOf(puntos)==0
+		    val isFinal=sliding.indexOf(puntos)>=sliding.size-1
+	      val g=cancha.getGraph()
+        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+		    val x:Nodo=cancha.getNodoByCord(puntos(0)._1,puntos(0)._2)
+		    val y:Nodo=cancha.getNodoByCord(puntos(1)._1,puntos(1)._2)
+	      val nx=g get x
+	      val ny=g get y
+  		  val spNO = nx shortestPathTo (ny, negWeight(_))
+        if (!spNO.isEmpty) 
+        {
+          val spN = spNO.get
+          if (isInicial)
+            desc2=(spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc2).distinct
+          else
+            if (isFinal)
+              desc2=(desc2++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)).distinct
+            else
+              desc2=desc2.slice(0, desc2.indexOf(puntos(0)))++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc2.slice(desc2.indexOf(puntos(1)),desc2.length).distinct
+        }	    
+		  }
+		  
+		  
 	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
 	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
-		
+  	
 		  return List(d1,d2)		      
     }
 }
@@ -335,8 +411,8 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG) extends Crosso
  * Combina los crossovers para sail
  */
 @SerialVersionUID(1L)
-class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG) extends Crossover[List[(Int,Int)]] {
-   val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco)
+class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
+   val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco,nodosMinimo)
    //val onePoint=new SailOnePointCrossover()
    val onePointInter=new SailOnePointIntersectCrossover()
    

@@ -86,7 +86,7 @@ class CrossOverTest {
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40,4)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -121,7 +121,7 @@ class CrossOverTest {
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40,4)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -154,7 +154,7 @@ class CrossOverTest {
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40,4)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap
@@ -196,7 +196,7 @@ class CrossOverTest {
      //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]            
       
-      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40)	    
+      val cross=new SailPathOnePointCrossoverHeFangguo(rioDeLaPlata,carr40,4)	    
   	  //val popI =new UniqueIntPopulationInitializer(true, 100, 5);
       val genes=List(GENES.GenUnico)
     	val translators=genes.map { x => (x,new ByPassRibosome()) }.toMap

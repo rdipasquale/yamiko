@@ -96,7 +96,7 @@ class Evol10Ind100EscTest extends Serializable {
       val mAgent=new SailAbstractMorphogenesisAgent()
       val selector:Selector[List[(Int,Int)]]=new ProbabilisticRouletteSelector()
       val canchaLocal:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
-      val crossover:Crossover[List[(Int,Int)]]=new SailPathOnePointCrossoverHeFangguo(canchaLocal,barco)
+      val crossover:Crossover[List[(Int,Int)]]=new SailPathOnePointCrossoverHeFangguo(canchaLocal,barco,4)
       val mutator:Mutator[List[(Int,Int)]]=new SailMutatorSwap(mAgent,genome).asInstanceOf[Mutator[List[(Int,Int)]]]
       val acceptEv:AcceptEvaluator[List[(Int,Int)]]=new DescendantAcceptEvaluator[List[(Int,Int)]]()
     	// tomo 10 para probar

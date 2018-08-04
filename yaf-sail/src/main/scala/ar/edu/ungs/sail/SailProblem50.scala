@@ -34,6 +34,7 @@ object SailProblem50 extends App {
       val DIMENSION=4
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
+      val NODOS_MINIMO_PATH=35
 
       val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
@@ -57,7 +58,7 @@ object SailProblem50 extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailOnePointCombinedCrossover(cancha,barco),
+          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
           new ProbabilisticRouletteSelector(),
           escenarios,
           barco,
