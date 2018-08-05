@@ -115,7 +115,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
           // Evalua el fitness de cada individuo
           
           val cacheados=Cache.getCache(esc.getId(), po.getAll())
-          val sinCachear=po.getAll().diff(cacheados)
+          val listaCacheados=cacheados.map(_._2)
+          val indCacheados=po.getAll().filter(p=>listaCacheados.contains(p.getId()))
+          val sinCachear=po.getAll().diff(indCacheados)
           if (profiler) println("Generacion " + generation + " - Escenario " + esc.getId() + " - " + cacheados.size + "/" +  po.getAll().size + " ind. cacheados sobre individuos totales")
           
     	    //po.getAll().par.foreach(i=>{
@@ -174,15 +176,14 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
       		  i.setFitness(fit)      	    
       	    parcial+=(( esc.getId(),i.getId(),fit ))
+      	    Cache.setCache(esc.getId(), i)
 
       		  //if (profiler) println("Escenario " + esc.getId() + " El individuo " + i.getId() + " tiene un fitness de " + fit + " - " + i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 
     	  })
     	  //println(parcial)
         //if (profiler) println("Evaluada la poblacion para el escenario en : " +(System.currentTimeMillis()-taux1) + "ms")
-    	  Cache.setCache(esc.getId(), sinCachear)
-    	  cacheados.foreach(f=> parcial+=(( esc.getId(),f.getId(),f.getFitness() )) )
-    	  parcial
+    	  parcial++cacheados
     	}).cache()     
 
     if (profiler) taux1=System.currentTimeMillis()
@@ -208,8 +209,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     val resultranking=performanceEnEscenariosOrdZipGroupPond.sortBy(_._1).collect()	  
   
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
-		for (p<-0 to po.getAll().size-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
-	
+
+    for (p<-0 to po.getAll().size-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
+		
 //		Cache.setCache(po.getAll())
 //		po.replacePopulation(po.getAll()++cacheados)
 		
@@ -262,6 +264,7 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 
     if (profiler) println("Mutacion: " +(System.currentTimeMillis()-taux1) + "ms")		
     
+    // Esto es para respetar el ID de los cacheados
     val detalles=po.getAll().map(f=>f.getGenotype().getChromosomes()(0).getFullRawRepresentation())
     val nonuevos=descendants.toList.filter(p=>detalles.contains(p.getGenotype().getChromosomes()(0).getFullRawRepresentation()))
     val nonuevosdet=nonuevos.map(f=>(f,po.getAll().find(p=>p.getGenotype().getChromosomes()(0).getFullRawRepresentation().equals(f.getGenotype().getChromosomes()(0).getFullRawRepresentation())).get))

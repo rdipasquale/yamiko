@@ -133,6 +133,8 @@ class SailMutatorEmpujadorCamino(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genom
       var nodo=nodoAMutarN
       nodoAMutarNG.outNeighbors.foreach(f=>{
         if (!fullRep.contains((f.getX(),f.getY())))
+        if (f.getX()!=nodoInicial.getX() && f.getY()!=nodoInicial.getY())
+        if (f.getX()!=nodoFinal.getX() && f.getY()!=nodoFinal.getY())
         {
         val distRef=Math.sqrt((Math.abs(f.getX()-nodoReferencia.getX())*Math.abs(f.getX()-nodoReferencia.getX())+Math.abs(f.getY()-nodoReferencia.getY())*Math.abs(f.getY()-nodoReferencia.getY())).doubleValue())
         if (distRef<distanciaAux)

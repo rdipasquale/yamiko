@@ -85,8 +85,8 @@ class SailRandomPopulationInitializer(dimension:Int,nodosPorCelda:Int,nodoInicia
         y=Random.nextInt(dimension*(nodosPorCelda-1)+1)
         while ((lista.contains((x,y)) || (nodoInicial.getX()==x && nodoInicial.getY()==y) || (nodoFinal.getX()==x && nodoFinal.getY()==y)) || (!(x==0 || x%(nodosPorCelda-1)==0 || y==0 || y%(nodosPorCelda-1)==0 )))
         {
-          x=Random.nextInt(dimension)
-          y=Random.nextInt(dimension)
+          x=Random.nextInt(dimension*(nodosPorCelda-1)+1)
+          y=Random.nextInt(dimension*(nodosPorCelda-1)+1)
         }
         lista+=((x,y))  
       })
@@ -135,8 +135,8 @@ class SailRandomMixedPopulationInitializer(dimension:Int,nodosPorCelda:Int,nodoI
         y=Random.nextInt(dimension*(nodosPorCelda-1)+1)
         while ((lista.contains((x,y)) || (nodoInicial.getX()==x && nodoInicial.getY()==y) || (nodoFinal.getX()==x && nodoFinal.getY()==y)) || (!(x==0 || x%(nodosPorCelda-1)==0 || y==0 || y%(nodosPorCelda-1)==0 )))
         {
-          x=Random.nextInt(dimension)
-          y=Random.nextInt(dimension)
+          x=Random.nextInt(dimension*(nodosPorCelda-1)+1)
+          y=Random.nextInt(dimension*(nodosPorCelda-1)+1)
         }
         lista+=((x,y))  
       })
@@ -155,7 +155,6 @@ class SailRandomMixedPopulationInitializer(dimension:Int,nodosPorCelda:Int,nodoI
       
       val listaFinal=listaIni++listaFin.reverse
       // FIXME! 
-      // 1) Sacar nodos iniciales y finales
       // 2) Evitar individuos asi: ListBuffer((0,1), (2,3), (0,3), (9,8))
 		  p.addIndividual(IndividualPathFactory.create(p.getGenome().getStructure().head._1,listaFinal.toList))
      })
