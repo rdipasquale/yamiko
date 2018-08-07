@@ -90,6 +90,8 @@ class SailMutatorEmpujador(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genome[List
       })
       
       val salida=fullRep.slice(0, p)++List((nodo.getX(),nodo.getY())) ++fullRep.slice(p+1, len)
+      if (salida.size<4)
+        println(salida)
       //salida=salida.distinct
       ind.getGenotype().getChromosomes()(0).setFullRawRepresentation(salida)          
       ma.develop(ge, ind)      

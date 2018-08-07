@@ -121,7 +121,7 @@ class SailOnePointReconstructCrossover(cancha:Cancha) extends Crossover[List[(In
  */
 
 @SerialVersionUID(1L)
-class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
+class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
      
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 
@@ -162,14 +162,100 @@ class SailOnePointIntersectCrossover() extends Crossover[List[(Int,Int)]] {
 		  
       val desc1Parte1=c1.slice(0, 1+Math.max(c1.indexOf(punto._1),0))
       val desc1Parte2=c2.slice(Math.min(c2.indexOf(punto._2),c2.length-1), c2.length)
-      val desc1=CycleHelper.remove(desc1Parte1++desc1Parte2).distinct
+      var desc1=CycleHelper.remove(desc1Parte1++desc1Parte2).distinct
       val desc2Parte1=c2.slice(0, 1+Math.max(c2.indexOf(punto._2),0))
       val desc2Parte2=c1.slice(Math.min(c1.indexOf(punto._1),c1.length-1), c1.length)
-      val desc2=CycleHelper.remove(desc2Parte1++desc2Parte2).distinct
+      var desc2=CycleHelper.remove(desc2Parte1++desc2Parte2).distinct
 
+		  // Si el tamaño es menor al minimo, incorporo un nodo en el trayecto mas largo.
+      var cuentaProteccion=0
+		  while (desc1.size<nodosMinimo)
+		  {
+		    cuentaProteccion=cuentaProteccion+1
+		    if (cuentaProteccion>10) 
+		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
+		    // Busco el trayecto más largo
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    var puntos=sliding(0)
+		    var maxDist=0d
+		    sliding.foreach(s=>{
+		      val dist=Math.sqrt(((s(0)._1-s(1)._1)*(s(0)._1-s(1)._1)).doubleValue()+((s(0)._2-s(1)._2)*(s(0)._2-s(1)._2)).doubleValue())		    
+		      if(dist>maxDist) 
+		      {
+		        puntos=s
+		        maxDist=dist
+		      }
+		    })
+		    val isInicial=sliding.indexOf(puntos)==0
+		    val isFinal=sliding.indexOf(puntos)>=sliding.size-1		    
+	      val g=cancha.getGraph()
+        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+		    val x:Nodo=cancha.getNodoByCord(puntos(0)._1,puntos(0)._2)
+		    val y:Nodo=cancha.getNodoByCord(puntos(1)._1,puntos(1)._2)
+	      val nx=g get x
+	      val ny=g get y
+  		  val spNO = nx shortestPathTo (ny, negWeight(_))
+        if (!spNO.isEmpty) 
+        {
+          val spN = spNO.get
+          if (isInicial)
+            desc1=(spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc1).distinct
+          else
+            if (isFinal)
+              desc1=(desc1++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)).distinct
+            else
+            {
+              val elem=spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)
+              desc1=desc1.slice(0, desc1.indexOf(puntos(0)))++elem++desc1.slice(desc1.indexOf(puntos(1)),desc1.length).distinct
+            }
+        }	    
+		  }
+      cuentaProteccion=0
+		  while (desc2.size<nodosMinimo)
+		  {
+		    cuentaProteccion=cuentaProteccion+1
+		    if (cuentaProteccion>10) 
+		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
+		    // Busco el trayecto más largo
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    var puntos=sliding(0)
+		    var maxDist=0d
+		    sliding.foreach(s=>{
+		      val dist=Math.sqrt(((s(0)._1-s(1)._1)*(s(0)._1-s(1)._1)).doubleValue()+((s(0)._2-s(1)._2)*(s(0)._2-s(1)._2)).doubleValue())		    
+		      if(dist>maxDist) 
+		      {
+		        puntos=s
+		        maxDist=dist
+		      }
+		    })
+		    val isInicial=sliding.indexOf(puntos)==0
+		    val isFinal=sliding.indexOf(puntos)>=sliding.size-1
+	      val g=cancha.getGraph()
+        def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), cancha.getVientoReferencia() ,barco)		
+		    val x:Nodo=cancha.getNodoByCord(puntos(0)._1,puntos(0)._2)
+		    val y:Nodo=cancha.getNodoByCord(puntos(1)._1,puntos(1)._2)
+	      val nx=g get x
+	      val ny=g get y
+  		  val spNO = nx shortestPathTo (ny, negWeight(_))
+        if (!spNO.isEmpty) 
+        {
+          val spN = spNO.get
+          if (isInicial)
+            desc2=(spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc2).distinct
+          else
+            if (isFinal)
+              desc2=(desc2++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)).distinct
+            else
+              desc2=desc2.slice(0, desc2.indexOf(puntos(0)))++spN.nodes.toList.map(f=>(f.getX(),f.getY())).slice(spN.nodes.size/2, spN.nodes.size/2+1)++desc2.slice(desc2.indexOf(puntos(1)),desc2.length).distinct
+        }	    
+		  }
+      
+      
 	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
 	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
 		
+//	    if (desc1.size<4 || desc2.size<4)
+//	       println("size menor a 4")
 		  return List(d1,d2)		      
       
      }
@@ -325,8 +411,12 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		  }
 		  
 		  // Si el tamaño es menor al minimo, incorporo un nodo en el trayecto mas largo.
-		  if (desc1.size<nodosMinimo)
+      var cuentaProteccion=0
+		  while (desc1.size<nodosMinimo)
 		  {
+		    cuentaProteccion=cuentaProteccion+1
+		    if (cuentaProteccion>10) 
+		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
 		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
@@ -363,8 +453,12 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
             }
         }	    
 		  }
-		  if (desc2.size<nodosMinimo)
+      cuentaProteccion=0
+		  while (desc2.size<nodosMinimo)
 		  {
+		    cuentaProteccion=cuentaProteccion+1
+		    if (cuentaProteccion>10) 
+		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
 		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
@@ -414,7 +508,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
    val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco,nodosMinimo)
    //val onePoint=new SailOnePointCrossover()
-   val onePointInter=new SailOnePointIntersectCrossover()
+   val onePointInter=new SailOnePointIntersectCrossover(cancha,barco,nodosMinimo)
    
    override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 
@@ -426,7 +520,7 @@ class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ext
                             else 
                               if (e.isInstanceOf[SameIndividualException])
                               {
-                                println("Mismo individuo")
+                                //println("Mismo individuo")
                                 onePointInter.execute(individuals)
                               }
                               else
