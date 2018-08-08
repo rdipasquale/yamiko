@@ -175,7 +175,7 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
 		    if (cuentaProteccion>10) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
-		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
 		    var maxDist=0d
 		    sliding.foreach(s=>{
@@ -217,7 +217,7 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
 		    if (cuentaProteccion>10) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
-		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
 		    var maxDist=0d
 		    sliding.foreach(s=>{
@@ -418,7 +418,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		    if (cuentaProteccion>10) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
-		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
 		    var maxDist=0d
 		    sliding.foreach(s=>{
@@ -460,7 +460,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		    if (cuentaProteccion>10) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
-		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))).sliding(2).toList 
+		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
 		    var puntos=sliding(0)
 		    var maxDist=0d
 		    sliding.foreach(s=>{

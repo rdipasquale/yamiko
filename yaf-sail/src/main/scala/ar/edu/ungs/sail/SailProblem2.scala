@@ -30,7 +30,7 @@ object SailProblem2 extends App {
 
     	val URI_SPARK="local[8]"
       val MAX_GENERATIONS=100
-      val POPULATION_SIZE=49
+      val POPULATION_SIZE=50
       val DIMENSION=4
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50

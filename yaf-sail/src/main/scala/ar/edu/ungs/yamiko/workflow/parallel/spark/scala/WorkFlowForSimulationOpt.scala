@@ -62,9 +62,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   sc:SparkContext,
                                   profiler:Boolean) extends Serializable{
   
- //val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(4))
+ val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList.take(96))
 // FIXME! PTUEBA
- 	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
+ //	val sparkEscenerarios=sc.parallelize(escenarios.getEscenarios.values.toList)
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
   val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   val r:Random=new Random(System.currentTimeMillis())
