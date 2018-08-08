@@ -336,13 +336,17 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
                 val nf=g get v
                 
           		  val spNO = nodoAux shortestPathTo (nf, negWeight(_))
-                val spN = spNO.get
-                val peso=spN.weight
-                pathTemp=spN.edges.map(f=>(f,negWeight(f)))
-                val costo=pathTemp.map(_._2).sum
-                if (costo<minCostAux){
-                  minCostAux=costo
-                  nodoTemp=nf
+                if (!spNO.isEmpty)
+                {
+                  val spN = spNO.get
+                  val peso=spN.weight
+                  pathTemp=spN.edges.map(f=>(f,negWeight(f)))
+                  val costo=pathTemp.map(_._2).sum
+                  if (costo<minCostAux){
+                    minCostAux=costo
+                    nodoTemp=nf
+                  }
+                  
                 }
           		})
               path++=pathTemp
