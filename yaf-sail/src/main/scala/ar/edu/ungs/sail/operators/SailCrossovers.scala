@@ -251,8 +251,8 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
 		  }
       
       
-	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
-	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
+	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1.distinct )
+	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2.distinct )
 		
 //	    if (desc1.size<4 || desc2.size<4)
 //	       println("size menor a 4")
@@ -494,8 +494,8 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		  }
 		  
 		  
-	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
-	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
+	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1.distinct )
+	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2.distinct )
   	
 		  return List(d1,d2)		      
     }
