@@ -99,10 +99,24 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 //      val cacheados=Cache.getCache(po.getAll())
 //      po.replacePopulation(po.getAll().diff(cacheados))
 //      if (profiler) Logger.getLogger("profiler").info(generation + "; cacheados;"+cacheados.size)
+
       
       // Evalua el rendimiento de cada individuo en cada escenario
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
+          /*-----------------------------------------------------*/
+          println("/*-----------------------------------------------------*/")
+          println("Por cada Escenario")
+          val mb = 1024*1024
+          val runtime = Runtime.getRuntime
+          println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+          println("** Free Memory:  " + runtime.freeMemory / mb)
+          println("** Total Memory: " + runtime.totalMemory / mb)
+          println("** Max Memory:   " + runtime.maxMemory / mb)
+          println("/*-----------------------------------------------------*/")
+          /*-----------------------------------------------------*/
+    	  
+    	  
 
     	    // Armado de la cancha
           if (profiler) taux1=System.currentTimeMillis()

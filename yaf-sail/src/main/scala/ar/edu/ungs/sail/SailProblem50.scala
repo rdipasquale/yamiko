@@ -28,17 +28,30 @@ object SailProblem50 extends App {
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[8]"
+    	val URI_SPARK="local[1]"
       val MAX_GENERATIONS=100
-      val POPULATION_SIZE=30
-      val DIMENSION=4
+      val POPULATION_SIZE=39
+      val DIMENSION=50
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
-      val NODOS_MINIMO_PATH=35
+      val NODOS_MINIMO_PATH=55
+      
+      /*-----------------------------------------------------*/
+      println("/*-----------------------------------------------------*/")
+      println("Inicial")
+      val mb = 1024*1024
+      val runtime = Runtime.getRuntime
+      println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+      println("** Free Memory:  " + runtime.freeMemory / mb)
+      println("** Total Memory: " + runtime.totalMemory / mb)
+      println("** Max Memory:   " + runtime.maxMemory / mb)
+      println("/*-----------------------------------------------------*/")
+      /*-----------------------------------------------------*/
 
-      val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
-      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val escenarios=DeserializadorEscenarios.run("./esc50x50/escenario50x50ConRachasNoUniformes.txt")
+      val nodoInicial:Nodo=new Nodo(17,0,"Inicial - (17)(0)",List((5,0)),null)
+      val nodoFinal:Nodo=new Nodo(150,120,"Final - (150)(120)",List((49,39)),null)
+    	
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
       val barco:VMG=new Carr40()
       val genes=List(GENES.GenUnico)
@@ -46,7 +59,7 @@ object SailProblem50 extends App {
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
     	val mAgent=new SailAbstractMorphogenesisAgent()
 
-      val conf=new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem")
+      val conf=new SparkConf().setMaster(URI_SPARK).setAppName("SailProblem").set("spark.executor.memory", "4g").set("spark.driver.memory","8g")
       val sc:SparkContext=new SparkContext(conf)
       
       // Primero resuelvo en t0 el problema clasico para tener una referencia
@@ -78,6 +91,18 @@ object SailProblem50 extends App {
 	    val t1=System.currentTimeMillis()
       
       //val winner= ga.run(sc)
+
+      /*-----------------------------------------------------*/
+      println("/*-----------------------------------------------------*/")
+      println("Antes del run")
+      println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+      println("** Free Memory:  " + runtime.freeMemory / mb)
+      println("** Total Memory: " + runtime.totalMemory / mb)
+      println("** Max Memory:   " + runtime.maxMemory / mb)
+      println("/*-----------------------------------------------------*/")
+      /*-----------------------------------------------------*/
+	    
+	    
 	    val winner= ga.run()
 
 	    val t2=System.currentTimeMillis();
