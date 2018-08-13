@@ -28,9 +28,9 @@ object SailProblem50 extends App {
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[1]"
+    	val URI_SPARK="local[8]"
       val MAX_GENERATIONS=100
-      val POPULATION_SIZE=39
+      val POPULATION_SIZE=10
       val DIMENSION=50
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
