@@ -154,38 +154,3 @@ class SailMutatorEmpujadorCamino(ma:MorphogenesisAgent[List[(Int,Int)]],ge:Genom
 
 
 
-
-/**
- * Operador de Mutación que hace Flip de algún gen de valor de campo.
- *
- * @author ricardo
- */
-//@SerialVersionUID(521103L)
-//class RuleFlipMutator() extends Mutator[BitSet]{
-//    
-//    private val r=new Random(System.currentTimeMillis())
-//    
-//    @throws(classOf[YamikoException])  
-//    override def execute(ind:Individual[BitSet])=  {
-//      if (ind==null) throw new NullIndividualException("BitSetFlipMutator -> Individuo Null")
-//		  val random=r.nextInt(2)
-//		  // Decide si muta antecedentes o consecuentes
-//		  if (random==0)
-//		  {
-//		    //Muta Antecedentes. TODO: Solo revisa el primer antecedente
-//		    val random2=r.nextInt(12)+RulesValueObjects.genCondicionAValor.getLoci()		    
-//  		  ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().flip(random2);		    
-//		  }
-//		  else
-//		  {
-//		    //Muta consecuentes
-//		    val random2=r.nextInt(12)+RulesValueObjects.genPrediccionValor.getLoci()		    
-//  		  ind.getGenotype().getChromosomes()(0).getFullRawRepresentation().flip(random2);		    
-//		  }
-//		  
-//		  ind.setFitness(0d)
-//      ind.setPhenotype(null)
-//    }
-//
-//}
-//
