@@ -71,16 +71,18 @@ object TorneoSoluciones4x4 extends App {
       escenariosNuevos.getEscenarios().foreach(esc=>
         individuos.foreach(i=>
         {
-  		    var minCostAux:Float=Float.MaxValue/2-1
-          var t=0
-	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc._2.getEstadoByTiempo(t) ,barco)		
-          var nodoAux:g.NodeT=g get cancha.getNodoInicial()
-      		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
-      		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()  		
-          var pathTemp:Traversable[(g.EdgeT, Float)]=null
+            var t=0
+  	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc._2.getEstadoByTiempo(t) ,barco)		
+            var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+        		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+        		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()  		
+            var pathTemp:Traversable[(g.EdgeT, Float)]=null
+
           i.foreach(nodoInt=>
       		  {
+      		    
       		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+      		    var minCostAux:Float=Float.MaxValue/2-1
           		nodosDestino.foreach(v=>{
                 val nf=g get v
                 
