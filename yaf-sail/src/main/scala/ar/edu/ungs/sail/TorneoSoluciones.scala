@@ -47,11 +47,16 @@ object TorneoSoluciones4x4 extends App {
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
     	val mAgent=new SailAbstractMorphogenesisAgent()
 
+      // Imprimir los mejores indiviuos para un escenario en todos los momentos
+//      escenarios.getEscenarios().values.toList(0).getEstados().toList.sortBy(_._1).foreach(e=>
+//            println("Escenario 1 - Mejor individuo en t" + e._1 + " - " + problemaClasico(nodoInicial,nodoFinal,cancha,e._2,barco,false))
+//        )
+      
       // Primero resuelvo en t0 el problema clasico para tener una referencia
       val e=escenarios.getEscenarios().values.toList.take(1)(0).getEstadoByTiempo(0)
 
       // Elemento ganador teniendo en cuenta solo t0
-      val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco)
+      val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
       // Elemento Aparecido en una corrida de 100 generaciones con 50 individuos. En la generacion 20
       val ind01=List((1,6), (3,3), (4,3), (6,6), (7,6), (9,9))      
       val individuos=List(ind00,ind01)
@@ -123,7 +128,7 @@ object TorneoSoluciones4x4 extends App {
       )) 
   }
    
-  def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG):List[(Int,Int)]={
+  def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean):List[(Int,Int)]={
      val salida:ListBuffer[(Int,Int)]=ListBuffer()
      val g=cancha.getGraph()
      def negWeightClasico(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
@@ -133,9 +138,9 @@ object TorneoSoluciones4x4 extends App {
      val spN = spNO.get                                    
      var costo:Float=0
      spN.edges.foreach(f=>costo=costo+negWeightClasico(f,0))
-     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
-     spN.nodes.foreach(f=>println(f.getId()))
-     Graficador.draw(cancha, est, "./esc4x4/solucionT0.png", 35, spN,0)
+//     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+     //spN.nodes.foreach(f=>println(f.getId()))
+     if (graficar) Graficador.draw(cancha, est, "./escenariosGenerados/solucionT0.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
      //salida.toList.reverse.drop(1).dropRight(1)
      salida.toList.reverse.drop(2).dropRight(2)
