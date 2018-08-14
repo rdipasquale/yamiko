@@ -73,6 +73,37 @@ object DeserializadorEscenarios {
   }
 }
 
+
+object EscenariosAdapter{
+  def adaptIntsToEst(momento:Int,celda:(Int, Int), angulo:Int, velocidad:Int):EstadoEscenarioViento=new EstadoEscenarioViento(momento, celda,angulo,velocidad)    
+  
+  def adaptIntsToEsc(id:Int,i:List[(Int, List[((Int, Int), Int, Int, Int)])]):EscenarioViento ={
+    var estado=ListBuffer[(Int,EstadoEscenarioViento)]()
+    i.foreach(f=>   {
+      f._2.foreach(g=>estado+=((f._1,adaptIntsToEst(f._1, g._1,g._2,g._3))))
+    })
+    val sali=estado.toList.groupBy(f=>f._1)
+    var aux=Map[Int,List[EstadoEscenarioViento]]()
+    sali.keys.foreach(f=>{
+      val inte=sali.get(f).get
+      val inte2=inte.map(p=>p._2)
+      aux=aux+((f,inte2))
+    })
+    new EscenarioViento(id,aux)
+
+  }
+  
+  def adaptListIntsToEsc(i:List[List[(Int, List[((Int, Int), Int, Int, Int)])]]):EscenariosViento ={
+    var salida1=Map[Int,EscenarioViento]()
+    var id=0
+    i.foreach(f=>{
+      id=id+1
+      salida1=salida1+((id,adaptIntsToEsc(id,f)))})
+    new EscenariosViento(salida1)
+  }
+  
+  
+}
 //object SerializadorEscenarios {
 //  def run(file:String,escenarios:List[List[(Int, List[((Int, Int), Int, Int, Int)])]]):Any={  
 //    val bw = new BufferedWriter(new FileWriter(new File(file)))
