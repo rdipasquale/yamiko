@@ -23,22 +23,31 @@ import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
 import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 
-object SailProblem2 extends App {
+object SailProblemParam extends App {
  
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[8]"
-      val MAX_GENERATIONS=100
-      val POPULATION_SIZE=50
-      val DIMENSION=4
-      val NODOS_POR_CELDA=4
-      val METROS_POR_CELDA=50
-      val NODOS_MINIMO_PATH=4
+     
+    	val URI_SPARK=args(0).trim() //"local[8]"
+      val MAX_GENERATIONS=args(1).toInt // 100
+      val POPULATION_SIZE =args(2).toInt // 50
+      val DIMENSION=args(3).toInt // 4
+      val NODOS_POR_CELDA=args(4).toInt // 4
+      val METROS_POR_CELDA=args(5).toInt // 50
+      val NODOS_MINIMO_PATH=args(6).toInt // 4
+      val NODOS_INICIAL_X=args(7).toInt // 2
+      val NODOS_INICIAL_Y=args(8).toInt // 0
+      val NODOS_FINAL_X=args(9).toInt // 9
+      val NODOS_FINAL_Y=args(10).toInt // 12
+      val FILE_ESCENARIOS=args(11)// "./esc4x4/escenario4x4ConRachasNoUniformes.txt"
+      val CELDA_FINAL_X=args(12).toInt // 3
+      val CELDA_FINAL_Y=args(13).toInt // 3
+      val CANT_ESCENARIOS=args(14).toInt // 8
 
-      val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
-      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val escenarios=DeserializadorEscenarios.run(FILE_ESCENARIOS)
+      val nodoInicial:Nodo=new Nodo(NODOS_INICIAL_X,NODOS_INICIAL_Y,"Inicial - ("+NODOS_INICIAL_X+")("+NODOS_INICIAL_Y +")",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(NODOS_FINAL_X,NODOS_FINAL_Y,"Final - ("+NODOS_FINAL_X+")("+NODOS_FINAL_Y+")",List((CELDA_FINAL_X,CELDA_FINAL_Y)),null)
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
       val barco:VMG=new Carr40()
       val genes=List(GENES.GenUnico)
@@ -72,7 +81,8 @@ object SailProblem2 extends App {
           DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,
           0.2,
           sc,
-          true,8
+          true,
+          CANT_ESCENARIOS
           )
       
 	    val t1=System.currentTimeMillis()
