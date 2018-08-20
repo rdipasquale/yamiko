@@ -45,7 +45,7 @@ class SerializadoresTest {
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]
-      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))      
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))      
       val escenarios=ListBuffer[EscenarioViento]()
       val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 5, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,true,null)
       escenarios+=salida

@@ -49,7 +49,7 @@ object GenerarEscenarios4x4 extends App {
 
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]
-      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))
       // Con rachas no uniformemente distribuidas
       val escenarios=ListBuffer[EscenarioViento]()
       
@@ -85,7 +85,7 @@ object GenerarEscenarios extends App {
       
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))
       
       // Sin rachas
 //      val salida=WindSimulation.simular(rioDeLaPlata, t0, 120, 0, 0, 5.5, 2.3, 10,false,0,0,0,0,false,null)
@@ -141,7 +141,7 @@ object Generar10Escenarios4x4 extends App {
 
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))
       // Con rachas no uniformemente distribuidas
       val escenarios=ListBuffer[EscenarioViento]()
       

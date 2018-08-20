@@ -60,25 +60,29 @@ object TorneoSoluciones4x4 extends App {
       val ind01=List((1,6), (3,3), (4,3), (6,6), (7,6), (9,9))      
       val individuos=List(ind00,ind01)
       
+      graficarIndividuoEnT0(1,ind01, nodoInicial, nodoFinal, cancha, e, barco, true)
+
       // Generamos 10 escenarios de prueba
       //-----------------------------------
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))
       // Con rachas no uniformemente distribuidas
-//      val escenariosGene:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
-//      val salida=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
-//      escenariosGene+=salida
-//      SerializadorEscenario.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt", "1",salida)
-//      salida.foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
-//      1 to 9 foreach(i=>{
-//        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
-//        val salida2=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
-//        escenariosGene+=salida2
-//      })
-//      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
+      val escenariosGene=ListBuffer[EscenarioViento]()
+      
+      val salida=WindSimulation.simular(0,cancha, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      escenariosGene+=salida
+      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt",new EscenariosViento(Map(0->escenariosGene(0))))
+      salida.getEstados().foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      1 to 9 foreach(i=>{
+        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
+        val salida2=WindSimulation.simular(i,cancha, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+        escenariosGene+=salida2
+      })
+      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
       //-----------------------------------
-      //val escenariosNuevos=DeserializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt")
-      val escenariosNuevos=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
+      val escenariosNuevos=DeserializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt")
+//      val escenariosNuevos=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
 
       val g=cancha.getGraph()
       
@@ -138,11 +142,63 @@ object TorneoSoluciones4x4 extends App {
      val spN = spNO.get                                    
      var costo:Float=0
      spN.edges.foreach(f=>costo=costo+negWeightClasico(f,0))
-//     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+     //println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
      //spN.nodes.foreach(f=>println(f.getId()))
-     if (graficar) Graficador.draw(cancha, est, "./escenariosGenerados/solucionT0.png", 35, spN,0)
+     if (graficar) Graficador.draw(cancha, est, "./escenariosGenerados/solucionT0_ind00.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
      //salida.toList.reverse.drop(1).dropRight(1)
+	   val fit=math.max(10000d-costo,0d)
+		 println("Individuo 0: " + salida.toList.reverse.drop(2).dropRight(2) + " en T0 - Fitness = " + fit)      	    
+     
      salida.toList.reverse.drop(2).dropRight(2)
   }
+  
+  def graficarIndividuoEnT0(id:Int,i:List[(Int,Int)],nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean)={
+     val g=cancha.getGraph()
+      val gpath=g.newPathBuilder(g get cancha.getNodoInicial())
+      val t=0
+      def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
+      var nodoAux:g.NodeT=g get cancha.getNodoInicial()
+  		var nodoTemp:g.NodeT=g get cancha.getNodoFinal()
+  		val path:ListBuffer[(g.EdgeT,Float)]=ListBuffer()  		
+      var pathTemp:Traversable[(g.EdgeT, Float)]=null
+      var pathAu:g.Path=null
+      //var pathAu:Traversable[g.InnerElem]=null
+      
+      var spN:g.Path=null
+      
+      i.foreach(nodoInt=>
+		  {
+		    
+		    val nodosDestino=cancha.getNodos().filter(n=>n.getX==nodoInt._1 && n.getY==nodoInt._2)
+		    var minCostAux:Float=Float.MaxValue/2-1
+    		nodosDestino.foreach(v=>{
+          val nf=g get v
+          
+    		  val spNO = nodoAux shortestPathTo (nf, negWeight(_,t))
+          if (!spNO.isEmpty) 
+          {
+            spN = spNO.get
+            val peso=spN.weight
+            pathTemp=spN.edges.map(f=>(f,negWeight(f,t)))
+            
+            
+            val costo=pathTemp.map(_._2).sum
+            if (costo<minCostAux){
+              minCostAux=costo
+              nodoTemp=nf
+            }
+          }
+    		})
+        path++=pathTemp
+        nodoAux=nodoTemp
+        spN.foreach(f=>gpath.add(f))
+		  })
+
+		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+		  println("Individuo " + id + ": " + i + " en T0 - Fitness = " + fit)      	    
+      gpath.add(g get cancha.getNodoFinal())
+		  if (graficar) Graficador.draw(cancha, est, "./escenariosGenerados/solucionT0_ind"+ id  + ".png", 35, gpath.result(),0)
+  }
+  
 }
