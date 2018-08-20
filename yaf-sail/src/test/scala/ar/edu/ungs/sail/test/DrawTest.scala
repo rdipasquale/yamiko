@@ -44,7 +44,7 @@ class DrawTest {
        val nodoFinal:Nodo=new Nodo(0,0,"Final - (9)(15)",List((3,3)),null)
        val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
  
-       assert(Graficador.draw(rioDeLaPlata,vientos.toList, "drawing.png",100))
+       assert(Graficador.drawList(rioDeLaPlata,vientos.toList, "drawing.png",100))
       
     }
     
@@ -64,7 +64,7 @@ class DrawTest {
        val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
  
 
-      assert(Graficador.draw(rioDeLaPlata, vientos, "drawing.png",35))      
+      assert(Graficador.drawList(rioDeLaPlata, vientos, "drawing.png",35))      
     }
         
   	

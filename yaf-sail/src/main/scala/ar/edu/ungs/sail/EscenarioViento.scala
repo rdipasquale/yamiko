@@ -2,11 +2,17 @@ package ar.edu.ungs.sail
 
 
 object EscenariosVientoFactory {
-  def createEscenariosViento(esc: List[List[(Int, List[((Int, Int), Int, Int, Int)])]]):EscenariosViento= {
+  def createEscenariosVientoList(esc: List[List[(Int, List[((Int, Int), Int, Int, Int)])]]):EscenariosViento= {
     val temp=esc.map(f=>new EscenarioViento(esc.indexOf(f), f.map(g=>(g._1, g._2.map(h=>new EstadoEscenarioViento(h._4,h._1,h._2,h._3)))).toMap))
     val temp2=temp.map(f=>(getNextId(),f)).toMap
     new EscenariosViento(temp2)
   }
+
+  def createEscenariosViento(esc: List[EscenarioViento]):EscenariosViento= {
+    val temp=esc.map(f=>(f.getId(),f)).toMap
+    new EscenariosViento(temp)
+  }
+  
   var idInt=0
   def getNextId():Int={
     idInt=idInt+1

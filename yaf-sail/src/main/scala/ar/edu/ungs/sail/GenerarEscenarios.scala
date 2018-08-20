@@ -1,11 +1,11 @@
 package ar.edu.ungs.sail
 
+import scala.collection.mutable.ListBuffer
+
 import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.simulation.WindSimulation
-import ar.edu.ungs.serialization.Serializador
-import ar.edu.ungs.serialization.SerializadorEscenario
 import ar.edu.ungs.serialization.Deserializador
-import scala.collection.mutable.ListBuffer
+import ar.edu.ungs.serialization.EscenariosAdapter
 import ar.edu.ungs.serialization.SerializadorEscenarios
 
 object ProbRachasNoUniformes50x50 {
@@ -48,17 +48,18 @@ object GenerarEscenarios4x4 extends App {
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
 
       //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
+      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
       // Con rachas no uniformemente distribuidas
-      val escenarios:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
+      val escenarios=ListBuffer[EscenarioViento]()
       
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
       escenarios+=salida
-      SerializadorEscenario.run("./esc4x4/escenario4x4ConRachasNoUniformes_0.txt", "1",salida)
-      salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
-      1 to 100 foreach(i=>{
+      SerializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0))))
+      salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      1 to 99 foreach(i=>{
         println("Generando Escenario " + i + " - " + System.currentTimeMillis())
-        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
         escenarios+=salida2
         //SerializadorEscenario.run("./esc4x4/escenario4x4ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
       })
@@ -84,6 +85,7 @@ object GenerarEscenarios extends App {
       
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
       
       // Sin rachas
 //      val salida=WindSimulation.simular(rioDeLaPlata, t0, 120, 0, 0, 5.5, 2.3, 10,false,0,0,0,0,false,null)
@@ -102,16 +104,17 @@ object GenerarEscenarios extends App {
 //        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 120, 0, 0, 5.5, 2.3, 10,false,0,0,0,0,false,null)
 //        SerializadorEscenario.run("escenario50x50ConRachas_"+i+".txt", i.toString(),salida2)      
 //      })
-      val escenarios:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
+      val escenarios=ListBuffer[EscenarioViento]()
       
       // Con rachas no uniformemente distribuidas
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(50,4,50,nodoInicial,nodoFinal,null,null);
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
-      SerializadorEscenario.run("./esc50x50/escenario50x50ConRachasNoUniformes_0.txt", "1",salida)
-      salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc50x50/escenario50x50ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
+      SerializadorEscenarios.run("./esc50x50/escenario50x50ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0))))
+
+      salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc50x50/escenario50x50ConRachasNoUniformes_t" + f._1 + ".png", 35))
       1 to 99 foreach(i=>{
         println("Generando Escenario " + i + " - " + System.currentTimeMillis())
-        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,150,150,45,15,false,ProbRachasNoUniformes50x50.getMatriz())
         escenarios+=salida2
         
         //SerializadorEscenario.run("escenario50x50ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
@@ -138,16 +141,17 @@ object Generar10Escenarios4x4 extends App {
 
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))
       // Con rachas no uniformemente distribuidas
-      val escenarios:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
+      val escenarios=ListBuffer[EscenarioViento]()
       
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
       escenarios+=salida
-      SerializadorEscenario.run("./esc4x4/10_escenario4x4ConRachasNoUniformes_0.txt", "1",salida)
-      salida.foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
-      1 to 10 foreach(i=>{
+      SerializadorEscenarios.run("./esc4x4/10_escenario4x4ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0)))) 
+      salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      1 to 9 foreach(i=>{
         println("Generando Escenario " + i + " - " + System.currentTimeMillis())
-        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
         escenarios+=salida2
         //SerializadorEscenario.run("./esc4x4/escenario4x4ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
       })

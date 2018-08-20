@@ -25,7 +25,6 @@ import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 import ar.edu.ungs.sail.simulation.WindSimulation
 import ar.edu.ungs.serialization.Deserializador
 import ar.edu.ungs.serialization.EscenariosAdapter
-import ar.edu.ungs.serialization.SerializadorEscenario
 import ar.edu.ungs.serialization.SerializadorEscenarios
 
 object TorneoSoluciones4x4 extends App {
@@ -66,19 +65,20 @@ object TorneoSoluciones4x4 extends App {
       //Tomar estado inicial de archivo
       val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
       // Con rachas no uniformemente distribuidas
-      val escenariosGene:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
-      val salida=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
-      escenariosGene+=salida
-      SerializadorEscenario.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt", "1",salida)
-      salida.foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
-      1 to 9 foreach(i=>{
-        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
-        val salida2=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
-        escenariosGene+=salida2
-      })
-      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
+//      val escenariosGene:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
+//      val salida=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+//      escenariosGene+=salida
+//      SerializadorEscenario.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt", "1",salida)
+//      salida.foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
+//      1 to 9 foreach(i=>{
+//        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
+//        val salida2=WindSimulation.simular(cancha, t0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+//        escenariosGene+=salida2
+//      })
+//      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
       //-----------------------------------
-      val escenariosNuevos=DeserializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt")
+      //val escenariosNuevos=DeserializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt")
+      val escenariosNuevos=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
 
       val g=cancha.getGraph()
       

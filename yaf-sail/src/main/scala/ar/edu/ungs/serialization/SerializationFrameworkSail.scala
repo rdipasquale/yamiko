@@ -9,15 +9,15 @@ import ar.edu.ungs.sail.EscenarioViento
 import ar.edu.ungs.sail.EscenariosViento
 import ar.edu.ungs.sail.EstadoEscenarioViento
 
-object SerializadorEscenario {
-  def run(file:String,id:String,escenario:List[(Int, List[((Int, Int), Int, Int, Int)])]):Any={  
-    val bw = new BufferedWriter(new FileWriter(new File(file)))
-    escenario.foreach(f=>f._2.foreach(g=>bw.write(id+","+f._1+","+g._1._1+","+g._1._2+","+g._2+","+g._3+","+g._4+"\n")))
-    bw.close()
-    true
-  }
-  
-}
+//object SerializadorEscenario {
+//  def run(file:String,id:String,escenario:List[(Int, List[((Int, Int), Int, Int, Int)])]):Any={  
+//    val bw = new BufferedWriter(new FileWriter(new File(file)))
+//    escenario.foreach(f=>f._2.foreach(g=>bw.write(id+","+f._1+","+g._1._1+","+g._1._2+","+g._2+","+g._3+","+g._4+"\n")))
+//    bw.close()
+//    true
+//  }
+//  
+//}
 
 object DeserializadorEscenario {
   def run(file:String,cant:Int):List[(Int, List[((Int, Int), Int, Int, Int)])]={

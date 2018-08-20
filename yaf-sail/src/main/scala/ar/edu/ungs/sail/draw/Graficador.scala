@@ -22,7 +22,28 @@ object pngCelda{
  * La velocidad se expresa en nudos (millas nauticas / hora)
  */
 object Graficador {
-  def draw(cancha:Cancha,vientos: List[((Int, Int), Int, Int,Int)],archivoSalida:String,maxWindSpeed:Int):Boolean={
+  
+  def draw(cancha:Cancha,vientos: List[EstadoEscenarioViento],archivoSalida:String,maxWindSpeed:Int):Boolean={
+    val a=cancha.getDimension()
+    val n=cancha.getNodosPorCelda()
+    val canvas = new BufferedImage(a*pngCelda.image.getWidth, a*pngCelda.image.getHeight, BufferedImage.TYPE_INT_RGB)
+    val g = canvas.createGraphics()
+    for (i<-0 to a-1) for (j<-0 to a-1) 
+      if (cancha.getIslas()==null)
+        g.drawImage(pngCelda.image, null, i*pngCelda.image.getWidth, j*pngCelda.image.getHeight)
+      else
+        if (cancha.getIslas().contains((i,n-j-1)))
+          g.drawImage(pngCelda.imageTierra, null, i*pngCelda.imageTierra.getWidth, j*pngCelda.imageTierra.getHeight)
+        else
+          g.drawImage(pngCelda.image, null, i*pngCelda.image.getWidth, j*pngCelda.image.getHeight)          
+    g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,  java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+    if (vientos!=null) vientos.foreach(f=>new Arrow(f.getVelocidad()*100/35,f.getAngulo()-90,f.getCelda(),g,canvas,a).draw())                    
+    g.dispose()
+    javax.imageio.ImageIO.write(canvas, "png", new java.io.File(archivoSalida))  	
+    true
+  }  
+  
+  def drawList(cancha:Cancha,vientos: List[((Int, Int), Int, Int,Int)],archivoSalida:String,maxWindSpeed:Int):Boolean={
     val a=cancha.getDimension()
     val n=cancha.getNodosPorCelda()
     val canvas = new BufferedImage(a*pngCelda.image.getWidth, a*pngCelda.image.getHeight, BufferedImage.TYPE_INT_RGB)

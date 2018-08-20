@@ -17,6 +17,8 @@ import java.io.File
 import org.junit.After
 import org.junit.Assert
 import ar.edu.ungs.serialization.DeserializadorEscenarios
+import ar.edu.ungs.serialization.EscenariosAdapter
+import ar.edu.ungs.sail.EscenarioViento
 
 @Test
 class SerializadoresTest {
@@ -42,22 +44,23 @@ class SerializadoresTest {
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-      val escenarios:ListBuffer[List[(Int, List[((Int, Int), Int, Int, Int)])]]=ListBuffer()
-      val salida=WindSimulation.simular(rioDeLaPlata, t0, 5, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,true,null)
+      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]
+      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._3,f._2))      
+      val escenarios=ListBuffer[EscenarioViento]()
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 5, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,true,null)
       escenarios+=salida
 
       1 to 5 foreach(i=>{
-        val salida2=WindSimulation.simular(rioDeLaPlata, t0, 5, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,true,null)
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 5, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,true,null)
         escenarios+=salida2
       })
 
       val objEscenarios=EscenariosVientoFactory.createEscenariosViento(escenarios.toList)
       
       Assert.assertSame(objEscenarios.getEscenarios().keys.size, escenarios.size)
-      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(1).size, escenarios(1)(0)._2.size)
-      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(4).size, escenarios(4)(0)._2.size)
-      Assert.assertEquals(objEscenarios.getEscenarioById(3).getEstadoByTiempo(3)(1).getAngulo(),escenarios(2)(3)._2(1)._2)
+      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(1).size, escenarios(1).getEstadoByTiempo(1).size)
+      Assert.assertSame(objEscenarios.getEscenarioById(1).getEstadoByTiempo(4).size, escenarios(4).getEstadoByTiempo(1).size)
+      Assert.assertEquals(objEscenarios.getEscenarioById(3).getEstadoByTiempo(3)(1).getAngulo(),escenarios(2).getEstadoByTiempo(3)(1).getAngulo())
       
       objEscenarios.getEscenarios().keys.foreach(f=>{
         println("Escenario objEscenarios " + f)
@@ -71,10 +74,10 @@ class SerializadoresTest {
       println("-------------------------------")
 
       escenarios.foreach(f=>{
-        println("Escenario escenarios " + f(0)._1)
-        f.foreach(g=>{
+        println("Escenario escenarios " + f.getId())
+        f.getEstados().foreach(g=>{
           print("Tiempo " + g._1)
-          g._2.foreach(h=>print("[t=" + h._4 + " (" + h._1._1 + ", " + h._1._2 + ") Ang: " + h._2 + " Vel: " + h._3 +"]"))
+          g._2.foreach(h=>print("[t=" + h.getMomento() + " (" + h.getCelda()._1 + ", " + h.getCelda()._2 + ") Ang: " + h.getAngulo() + " Vel: " + h.getVelocidad() +"]"))
           println()
         })
       })
