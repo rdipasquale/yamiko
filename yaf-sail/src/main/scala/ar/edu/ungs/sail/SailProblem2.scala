@@ -36,10 +36,14 @@ object SailProblem2 extends App {
       val METROS_POR_CELDA=50
       val NODOS_MINIMO_PATH=4
 
-      val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
+      val escenarios96=DeserializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes.txt")
+      
+      val t0=DeserializadorEscenarios.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e=t0.get(0).get
+      
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
+      val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,e)
       val barco:VMG=new Carr40()
       val genes=List(GENES.GenUnico)
       val translators=genes.map { x => (x,new ByPassRibosome().asInstanceOf[Ribosome[List[(Int, Int)]]]) }.toMap
@@ -50,7 +54,6 @@ object SailProblem2 extends App {
       val sc:SparkContext=new SparkContext(conf)
       
       // Primero resuelvo en t0 el problema clasico para tener una referencia
-      val e=escenarios.getEscenarios().values.toList.take(1)(0).getEstadoByTiempo(0)
       val individuosAgregados=List(problemaClasico(nodoInicial,nodoFinal,cancha,e,barco))
       
       val ga=new WorkFlowForSimulationOpt(
@@ -60,7 +63,7 @@ object SailProblem2 extends App {
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
           new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
           new ProbabilisticRouletteSelector(),
-          escenarios,
+          escenarios96,
           barco,
           genes,
           translators,
