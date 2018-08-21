@@ -35,14 +35,28 @@ object ProblemaClasico extends App {
       println("Armado cancha: finaliza en " + System.currentTimeMillis())      
 
       val carr40:VMG=new Carr40()
-    
-     //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-
     //  var arcos=ListBuffer[WUnDiEdge[Nodo]]()
       val g=rioDeLaPlata.getGraph()
       val ni=g get nodoInicial
       val nf=g get nodoFinal
+      
+     //Tomar estado inicial de archivo
+      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
+      val t1=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e1=t1.get(0).get
+
+      val nfs=g.nodes.filter(p=>p.getX()==2 && p.getY()==0)
+      val nfs1=g.nodes.filter(p=>p.getX()==3 && p.getY()==0)
+      nfs.foreach(pi=>nfs1.foreach(p=>
+       {
+          val c1=Costo.calcCosto(pi,p,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), t0,carr40)
+          val c2=Costo.calcCostoEsc(pi,p,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), e1,carr40)
+          println("de " +pi + " a " + p + " c1=" + c1 + " c2=" + c2) 
+       }
+       ))
+      
+
+
       
 //      println("empieza en " + System.currentTimeMillis())
 //      ni.shortestPathTo(nf)
@@ -73,11 +87,21 @@ object ProblemaClasico extends App {
       var costo:Float=0
       spN.edges.foreach(f=>costo=costo+negWeight(f))
 
-      println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+      println("Calculo camino (c1) : termina con costo " + costo + " en " + System.currentTimeMillis())
 
       spN.nodes.foreach(f=>println(f.getId()))
       
      Graficador.draw(rioDeLaPlata, t0, "solucionProblema.png", 35, spN)
+     
+      def negWeight2(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), e1,carr40)
+      val spNO2 = ni shortestPathTo (nf, negWeight2) 
+      val spN2 = spNO2.get                                          
+      costo=0
+      spN2.edges.foreach(f=>costo=costo+negWeight2(f))
+      println("Calculo camino (c2) : termina con costo " + costo + " en " + System.currentTimeMillis())
+      spN2.nodes.foreach(f=>println(f.getId()))
+     
+     
      
       // Calcular Costos
 //    val costos=rioDeLaPlata.getGraph()

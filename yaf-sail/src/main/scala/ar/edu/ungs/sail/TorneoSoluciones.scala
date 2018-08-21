@@ -52,8 +52,9 @@ object TorneoSoluciones4x4 extends App {
 //        )
       
       // Primero resuelvo en t0 el problema clasico para tener una referencia
-      val e=escenarios.getEscenarios().values.toList.take(1)(0).getEstadoByTiempo(0)
-
+      val t1=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e=t1.get(0).get
+      
       // Elemento ganador teniendo en cuenta solo t0
       val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
       // Elemento Aparecido en una corrida de 100 generaciones con 50 individuos. En la generacion 20
@@ -65,12 +66,12 @@ object TorneoSoluciones4x4 extends App {
       // Generamos 10 escenarios de prueba
       //-----------------------------------
       //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-      val e0=t0.map(f=> EscenariosAdapter.adaptIntsToEst(0, f._1, f._2,f._3))
+      val t0=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[Map[Int, List[EstadoEscenarioViento]]]      
+      val e0=t0.get(0).get
       // Con rachas no uniformemente distribuidas
       val escenariosGene=ListBuffer[EscenarioViento]()
       
-      val salida=WindSimulation.simular(0,cancha, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      val salida=WindSimulation.simular(0,cancha,e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
       escenariosGene+=salida
       SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt",new EscenariosViento(Map(0->escenariosGene(0))))
       salida.getEstados().foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
@@ -135,22 +136,40 @@ object TorneoSoluciones4x4 extends App {
   def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean):List[(Int,Int)]={
      val salida:ListBuffer[(Int,Int)]=ListBuffer()
      val g=cancha.getGraph()
-     def negWeightClasico(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
+     def negWeightClasico(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
+      
      val ni=g get nodoInicial
-     val nf=g get nodoFinal     
-     val spNO = ni shortestPathTo (nf, negWeightClasico(_, 0)) 
+     val nf=g get nodoFinal  
+     
+//     val nfs=g.nodes.filter(p=>p.getX()==0 && p.getY()==3)
+//     nfs.foreach(p=>
+//       {
+//         val spno = ni shortestPathTo (p, negWeightClasico(_, 0)) 
+//         val spn=spno.get
+//         spn.edges.foreach(f=>{
+//           println("de " +f._1 + " a " + f._2 + " el optimo costo es " + negWeightClasico(f,0)) 
+//         })
+//         
+//       }
+//       )
+     
+     val spNO = ni shortestPathTo (nf, negWeightClasico) 
      val spN = spNO.get                                    
      var costo:Float=0
-     spN.edges.foreach(f=>costo=costo+negWeightClasico(f,0))
-     //println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+     spN.edges.foreach(f=>{
+       println("de " +f._1 + " a " + f._2 + " el optimo costo es " + negWeightClasico(f)) 
+       costo=costo+negWeightClasico(f)
+     })
+     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
      //spN.nodes.foreach(f=>println(f.getId()))
      if (graficar) Graficador.draw(cancha, est, "./escenariosGenerados/solucionT0_ind00.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
      //salida.toList.reverse.drop(1).dropRight(1)
 	   val fit=math.max(10000d-costo,0d)
-		 println("Individuo 0: " + salida.toList.reverse.drop(2).dropRight(2) + " en T0 - Fitness = " + fit)      	    
+	   val salidaFinal=salida.toList.reverse.drop(2).dropRight(2).distinct
+		 println("Individuo 0: " + salidaFinal + " en T0 - Fitness = " + fit)      	    
      
-     salida.toList.reverse.drop(2).dropRight(2)
+     salidaFinal
   }
   
   def graficarIndividuoEnT0(id:Int,i:List[(Int,Int)],nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean)={

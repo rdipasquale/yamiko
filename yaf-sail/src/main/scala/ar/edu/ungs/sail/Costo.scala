@@ -10,10 +10,36 @@ object Costo extends Serializable{
   }
     
   def calcCostoEsc(u:Nodo,v:Nodo,metrosPorCelda:Int,nodosPorCelda:Int,valores:List[EstadoEscenarioViento],vmg:VMG):Float={
-    if (u.getId().startsWith("Inicial") || v.getId().startsWith("Inicial")) return 0f
-    if (u.getId().startsWith("Final") || v.getId().startsWith("Final")) return 0f
-    if (u.getCuadrante().intersect(v.getCuadrante())==null) return Float.MaxValue/100
-    if (u.getManiobra().equals(v.getManiobra())) calcCostoNavegacionEst(u,v,metrosPorCelda,nodosPorCelda,valores,vmg) else calcCostoManiobra(u,v)
+  //  println("de " + u + " a " +v)
+    if (u.getId().startsWith("Inicial") && u.getX()==v.getX() && u.getY()==v.getY()) return 0f 
+    if (v.getId().startsWith("Inicial") && u.getX()==v.getX() && u.getY()==v.getY()) return 0f
+    if (u.getId().startsWith("Final") && u.getX()==v.getX() && u.getY()==v.getY()) return 0f
+    if (v.getId().startsWith("Final") && u.getX()==v.getX() && u.getY()==v.getY()) return 0f
+    if (u.getCuadrante().intersect(v.getCuadrante())==null) {
+ //     println("de " + u + " a " +v+ " => No tienen cuadrante en comun = " + Float.MaxValue/100)
+      return Float.MaxValue/100
+    }
+    if (u.getManiobra()==null || v.getManiobra()==null) return Float.MaxValue/100
+    if (u.getManiobra().equals(v.getManiobra())) 
+    {
+      val ccc=calcCostoNavegacionEst(u,v,metrosPorCelda,nodosPorCelda,valores,vmg)
+  //    println("de " + u + " a " +v+ " => ccc=" + ccc)
+      return ccc
+    }
+    else 
+    {
+      if (u.getX()==v.getX() && u.getY()==v.getY())
+      {
+        val ccm=calcCostoManiobra(u,v)
+     //   println("de " + u + " a " +v+ " => ccm=" + ccm)
+        return ccm
+      }
+      else
+      {
+        val ccm=calcCostoManiobra(u,v)+calcCostoNavegacionEst(u,v,metrosPorCelda,nodosPorCelda,valores,vmg)
+        return ccm
+      }
+    }    
   }
   
   def calcCostoManiobra(u:Nodo,v:Nodo):Float=
