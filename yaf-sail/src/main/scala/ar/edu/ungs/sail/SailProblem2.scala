@@ -1,11 +1,18 @@
 package ar.edu.ungs.sail
 
 
+import scala.collection.mutable.ListBuffer
+
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+
+import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.operators.ByPassRibosome
 import ar.edu.ungs.sail.operators.SailAbstractMorphogenesisAgent
-import ar.edu.ungs.sail.operators.SailMutatorSwap
+import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 import ar.edu.ungs.sail.operators.SailOnePointCombinedCrossover
-import ar.edu.ungs.sail.operators.SailRandomPopulationInitializer
+import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
+import ar.edu.ungs.serialization.Deserializador
 import ar.edu.ungs.serialization.DeserializadorEscenarios
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Ribosome
@@ -16,12 +23,6 @@ import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantAcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.WorkFlowForSimulationOpt
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
-import scala.collection.mutable.ListBuffer
-import ar.edu.ungs.sail.draw.Graficador
-import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
-import ar.edu.ungs.sail.operators.SailMutatorEmpujador
 
 object SailProblem2 extends App {
  
@@ -38,7 +39,7 @@ object SailProblem2 extends App {
 
       val escenarios96=DeserializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes.txt")
       
-      val t0=DeserializadorEscenarios.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val t0=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	
       val e=t0.get(0).get
       
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)

@@ -58,7 +58,7 @@ object TorneoSoluciones4x4 extends App {
       // Elemento ganador teniendo en cuenta solo t0
       val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
       // Elemento Aparecido en una corrida de 100 generaciones con 50 individuos. En la generacion 20
-      val ind01=List((1,6), (3,3), (4,3), (6,6), (7,6), (9,9))      
+      val ind01=List((2,0), (5,6), (6,8), (9,12))   
       val individuos=List(ind00,ind01)
       
       graficarIndividuoEnT0(1,ind01, nodoInicial, nodoFinal, cancha, e, barco, true)
