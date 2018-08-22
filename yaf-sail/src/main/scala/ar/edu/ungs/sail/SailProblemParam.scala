@@ -22,13 +22,16 @@ import scala.collection.mutable.ListBuffer
 import ar.edu.ungs.sail.draw.Graficador
 import ar.edu.ungs.sail.operators.SailRandomMixedPopulationInitializer
 import ar.edu.ungs.sail.operators.SailMutatorEmpujador
+import ar.edu.ungs.serialization.Deserializador
+import org.apache.log4j.Logger
 
 object SailProblemParam extends App {
  
   
    override def main(args : Array[String]) {
 
-     
+      Logger.getLogger("file").info("Inicio: " + System.currentTimeMillis())
+      
     	val URI_SPARK=args(0).trim() //"local[8]"
       val MAX_GENERATIONS=args(1).toInt // 100
       val POPULATION_SIZE =args(2).toInt // 50
@@ -41,11 +44,15 @@ object SailProblemParam extends App {
       val NODOS_FINAL_X=args(9).toInt // 9
       val NODOS_FINAL_Y=args(10).toInt // 12
       val FILE_ESCENARIOS=args(11)// "./esc4x4/escenario4x4ConRachasNoUniformes.txt"
-      val CELDA_FINAL_X=args(12).toInt // 3
-      val CELDA_FINAL_Y=args(13).toInt // 3
-      val CANT_ESCENARIOS=args(14).toInt // 8
+      val FILE_ESTADO_INCICIAL=args(12)// estadoInicialEscenario4x4.winds
+      val CELDA_FINAL_X=args(13).toInt // 3
+      val CELDA_FINAL_Y=args(14).toInt // 3
+      val CANT_ESCENARIOS=args(15).toInt // 8
 
       val escenarios=DeserializadorEscenarios.run(FILE_ESCENARIOS)
+      val t0=Deserializador.run(FILE_ESTADO_INCICIAL).asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	      
+      val e=t0.get(0).get      
+
       val nodoInicial:Nodo=new Nodo(NODOS_INICIAL_X,NODOS_INICIAL_Y,"Inicial - ("+NODOS_INICIAL_X+")("+NODOS_INICIAL_Y +")",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(NODOS_FINAL_X,NODOS_FINAL_Y,"Final - ("+NODOS_FINAL_X+")("+NODOS_FINAL_Y+")",List((CELDA_FINAL_X,CELDA_FINAL_Y)),null)
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
@@ -59,7 +66,6 @@ object SailProblemParam extends App {
       val sc:SparkContext=new SparkContext(conf)
       
       // Primero resuelvo en t0 el problema clasico para tener una referencia
-      val e=escenarios.getEscenarios().values.toList.take(1)(0).getEstadoByTiempo(0)
       val individuosAgregados=List(problemaClasico(nodoInicial,nodoFinal,cancha,e,barco))
       
       val ga=new WorkFlowForSimulationOpt(
@@ -92,20 +98,20 @@ object SailProblemParam extends App {
 
 	    val t2=System.currentTimeMillis();
       
-	    println("Fin ga.run()");   	
+      Logger.getLogger("file").info("Fin ga.run()" + System.currentTimeMillis())
 
       mAgent.develop(genome, winner)
 //      winner.setFitness(fev.execute(winner))
-      println("...And the winner is... (" + winner.toString() + ") -> " + winner.getFitness())
-      println("...And the winner is... (" + winner.getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + winner.getFitness());
+      Logger.getLogger("file").info("...And the winner is... (" + winner.toString() + ") -> " + winner.getFitness())
+      Logger.getLogger("file").info("...And the winner is... (" + winner.getGenotype().getChromosomes()(0).getFullRawRepresentation() + ") -> " + winner.getFitness());
       
       ga.finalPopulation.foreach { x =>
 //              mAgent.develop(genome, x)
 //              x.setFitness(fev.execute(x))
-              println(x.toString() + " -> " + x.getFitness() + x.getGenotype().getChromosomes()(0).getFullRawRepresentation()) }
+              Logger.getLogger("file").info(x.toString() + " -> " + x.getFitness() + x.getGenotype().getChromosomes()(0).getFullRawRepresentation()) }
       
-			println("Tiempo -> " + (t2-t1)/1000 + " seg");
-			println("Promedio -> " + ((t2-t1)/(MAX_GENERATIONS.toDouble))+ " ms/generacion");
+			Logger.getLogger("file").info("Tiempo -> " + (t2-t1)/1000 + " seg");
+			Logger.getLogger("file").info("Promedio -> " + ((t2-t1)/(MAX_GENERATIONS.toDouble))+ " ms/generacion");
 			
 			sc.stop()
   }
@@ -120,11 +126,11 @@ object SailProblemParam extends App {
      val spN = spNO.get                                    
      var costo:Float=0
      spN.edges.foreach(f=>costo=costo+negWeightClasico(f,0))
-     println("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
-     spN.nodes.foreach(f=>println(f.getId()))
-     Graficador.draw(cancha, est, "./esc4x4/solucionT0.png", 35, spN,0)
+     Logger.getLogger("file").info("Calculo camino: termina con costo " + costo + " en " + System.currentTimeMillis())
+     spN.nodes.foreach(f=>Logger.getLogger("file").info(f.getId()))
+     Graficador.draw(cancha, est, "/tmp/solucionT0.png", 35, spN,0)
      spN.nodes.foreach(f=>salida.+=:(f.getX(),f.getY()))
      //salida.toList.reverse.drop(1).dropRight(1)
-     salida.toList.reverse.drop(2).dropRight(2)
+     salida.toList.reverse.drop(2).dropRight(2).distinct
   }
 }
