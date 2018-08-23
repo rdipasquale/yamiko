@@ -41,6 +41,22 @@ object ProbRachasNoUniformes4x4 {
   def getMatriz()=matriz
 }
 
+object ProbRachasNoUniformes8x8 {
+  var matriz:Array[Array[Double]]=Array.ofDim[Double](8,8)
+  var totalizador:Double=0
+  0 to 7 foreach(i=>{
+    0 to 7 foreach(j=>{
+      if (i>=3 && i<=4) 
+        matriz(i)(j)=4d/112d 
+      else 
+        matriz(i)(j)=1d/112d
+      totalizador=totalizador+matriz(i)(j)
+    })
+  })  
+
+  def getMatriz()=matriz
+}
+
 object GenerarEscenarios4x4 extends App {
   
   override def main(args : Array[String]) {
@@ -137,14 +153,15 @@ object GenerarEstadoInicial4x4 extends App {
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
       val t0=WindSimulation.generarEstadoInicial(4, 270, 14, 6, 3)
-      val tmodi1=t0.get(0).get
-      val tmodi=tmodi1.map(t=>{
-        if (t.getCelda()._1==0 && t.getCelda()._2==0)          
-        new EstadoEscenarioViento(0,t.getCelda(),236,14)
-        else
-        t
-      })
-      Serializador.run("estadoInicialEscenario4x4.winds", Map(0->tmodi))
+      Serializador.run("estadoInicialEscenario4x4.winds", t0)
+}
+
+object GenerarEstadoInicial8x8 extends App {
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (19)(24)",List((7,7)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(8,4,50,nodoInicial,nodoFinal,null,null);
+      val t0=WindSimulation.generarEstadoInicial(8, 270, 15, 7, 4)
+      Serializador.run("estadoInicialEscenario8x8.winds",t0)
 }
 
 object Generar10Escenarios4x4 extends App {
@@ -203,5 +220,33 @@ object Generar96Escenarios4x4 extends App {
       })
       
       SerializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
+  }
+}
+
+object Generar200Escenarios8x8 extends App {
+  
+  override def main(args : Array[String]) {
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (19)(24)",List((7,7)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(8,4,50,nodoInicial,nodoFinal,null,null);
+
+      //Tomar estado inicial de archivo
+      val t0=Deserializador.run("estadoInicialEscenario8x8.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e0=t0.get(0).get
+      
+      // Con rachas no uniformemente distribuidas
+      val escenarios=ListBuffer[EscenarioViento]()
+      
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 140, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes8x8.getMatriz())
+      escenarios+=salida
+      SerializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0)))) 
+      salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc8x8/200_escenario8x8ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      1 to 199 foreach(i=>{
+        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 140, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes8x8.getMatriz())
+        escenarios+=salida2
+      })
+      
+      SerializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
   }
 }
