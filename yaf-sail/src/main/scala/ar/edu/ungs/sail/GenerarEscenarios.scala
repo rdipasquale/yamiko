@@ -227,7 +227,7 @@ object Generar200Escenarios8x8 extends App {
   
   override def main(args : Array[String]) {
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (19)(24)",List((7,7)),null)
+      val nodoFinal:Nodo=new Nodo(19,24,"Final - (19)(24)",List((7,7)),null)
       val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(8,4,50,nodoInicial,nodoFinal,null,null);
 
       //Tomar estado inicial de archivo

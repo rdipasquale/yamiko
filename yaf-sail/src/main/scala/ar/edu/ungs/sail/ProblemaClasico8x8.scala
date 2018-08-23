@@ -11,7 +11,7 @@ import scala.collection.mutable.Map
 /**
  * Resuelve el problema clasico documentado en "Martinez, Sainz-Trapaga"
  */
-object ProblemaClasico extends App {
+object ProblemaClasico8x8 extends App {
    
   override def main(args : Array[String]) {
 
@@ -23,8 +23,9 @@ object ProblemaClasico extends App {
 //      Serializador.run("RioDeLaPlata50x50.cancha", rioDeLaPlata)
 
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
-      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
+      val nodoFinal:Nodo=new Nodo(19,24,"Final - (19)(24)",List((7,7)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(8,4,50,nodoInicial,nodoFinal,null,null);
+
 //      Serializador.run("RioDeLaPlata4x4.cancha", rioDeLaPlata)
       
       
@@ -41,23 +42,11 @@ object ProblemaClasico extends App {
       val nf=g get nodoFinal
       
      //Tomar estado inicial de archivo
-      val t0:List[((Int, Int), Int, Int, Int)]=Deserializador.run("estadoInicialEscenario50x50.winds").asInstanceOf[List[((Int, Int), Int, Int, Int)]]      
-      val t1=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
-      val e1=t1.get(0).get
+      val t0=Deserializador.run("estadoInicialEscenario8x8.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e1=t0.get(0).get
 
-      val nfs=g.nodes.filter(p=>p.getX()==2 && p.getY()==0)
-      val nfs1=g.nodes.filter(p=>p.getX()==3 && p.getY()==0)
-      nfs.foreach(pi=>nfs1.foreach(p=>
-       {
-          val c1=Costo.calcCosto(pi,p,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), t0,carr40)
-          val c2=Costo.calcCostoEsc(pi,p,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), e1,carr40)
-          println("de " +pi + " a " + p + " c1=" + c1 + " c2=" + c2) 
-       }
-       ))
- 
-      
       // Esta implementacion no es time dependant
-      def negWeight(e: g.EdgeT): Float = Costo.calcCosto(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), t0,carr40)
+      def negWeight(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), e1,carr40)
         //println(e._1.getX()+","+e._1.getY()+ " al Maniobra:" + e._1.getManiobra() + " al " + e._2.getX() + "," + e._2.getY() + " Maniobra:" + e._2.getManiobra()  + ".... Costo: " + salida)        
       
       println("Calculo camino: empieza en " + System.currentTimeMillis())      
@@ -71,7 +60,7 @@ object ProblemaClasico extends App {
 
       spN.nodes.foreach(f=>println(f.getId()))
       
-     Graficador.draw(rioDeLaPlata, t0, "solucionProblema.png", 35, spN)
+     Graficador.draw(rioDeLaPlata, e1, "solucionProblema8x8.png", 35, spN,0)
      
       def negWeight2(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,rioDeLaPlata.getMetrosPorLadoCelda(),rioDeLaPlata.getNodosPorCelda(), e1,carr40)
       val spNO2 = ni shortestPathTo (nf, negWeight2) 
