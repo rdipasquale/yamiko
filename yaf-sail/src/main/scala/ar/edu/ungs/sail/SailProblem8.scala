@@ -46,7 +46,7 @@ object SailProblem8 extends App {
       val nodoFinal:Nodo=new Nodo(19,24,"Final - (19)(24)",List((3,3)),null)
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,e)
       val barco:VMG=new Carr40()
-      val genes=List(GENES.GenUnico)
+      val genes=List(GENES9.GenUnico)
       val translators=genes.map { x => (x,new ByPassRibosome().asInstanceOf[Ribosome[List[(Int, Int)]]]) }.toMap
       val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
     	val mAgent=new SailAbstractMorphogenesisAgent()
