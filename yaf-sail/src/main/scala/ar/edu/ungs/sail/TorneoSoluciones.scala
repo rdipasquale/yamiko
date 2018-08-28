@@ -54,6 +54,8 @@ object TorneoSoluciones4x4 extends App {
       // Primero resuelvo en t0 el problema clasico para tener una referencia
       val t1=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
       val e=t1.get(0).get
+
+      println("Grafo con " + cancha.getNodos().size + " nodos y " + cancha.getArcos().size + " arcos.")
       
       // Elemento ganador teniendo en cuenta solo t0
       val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
@@ -234,7 +236,7 @@ object TorneoSoluciones8x8 extends App {
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       
-      val escenarios=DeserializadorEscenarios.run("./esc8x8/escenario8x8ConRachasNoUniformes.txt")
+      val escenarios=DeserializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(19,24,"Final - (19)(24)",List((3,3)),null)
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
@@ -257,10 +259,14 @@ object TorneoSoluciones8x8 extends App {
       val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
       // Elemento Aparecido en una corrida de 100 generaciones con 50 individuos. En la generacion 20
       val ind01=List((3,3), (3,6), (5,9), (6,12), (9,15), (12,18), (15,21), (18,23))
+      val ind02=List((5,9), (3,9), (6,12), (9,14), (10,15), (12,17), (13,18), (15,20), (15,21), (18,24))
       val individuos=List(ind00,ind01)
       
       graficarIndividuoEnT0(1,ind01, nodoInicial, nodoFinal, cancha, e, barco, true)
+      graficarIndividuoEnT0(2,ind02, nodoInicial, nodoFinal, cancha, e, barco, true)
 
+      println("Grafo con " + cancha.getNodos().size + " nodos y " + cancha.getArcos().size + " arcos.")
+      
       // Generamos 10 escenarios de prueba
       //-----------------------------------
       //Tomar estado inicial de archivo
@@ -269,7 +275,7 @@ object TorneoSoluciones8x8 extends App {
       // Con rachas no uniformemente distribuidas
       val escenariosGene=ListBuffer[EscenarioViento]()
       
-      val salida=WindSimulation.simular(0,cancha,e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      val salida=WindSimulation.simular(0,cancha,e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes8x8.getMatriz())
       escenariosGene+=salida
       SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes_0.txt",new EscenariosViento(Map(0->escenariosGene(0))))
       salida.getEstados().foreach(f=>Graficador.draw(cancha, f._2, "./escenariosGenerados/escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
@@ -278,7 +284,7 @@ object TorneoSoluciones8x8 extends App {
         val salida2=WindSimulation.simular(i,cancha, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
         escenariosGene+=salida2
       })
-      SerializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
+      SerializadorEscenarios.run("./escenariosGenerados/escenario8x8ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenariosGene.toList))
       //-----------------------------------
       val escenariosNuevos=DeserializadorEscenarios.run("./escenariosGenerados/escenario4x4ConRachasNoUniformes.txt")
 //      val escenariosNuevos=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
