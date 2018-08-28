@@ -2,3 +2,12 @@ kubectl create serviceaccount spark -n desa
 kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=desa:spark --namespace=desa
 
 bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi --conf spark.executor.instances=5 --conf spark.kubernetes.driver.label.run=yafsail --conf spark.kubernetes.driver.pod.name=sparksailpod --conf spark.kubernetes.namespace=desa --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark --conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/spark:2.3.1 local:///opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar
+
+
+bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name yaf-sail4x4 --class ar.edu.ungs.sail.spark.SailProblem4x4 --conf spark.executor.instances=96 --conf spark.kubernetes.driver.label.run=yaf-sail4x4 --conf spark.kubernetes.driver.pod.name=yafsail4x4pod --conf spark.kubernetes.namespace=desa --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark --conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-sail:1.0.1 local:///opt/spark/work-dir/yaf-sail-1.0.0.jar
+
+
+bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name yaf-sail4x4 --class ar.edu.ungs.sail.spark.SailProblem4x4 --conf spark.executor.instances=8 --conf spark.kubernetes.driver.label.run=yaf-sail4x4 --conf spark.kubernetes.driver.pod.name=yafsail4x4pod --conf spark.kubernetes.namespace=desa --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark --conf spark.kubernetes.allocation.batch.size=8 --conf spark.driver.cores=4 --conf spark.executor.cores=4 --conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-sail:1.0.1 local:///opt/spark/work-dir/yaf-sail-1.0.0.jar
+
+
+

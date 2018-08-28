@@ -33,19 +33,18 @@ import ar.edu.ungs.sail.CanchaRioDeLaPlata
 import ar.edu.ungs.sail.Costo
 import org.apache.spark.sql.SparkSession
 
+
 object SailProblem4x4 extends App {
- 
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[8]"
       val MAX_GENERATIONS=100
       val POPULATION_SIZE=50
       val DIMENSION=4
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       val NODOS_MINIMO_PATH=4
-
+      
       val escenarios96=DeserializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes.txt")
       
       val t0=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	

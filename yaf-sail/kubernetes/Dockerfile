@@ -47,11 +47,14 @@ COPY conf /opt/spark/conf
 COPY ${img_path}/spark/entrypoint.sh /opt/
 COPY examples /opt/spark/examples
 COPY data /opt/spark/data
-COPY yaf-sail-1.0.0.jar /opt/spark/examples
+COPY yaf /opt/spark/work-dir/
+
+
+
 
 ENV SPARK_HOME /opt/spark
 
-RUN ls -l opt/spark/examples/
+RUN ls -l opt/yaf/
 
 WORKDIR /opt/spark/work-dir
 

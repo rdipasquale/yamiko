@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yaf4x4
+  namespace: desa
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+    targetPort: 4040
+  type:
+    ClusterIP
+  selector:
+    run: yaf-sail4x4
+    spark-role: driver

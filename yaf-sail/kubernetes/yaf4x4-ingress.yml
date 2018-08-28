@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: yaf4x4
+  namespace: desa
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: spark.cammesa.com
+    http:
+      paths:
+      - backend:
+          serviceName: yaf4x4
+          servicePort: web
