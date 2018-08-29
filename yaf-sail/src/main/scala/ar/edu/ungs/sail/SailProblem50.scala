@@ -85,7 +85,7 @@ object SailProblem50 extends App {
           DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,
           0.2,
           sc,
-          true,8
+          true,8,0
           )
       
 	    val t1=System.currentTimeMillis()

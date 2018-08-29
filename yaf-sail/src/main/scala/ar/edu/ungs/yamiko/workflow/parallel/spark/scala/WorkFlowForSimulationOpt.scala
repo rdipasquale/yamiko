@@ -61,9 +61,11 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
                                   mutationProbability:Double,
                                   sc:SparkContext,
                                   profiler:Boolean,
-                                  limiteEscenarios:Int) extends Serializable{
+                                  limiteEscenarios:Int,
+                                  partitions:Int) extends Serializable{
   
-  val sparkEscenerarios=if(limiteEscenarios==0) sc.parallelize(escenarios.getEscenarios.values.toList) else sc.parallelize(escenarios.getEscenarios.values.toList.take(limiteEscenarios)) 
+  val sparkEscenerarios2=if(limiteEscenarios==0) sc.parallelize(escenarios.getEscenarios.values.toList) else sc.parallelize(escenarios.getEscenarios.values.toList.take(limiteEscenarios))
+  val sparkEscenerarios=if (partitions>0) sparkEscenerarios2.repartition(partitions) else sparkEscenerarios2  
  	val holder:Map[Int,Individual[List[(Int,Int)]]]=Map[Int,Individual[List[(Int,Int)]]]()
   val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   val r:Random=new Random(System.currentTimeMillis())
@@ -101,6 +103,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 
       
       // Evalua el rendimiento de cada individuo en cada escenario
+      
+      if (profiler) Logger.getLogger("profiler").info("real;sparkEscenerarios.partitions.size;"+sparkEscenerarios.partitions.size)
+      
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
 //          println("/*-----------------------------------------------------*/")

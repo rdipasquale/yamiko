@@ -88,7 +88,7 @@ object SailProblemParam extends App {
           0.2,
           sc,
           true,
-          CANT_ESCENARIOS
+          CANT_ESCENARIOS,0
           )
       
 	    val t1=System.currentTimeMillis()
