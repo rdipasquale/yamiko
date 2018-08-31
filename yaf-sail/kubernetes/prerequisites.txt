@@ -32,7 +32,7 @@ bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode clust
 --conf spark.driver.cores=1 \
 --conf spark.executor.cores=1 \
 --conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-sail:1.0.4 \
-local:///opt/spark/work-dir/yaf-sail-1.0.0.jar 10 40 ./esc4x4/96_escenario4x4ConRachasNoUniformes.txt 16 1
+local:///opt/spark/work-dir/yaf-sail-1.0.0.jar 10 40 ./esc4x4/96_escenario4x4ConRachasNoUniformes.txt 16 4
 
 
 
