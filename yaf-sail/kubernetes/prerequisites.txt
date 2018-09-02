@@ -35,5 +35,17 @@ bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode clust
 local:///opt/spark/work-dir/yaf-sail-1.0.0.jar 10 40 ./esc4x4/96_escenario4x4ConRachasNoUniformes.txt 16 4
 
 
+bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name yaf-sail8x8 \
+--class ar.edu.ungs.sail.spark.SailProblem8x8Param --conf spark.executor.instances=24 \
+--conf spark.kubernetes.driver.label.run=yafsail8x8pod \
+--conf spark.kubernetes.driver.pod.name=yafsail8x8pod \
+--conf spark.kubernetes.namespace=desa \
+--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+--conf spark.kubernetes.allocation.batch.size=8 \
+--conf spark.driver.cores=1 \
+--conf spark.executor.cores=1 \
+--conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-sail:1.0.6 \
+local:///opt/spark/work-dir/yaf-sail-1.0.0.jar 200 50 ./esc8x8/200_escenario8x8ConRachasNoUniformes.txt 192 0
+
 
 

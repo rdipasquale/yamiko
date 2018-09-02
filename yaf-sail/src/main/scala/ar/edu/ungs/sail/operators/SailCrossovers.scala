@@ -169,7 +169,7 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
 
 		  // Si el tamaño es menor al minimo, incorporo un nodo en el trayecto mas largo.
       var cuentaProteccion=0
-		  while (desc1.size<nodosMinimo)
+		  while (desc1.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
 		    if (cuentaProteccion>10) 
@@ -211,7 +211,7 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
         }	    
 		  }
       cuentaProteccion=0
-		  while (desc2.size<nodosMinimo)
+		  while (desc2.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
 		    if (cuentaProteccion>10) 
@@ -416,7 +416,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		  
 		  // Si el tamaño es menor al minimo, incorporo un nodo en el trayecto mas largo.
       var cuentaProteccion=0
-		  while (desc1.size<nodosMinimo)
+		  while (desc1.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
 		    if (cuentaProteccion>10) 
@@ -458,7 +458,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
         }	    
 		  }
       cuentaProteccion=0
-		  while (desc2.size<nodosMinimo)
+		  while (desc2.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
 		    if (cuentaProteccion>10) 
