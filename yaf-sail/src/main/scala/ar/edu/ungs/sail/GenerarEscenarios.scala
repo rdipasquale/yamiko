@@ -210,7 +210,7 @@ object Generar96Escenarios4x4 extends App {
       
       val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
       escenarios+=salida
-      SerializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0)))) 
+      SerializadorEscenarios.run("./esc4x4/2_escenario4x4ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0)))) 
       salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/96_escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
       1 to 95 foreach(i=>{
         println("Generando Escenario " + i + " - " + System.currentTimeMillis())
@@ -223,6 +223,34 @@ object Generar96Escenarios4x4 extends App {
   }
 }
 
+object Generar240Escenarios4x4 extends App {
+  
+  override def main(args : Array[String]) {
+      val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
+      val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
+      val rioDeLaPlata:Cancha=new CanchaRioDeLaPlata(4,4,50,nodoInicial,nodoFinal,null,null);
+
+      //Tomar estado inicial de archivo
+      val t0=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val e0=t0.get(0).get
+      
+      // Con rachas no uniformemente distribuidas
+      val escenarios=ListBuffer[EscenarioViento]()
+      
+      val salida=WindSimulation.simular(0,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+      escenarios+=salida
+      SerializadorEscenarios.run("./esc4x4/240_escenario4x4ConRachasNoUniformes_0.txt", new EscenariosViento(Map(0->escenarios(0)))) 
+      salida.getEstados().foreach(f=>Graficador.draw(rioDeLaPlata, f._2, "./esc4x4/240_escenario4x4ConRachasNoUniformes_t" + f._1 + ".png", 35))
+      1 to 239 foreach(i=>{
+        println("Generando Escenario " + i + " - " + System.currentTimeMillis())
+        val salida2=WindSimulation.simular(i,rioDeLaPlata, e0, 75, 0, 0, 5.7, 2.5, 10,true,75,150,45,15,false,ProbRachasNoUniformes4x4.getMatriz())
+        escenarios+=salida2
+        //SerializadorEscenario.run("./esc4x4/escenario4x4ConRachasNoUniformes_"+i+".txt", i.toString(),salida2)      
+      })
+      
+      SerializadorEscenarios.run("./esc4x4/240_escenario4x4ConRachasNoUniformes.txt", EscenariosVientoFactory.createEscenariosViento(escenarios.toList))
+  }
+}
 object Generar200Escenarios8x8 extends App {
   
   override def main(args : Array[String]) {
