@@ -452,3 +452,36 @@ object TorneoSoluciones8x8 extends App {
     
    
 }
+
+
+
+object TorneoSoluciones50x50 extends App {
+ 
+  
+   override def main(args : Array[String]) {
+
+      val DIMENSION=50
+      val NODOS_POR_CELDA=4
+      val METROS_POR_CELDA=50
+      
+      // El problema es que este archivo se genera con [t=0 (0, 0) Ang: 238 Vel: 2] 
+      // Pero el esatdo inicial es (0,List([t=0 (0, 0) Ang: 236 Vel: 14], [t=0 (0, 1) Ang: 258 Vel: 11], [t=0 (0, 2) Ang: 260 Vel: 9], [t=0 (0, 3) Ang: 275 Vel: 10], [t=0 (1, 0) Ang: 275 Vel: 17], [t=0 (1, 1) Ang: 272 Vel: 11], [t=0 (1, 2) Ang: 266 Vel: 15], [t=0 (1, 3) Ang: 281 Vel: 9], [t=0 (2, 0) Ang: 258 Vel: 15], [t=0 (2, 1) Ang: 273 Vel: 18], [t=0 (2, 2) Ang: 271 Vel: 13], [t=0 (2, 3) Ang: 271 Vel: 14], [t=0 (3, 0) Ang: 265 Vel: 14], [t=0 (3, 1) Ang: 266 Vel: 12], [t=0 (3, 2) Ang: 249 Vel: 10], [t=0 (3, 3) Ang: 265 Vel: 20]))    
+      val escenarios=DeserializadorEscenarios.run("./esc50x50/escenario50x50ConRachasNoUniformes.txt")
+      val nodoInicial:Nodo=new Nodo(17,0,"Inicial - (17)(0)",List((5,0)),null)
+      val nodoFinal:Nodo=new Nodo(150,120,"Final - (150)(120)",List((49,39)),null)
+    	
+      val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,(escenarios.getEscenarios().values.take(1).toList(0).getEstadoByTiempo(0)))
+      val barco:VMG=new Carr40()
+      val genes=List(GENES.GenUnico)
+      val translators=genes.map { x => (x,new ByPassRibosome().asInstanceOf[Ribosome[List[(Int, Int)]]]) }.toMap
+      val genome:Genome[List[(Int,Int)]]=new BasicGenome[List[(Int,Int)]]("Chromosome 1", genes, translators).asInstanceOf[Genome[List[(Int,Int)]]]
+    	val mAgent=new SailAbstractMorphogenesisAgent()
+
+      // Imprimir los mejores indiviuos para un escenario en todos los momentos
+//      escenarios.getEscenarios().values.toList(0).getEstados().toList.sortBy(_._1).foreach(e=>
+//            println("Escenario 1 - Mejor individuo en t" + e._1 + " - " + problemaClasico(nodoInicial,nodoFinal,cancha,e._2,barco,false))
+//        )
+
+      println("Grafo con " + cancha.getNodos().size + " nodos y " + cancha.getArcos().size + " arcos.")
+   }
+}
