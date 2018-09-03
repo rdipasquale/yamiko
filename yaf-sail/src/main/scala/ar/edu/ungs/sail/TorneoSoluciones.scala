@@ -36,6 +36,8 @@ object TorneoSoluciones4x4 extends App {
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       
+      // El problema es que este archivo se genera con [t=0 (0, 0) Ang: 238 Vel: 2] 
+      // Pero el esatdo inicial es (0,List([t=0 (0, 0) Ang: 236 Vel: 14], [t=0 (0, 1) Ang: 258 Vel: 11], [t=0 (0, 2) Ang: 260 Vel: 9], [t=0 (0, 3) Ang: 275 Vel: 10], [t=0 (1, 0) Ang: 275 Vel: 17], [t=0 (1, 1) Ang: 272 Vel: 11], [t=0 (1, 2) Ang: 266 Vel: 15], [t=0 (1, 3) Ang: 281 Vel: 9], [t=0 (2, 0) Ang: 258 Vel: 15], [t=0 (2, 1) Ang: 273 Vel: 18], [t=0 (2, 2) Ang: 271 Vel: 13], [t=0 (2, 3) Ang: 271 Vel: 14], [t=0 (3, 0) Ang: 265 Vel: 14], [t=0 (3, 1) Ang: 266 Vel: 12], [t=0 (3, 2) Ang: 249 Vel: 10], [t=0 (3, 3) Ang: 265 Vel: 20]))    
       val escenarios=DeserializadorEscenarios.run("./esc4x4/escenario4x4ConRachasNoUniformes.txt")
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
       val nodoFinal:Nodo=new Nodo(9,12,"Final - (9)(12)",List((3,3)),null)
@@ -52,13 +54,20 @@ object TorneoSoluciones4x4 extends App {
 //        )
       
       // Primero resuelvo en t0 el problema clasico para tener una referencia
-      val t1=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]      
+      val txx=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]   
+      val t1=escenarios.getEscenarioById(0).getEstados()
       val e=t1.get(0).get
 
+      // FIXME: Sacar
+      txx.foreach(println(_))
+      e.foreach(println(_))
+      // ----------
+      
       println("Grafo con " + cancha.getNodos().size + " nodos y " + cancha.getArcos().size + " arcos.")
       
       // Elemento ganador teniendo en cuenta solo t0
-      val ind00=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
+      val winner=problemaClasico(nodoInicial,nodoFinal,cancha,e,barco,true)
+      val ind00=winner._1
       // Elemento Aparecido en una corrida de 100 generaciones con 50 individuos. En la generacion 20
       val ind01=List((2,0), (5,6), (6,8), (9,12))   
       val individuos=List(ind00,ind01)
@@ -90,7 +99,21 @@ object TorneoSoluciones4x4 extends App {
       val g=cancha.getGraph()
       
       escenariosNuevos.getEscenarios().foreach(esc=>
-        individuos.foreach(i=>
+      {
+        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc._2.getEstadoByTiempo(t) ,barco)
+        val ganador:g.Path=winner._2.asInstanceOf[g.Path]
+        var t=0
+        var costo=0d
+        ganador.edges.foreach(ed=>{
+          val costoN=negWeight(ed,t)
+          costo=costo+costoN
+          t=t+1
+          println(ed + " costo => " + costoN)
+        })
+  		  val fit=math.max(10000d-costo,0d)
+  		  println("Escenario " + esc._1 + " - Individuo: Winner en t0 - Fitness = " + fit)      	    
+        
+        individuos.drop(1).foreach(i=>
         {
             var t=0
   	        def negWeight(e: g.EdgeT,t:Int): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), esc._2.getEstadoByTiempo(t) ,barco)		
@@ -128,14 +151,17 @@ object TorneoSoluciones4x4 extends App {
       		  })
       
       		  val fit=math.max(10000d-path.map(_._2).sum.doubleValue(),0d)
+      		  print("Debug: ")
+      		  path.foreach(f=>print(f._1 + ": " + f._2 + "-"))
       		  println("Escenario " + esc._1 + " - Individuo: " + i + " - Fitness = " + fit)      	    
           
           
         }
-      )) 
+      
+      )}) 
   }
    
-  def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean):List[(Int,Int)]={
+  def problemaClasico(nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean):(List[(Int,Int)],Any)={
      val salida:ListBuffer[(Int,Int)]=ListBuffer()
      val g=cancha.getGraph()
      def negWeightClasico(e: g.EdgeT): Float = Costo.calcCostoEsc(e._1,e._2,cancha.getMetrosPorLadoCelda(),cancha.getNodosPorCelda(), est,barco)
@@ -171,7 +197,7 @@ object TorneoSoluciones4x4 extends App {
 	   val salidaFinal=salida.toList.reverse.drop(2).dropRight(2).distinct
 		 println("Individuo 0: " + salidaFinal + " en T0 - Fitness = " + fit)      	    
      
-     salidaFinal
+     (salidaFinal,spN)
   }
   
   def graficarIndividuoEnT0(id:Int,i:List[(Int,Int)],nodoInicial:Nodo,nodoFinal:Nodo,cancha:Cancha,est:List[EstadoEscenarioViento],barco:VMG,graficar:Boolean)={
