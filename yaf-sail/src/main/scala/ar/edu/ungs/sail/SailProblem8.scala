@@ -43,7 +43,7 @@ object SailProblem8 extends App {
       val e=t0.get(0).get
       
       val nodoInicial:Nodo=new Nodo(2,0,"Inicial - (2)(0)",List((0,0)),null)
-      val nodoFinal:Nodo=new Nodo(19,24,"Final - (19)(24)",List((3,3)),null)
+      val nodoFinal:Nodo=new Nodo(19,24,"Final - (22)(24)",List((7,7)),null)
       val cancha:Cancha=new CanchaRioDeLaPlata(DIMENSION,NODOS_POR_CELDA,METROS_POR_CELDA,nodoInicial,nodoFinal,null,e)
       val barco:VMG=new Carr40()
       val genes=List(GENES9.GenUnico)

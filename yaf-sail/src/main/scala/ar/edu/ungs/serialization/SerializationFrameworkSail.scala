@@ -59,8 +59,8 @@ object DeserializadorEscenarios {
       var aux:ListBuffer[(Int,Int, EstadoEscenarioViento)]=ListBuffer()
       for (line <- bufferedSource.getLines) {
         val cols = line.split(",").map(_.trim)
-        aux+=((cols(0).toInt,cols(1).toInt, new EstadoEscenarioViento(cols(1).toInt,(cols(2).toInt,cols(3).toInt) ,cols(4).toInt,cols(5).toInt)))
-//        aux+=((cols(0).toInt,cols(1).toInt, new EstadoEscenarioViento(cols(1).toInt,(cols(2).toInt,cols(3).toInt) ,cols(5).toInt,cols(4).toInt)))
+//        aux+=((cols(0).toInt,cols(1).toInt, new EstadoEscenarioViento(cols(1).toInt,(cols(2).toInt,cols(3).toInt) ,cols(4).toInt,cols(5).toInt)))
+        aux+=((cols(0).toInt,cols(1).toInt, new EstadoEscenarioViento(cols(1).toInt,(cols(2).toInt,cols(3).toInt) ,cols(5).toInt,cols(4).toInt)))
       }
       bufferedSource.close()
       val xx=aux.toList.groupBy(f=>(f._1,f._2))
