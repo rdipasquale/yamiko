@@ -69,7 +69,7 @@ trait FitnessEvaluator[T]  extends Serializable{
 	 * @param i		-] Individuo a ser evaluado
 	 * @return		-] double ( ]0 )
 	 */
-	def execute(i:Individual[T]):Double;
+	def execute(i:Individual[T]):Double
 
 }
 

@@ -19,6 +19,6 @@ trait DistributedFitnessEvaluator[T]  extends FitnessEvaluator[T]{
 	 * 
 	 * @param i		-] Población de Individuos a ser evaluada
 	 */
-	def execute(i:Population[T]);
+	def execute(i:Population[T])
 
 }
