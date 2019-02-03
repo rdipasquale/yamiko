@@ -6,7 +6,7 @@ import ar.edu.ungs.yamiko.ga.domain.Population
 import scala.util.Random
 
 /**
- * Una variante del DescendantModifiedAcceptEvaluator
+ * Implementación de un selector por ruletas de probabilidades que trabaja sobre una población definida.
  */
 @SerialVersionUID(129L)
 class ProbabilisticRouletteSelector[T] extends Selector[T] {
