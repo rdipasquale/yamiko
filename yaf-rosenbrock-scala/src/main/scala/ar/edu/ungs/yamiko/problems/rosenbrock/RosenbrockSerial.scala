@@ -24,11 +24,6 @@ import ar.edu.ungs.yamiko.ga.operators.impl.BitSetJavaTwoPointCrossover
 
 object RosenbrockSerial extends App {
 
-  	  val URI_SPARK="local[2]"
-      val MAX_NODES=2
-      val MIGRATION_RATIO=0.05
-      val ISOLATED_GENERATIONS=5000
-      val MAX_TIME_ISOLATED=200000
       val POPULATION_SIZE=300
       
     	val genX:Gene=new BasicGene("x", 0, 50)
@@ -41,7 +36,7 @@ object RosenbrockSerial extends App {
     	val par:Parameter[BitSet]=	new Parameter[BitSet](0.035, 1d, POPULATION_SIZE, new DescendantModifiedAcceptLigthEvaluator[BitSet](), 
         						new RosenbrockFitnessEvaluator(genX,genY), new BitSetJavaTwoPointCrossover().asInstanceOf[Crossover[BitSet]], new BitSetJavaFlipMutator().asInstanceOf[Mutator[BitSet]], 
         						new BitSetJavaRandomPopulationInitializer().asInstanceOf[PopulationInitializer[BitSet]],  new ProbabilisticRouletteSelector(), 
-        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), ISOLATED_GENERATIONS, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,MAX_NODES,MIGRATION_RATIO,MAX_TIME_ISOLATED,null);
+        						new DistributedPopulation[BitSet](genome,POPULATION_SIZE), 5000, 60000d,new BitSetJavaMorphogenesisAgent().asInstanceOf[MorphogenesisAgent[BitSet]],genome,1,0d,200000,null);
     	
     	
        val ga:SerialGA[BitSet]=new SerialGA[BitSet](par);
