@@ -44,7 +44,7 @@ object WindSimulation extends Serializable {
             speed=(Random.nextGaussian()*devSpeed+(meanSpeed+(i*0.1)/(dim/4))).intValue()
             if (j<dim/4) angle=(Random.nextGaussian()*devAngle+(meanAngle-10)).intValue()
               else if (j>dim*3/4) angle=(Random.nextGaussian()*devAngle+(meanAngle+20)).intValue()
-                else angle=(Random.nextGaussian()*devAngle+(meanAngle-10)).intValue()                                  
+                else angle=(Random.nextGaussian()*devAngle+(meanAngle)).intValue()                                  
           }          
         x+=new EstadoEscenarioViento(0,(i,j),angle,speed)
       }
