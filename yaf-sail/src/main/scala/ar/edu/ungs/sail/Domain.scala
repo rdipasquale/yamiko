@@ -27,18 +27,69 @@ trait VMG extends Serializable{
  */
 @SerialVersionUID(1L)
 trait Cancha extends Serializable{
-  def getGraph():Graph[Nodo,DiEdge]
+  /**
+   * Devuelve el grafo dirigido que modela la Cancha
+   */
+  def getGraph():Graph[Nodo,DiEdge] 
+  
+  /**
+   * Devuelve la dimensión de la cancha. En términos prácticos consiste en la cantidad de celdas por lado de la cancha (cuadrada).
+   */
   def getDimension():Int
+  
+  /**
+   * Devuelve la cantidad de nodos de navegación que entran en un lado de la celda.
+   */
   def getNodosPorCelda():Int
+  
+  /**
+   * Longitud de un lado de la celda (en metros)
+   */
   def getMetrosPorLadoCelda():Int
+  
+  /**
+   * Devuelve la lista de nodos (tanto de navegación como de maniobra) del grafo que modela la cancha
+   */
   def getNodos():List[Nodo]
+  
+  /**
+   * Devuelve la lista de Arcos dirigidos del grafo que modela la cancha.
+   */
   def getArcos():List[DiEdge[Nodo]]
+  
+  /**
+   * Devuelve el nodo de partida de la regata
+   */
   def getNodoInicial():Nodo
+  
+  /**
+   * Devuelve el nodo de llegada de la regata
+   */
   def getNodoFinal():Nodo
+  
+  /**
+   * Devuelve la lista de celdas que son consideradas islas.
+   */
   def getIslas():List[(Int,Int)]
+  
+  /**
+   * Devuelve el nodo correspondiente a la convención de coordenadas utilizada.
+   */
   def getNodoByCord(x:Int, y:Int):Nodo
+  
+  /** 
+   *  Devuelve true si el nodo y es vecino del nodo x
+   */
   def isNeighbour(x:Nodo, y:Nodo):Boolean
+  
+  /**
+   * Devuelve un camino simple entre el nodo x y el y.
+   */
   def simplePath(x:Nodo, y:Nodo):List[Nodo]
+  
+  /**
+   * Devuelve el estado inicial de Vientos asignado.
+   */
   def getVientoReferencia():List[EstadoEscenarioViento]
 }
 
