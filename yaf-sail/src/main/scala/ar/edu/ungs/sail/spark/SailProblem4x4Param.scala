@@ -47,6 +47,7 @@ object SailProblem4x4Param extends App {
       val FILE_ESCENARIOS=args(2) // ./esc4x4/96_escenario4x4ConRachasNoUniformes.txt
       val CANT_ESCENARIOS=args(3).toInt
       val CANT_PARTITIONS=args(4).toInt
+      val CAMINO_MAXIMO=10
       
       val escenarios96=DeserializadorEscenarios.run(FILE_ESCENARIOS)
       
@@ -75,7 +76,7 @@ object SailProblem4x4Param extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
+          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH,CAMINO_MAXIMO),
           new ProbabilisticRouletteSelector(),
           escenarios96,
           barco,

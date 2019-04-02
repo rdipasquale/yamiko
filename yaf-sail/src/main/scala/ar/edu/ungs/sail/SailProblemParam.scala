@@ -48,6 +48,7 @@ object SailProblemParam extends App {
       val CELDA_FINAL_X=args(13).toInt // 3
       val CELDA_FINAL_Y=args(14).toInt // 3
       val CANT_ESCENARIOS=args(15).toInt // 8
+      val CAMINO_MAXIMO=10
 
       val escenarios=DeserializadorEscenarios.run(FILE_ESCENARIOS)
       val t0=Deserializador.run(FILE_ESTADO_INCICIAL).asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	      
@@ -73,7 +74,7 @@ object SailProblemParam extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
+          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH,CAMINO_MAXIMO),
           new ProbabilisticRouletteSelector(),
           escenarios,
           barco,

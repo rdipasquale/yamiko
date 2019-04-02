@@ -20,17 +20,15 @@ import scala.collection.mutable.ListBuffer
 
 
 /**
- * Operador de Crossover en un punto implementado para individuos basados en tiras de bits.
- * FIXME: Funciona para individuos con un cromosoma solo.
- * 2017
+ * Operador de Crossover en un punto implementado para individuos basados en listas de pares ordenados de enteros.
  * @author ricardo
- *
  */
 @SerialVersionUID(41119L)
 class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
      
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 
+      // Validaciones
 		  if (individuals==null) throw new NullIndividualException("SailOnePointCrossover")
 		  if (individuals.length<2) throw new NullIndividualException("SailOnePointCrossover")
 		  if (individuals(0)==null || individuals(1)==null) throw new NullIndividualException("SailOnePointCrossover");
@@ -38,23 +36,23 @@ class SailOnePointCrossover extends Crossover[List[(Int,Int)]] {
 		  val i1 = individuals(0)
 		  val i2 = individuals(1)
 		
+		  // Se obtiene la lista de pares ordenados de cada individuo en c1 y c2
 		  val c1=i1.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		  val c2=i2.getGenotype().getChromosomes()(0).getFullRawRepresentation()
 		
+		  // Se toma un punto a partir de un numero pseudo aleatorio.
 		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()
       val point=Random.nextInt(realSize)
 		
-      
+      // Se efectua la cruza en el punto determinado.
       val desc1=c1.slice(0, point)++c2.slice(point, c2.length)
 		  val desc2=c2.slice(0, point)++c1.slice(point, c2.length)
 		
-	    val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
+	    // Se crea la descendencia a partir de la cruza
+		  val d1:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i1.getGenotype().getChromosomes()(0).name(), desc1 )
 	    val d2:Individual[List[(Int,Int)]]= IndividualPathFactory.create(i2.getGenotype().getChromosomes()(0).name(), desc2 )
-		
 		  return List(d1,d2)		      
-      
      }
-
 }
 
 /**
@@ -274,7 +272,7 @@ class SailOnePointIntersectCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) ex
  *
  */
 @SerialVersionUID(41120L)
-class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
+class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int,longitudMaxima:Int) extends Crossover[List[(Int,Int)]] {
 
     override def execute(individuals:List[Individual[List[(Int,Int)]]]):List[Individual[List[(Int,Int)]]] = {
 		  if (individuals==null) throw new NullIndividualException("SailPathOnePointCrossoverHeFangguo")
@@ -419,7 +417,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		  while (desc1.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
-		    if (cuentaProteccion>10) 
+		    if (cuentaProteccion>longitudMaxima) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
 		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc1++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
@@ -461,7 +459,7 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
 		  while (desc2.size<nodosMinimo && cuentaProteccion<nodosMinimo*3)
 		  {
 		    cuentaProteccion=cuentaProteccion+1
-		    if (cuentaProteccion>10) 
+		    if (cuentaProteccion>longitudMaxima) 
 		      println ("Se generaron elemento en cruza con longitud = max - " + cuentaProteccion)
 		    // Busco el trayecto más largo
 		    val sliding=(List((cancha.getNodoInicial().getX(),cancha.getNodoInicial().getY()))++desc2++List((cancha.getNodoFinal().getX(),cancha.getNodoFinal().getY()))).sliding(2).toList 
@@ -509,8 +507,8 @@ class SailPathOnePointCrossoverHeFangguo(cancha:Cancha,barco:VMG,nodosMinimo:Int
  * Combina los crossovers para sail
  */
 @SerialVersionUID(1L)
-class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int) extends Crossover[List[(Int,Int)]] {
-   val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco,nodosMinimo)
+class SailOnePointCombinedCrossover(cancha:Cancha,barco:VMG,nodosMinimo:Int,longitudMaxima:Int) extends Crossover[List[(Int,Int)]] {
+   val heFanguo=new SailPathOnePointCrossoverHeFangguo(cancha,barco,nodosMinimo,longitudMaxima)
    //val onePoint=new SailOnePointCrossover()
    val onePointInter=new SailOnePointIntersectCrossover(cancha,barco,nodosMinimo)
    

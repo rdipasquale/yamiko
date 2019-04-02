@@ -44,7 +44,8 @@ object SailProblem4x4P40G10E16 extends App {
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       val NODOS_MINIMO_PATH=4
-      
+       val CAMINO_MAXIMO=10
+     
       val escenarios96=DeserializadorEscenarios.run("./esc4x4/96_escenario4x4ConRachasNoUniformes.txt")
       
       val t0=Deserializador.run("estadoInicialEscenario4x4.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	
@@ -72,7 +73,7 @@ object SailProblem4x4P40G10E16 extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
+          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH,CAMINO_MAXIMO),
           new ProbabilisticRouletteSelector(),
           escenarios96,
           barco,

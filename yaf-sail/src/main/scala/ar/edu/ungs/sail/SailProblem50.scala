@@ -35,7 +35,8 @@ object SailProblem50 extends App {
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       val NODOS_MINIMO_PATH=55
-      
+      val CAMINO_MAXIMO=10
+    
       /*-----------------------------------------------------*/
       println("/*-----------------------------------------------------*/")
       println("Inicial")
@@ -71,7 +72,7 @@ object SailProblem50 extends App {
           new DistributedPopulation[List[(Int,Int)]](genome,POPULATION_SIZE),
           new DescendantAcceptEvaluator[List[(Int,Int)]](),
           new SailMutatorEmpujador(mAgent,genome,cancha).asInstanceOf[Mutator[List[(Int,Int)]]],
-          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH),
+          new SailOnePointCombinedCrossover(cancha,barco,NODOS_MINIMO_PATH,CAMINO_MAXIMO),
           new ProbabilisticRouletteSelector(),
           escenarios,
           barco,
