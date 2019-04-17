@@ -201,6 +201,15 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     	  parcial++cacheados
     	}).cache()     
 
+//    if (profiler) 
+//      {
+//        println("Elementos en Cache Keys=" +Cache.cache.keySet.size + " - Values=" + Cache.cache.seq.size) 
+//        Cache.cache.keys.foreach(c=>{
+//          println("\tEscenario:" + c)
+//          println("\t\t" + Cache.cache(c).size)
+//        })            
+//      }
+    
     if (profiler) taux1=System.currentTimeMillis()
      
 	  val promedios=performanceEnEscenarios.map(f=>(f._2,f._3)).mapValues(g=>(g,1)).reduceByKey({
