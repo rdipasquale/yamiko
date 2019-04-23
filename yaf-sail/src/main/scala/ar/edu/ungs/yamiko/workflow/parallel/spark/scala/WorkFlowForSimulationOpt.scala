@@ -223,17 +223,24 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	  // (|pob|-1)|e|/2
     val coef=((po.size-1)*escenarios.getEscenarios().size).doubleValue()/2000d
     val performanceEnEscenariosOrd=performanceEnEscenarios.sortBy(s=>(s._1,s._3), true)
+    performanceEnEscenariosOrd.foreach(println(_))
 //    val performanceEnEscenariosOrdcol=performanceEnEscenariosOrd.collect()
     val performanceEnEscenariosOrdZip=performanceEnEscenariosOrd.zipWithIndex()
+    performanceEnEscenariosOrdZip.foreach(println(_))
 //    val performanceEnEscenariosOrdZipcol=performanceEnEscenariosOrdZip.collect()
     val performanceEnEscenariosOrdZipGroup=performanceEnEscenariosOrdZip.groupBy(_._1._2)
+    performanceEnEscenariosOrdZipGroup.foreach(println(_))
 //    val performanceEnEscenariosOrdZipGroupcol=performanceEnEscenariosOrdZipGroup.collect()
     val performanceEnEscenariosOrdZipGroupPond=performanceEnEscenariosOrdZipGroup.mapValues(_.map(_._2 % po.getAll().size+1).sum*coef)
+    performanceEnEscenariosOrdZipGroupPond.foreach(println(_))
 //    val performanceEnEscenariosOrdZipGroupPondcol=performanceEnEscenariosOrdZipGroupPond.collect()
     val resultranking=performanceEnEscenariosOrdZipGroupPond.sortBy(_._1).collect()	  
+    resultranking.foreach(println(_))
   
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
+    salida.foreach(println(_))
 
+    
     for (p<-0 to po.getAll().size-1) po.getAll()(p).setFitness(salida.find(_._1==po.getAll()(p).getId()).get._2)
 		
 //		Cache.setCache(po.getAll())

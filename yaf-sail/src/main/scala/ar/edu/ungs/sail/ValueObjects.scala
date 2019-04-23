@@ -44,3 +44,4 @@ object CONSTANTS {
 
 object GENES {val GenUnico:Gene=new BasicGene("Gen1", 0, 4)}
 object GENES9 {val GenUnico:Gene=new BasicGene("Gen1", 0, 9)}
+object GENES49 {val GenUnico:Gene=new BasicGene("Gen1", 0, 49)}
