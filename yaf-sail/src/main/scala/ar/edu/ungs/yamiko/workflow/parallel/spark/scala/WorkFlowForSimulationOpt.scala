@@ -82,11 +82,20 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
   @throws(classOf[YamikoException])
   def run( ):Individual[List[(Int,Int)]] =
   {
+    var serial=0l
+    var paralelo=0l
+    var serialP=System.currentTimeMillis()
+    var paraleloP=System.currentTimeMillis()    
+    
     // Inicializa poblacion
     if (po.getAll().size==0) pi.execute(po)
     
+    serial=serial+System.currentTimeMillis()-serialP
+    
     while (generation<maxGenerations)
     {
+      serialP=System.currentTimeMillis()
+      
       generation=generation+1
       // Desarrolla los individuos
       if (profiler) taux1=System.currentTimeMillis()
@@ -105,6 +114,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
       // Evalua el rendimiento de cada individuo en cada escenario
       
       if (profiler) Logger.getLogger("profiler").info("real;sparkEscenerarios.partitions.size;"+sparkEscenerarios.partitions.size)
+      
+      serial=serial+System.currentTimeMillis()-serialP
+      paraleloP=System.currentTimeMillis()
       
     	val performanceEnEscenarios=sparkEscenerarios.flatMap(esc=>{
     	    // Por cada Escenario
@@ -235,6 +247,10 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     performanceEnEscenariosOrdZipGroupPond.foreach(println(_))
 //    val performanceEnEscenariosOrdZipGroupPondcol=performanceEnEscenariosOrdZipGroupPond.collect()
     val resultranking=performanceEnEscenariosOrdZipGroupPond.sortBy(_._1).collect()	  
+    
+      paralelo=paralelo+System.currentTimeMillis()-paraleloP
+      serialP=System.currentTimeMillis()
+
     resultranking.foreach(println(_))
   
     val salida=promedios.zip(resultranking).map(f=>(f._1._1,f._1._2*f._2._2))	  
@@ -318,8 +334,13 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
   	  else
   	    convergenteAnalysis.printAnalysis(po.getAll())
 	    
-    }
+      serial=serial+System.currentTimeMillis()-serialP
+  	    
+  	 }
 
+    println("Serial=" + serial)
+    println("Paralelo=" + paralelo)
+    
     _finalpop=po.getAll()
     (holder.maxBy(f=>f._2.getFitness())) ._2;
   }
