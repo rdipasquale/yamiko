@@ -24,6 +24,8 @@
   </properties>
 
   <dependencies>
+  
+ 
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
@@ -137,8 +139,8 @@
                   <include>ar.edu.ungs.yamiko:yaf-gadomain-scala</include>
                   <include>ar.edu.ungs.yamiko:yaf-workflow-controller</include>
                   <include>ar.edu.ungs:yaf-workflow-controller-scala</include>
-				  <include>com.google.guava:guava</include> 
-				  <include>org.scala-graph:graph-core_2.11</include>
+<!-- 				  <include>com.google.guava:guava</include>  -->
+<!-- 				  <include>org.scala-graph:graph-core_2.11</include> -->
                 </includes>
               </artifactSet>
             </configuration>

@@ -58,5 +58,8 @@ RUN ls -l opt/yaf/
 
 WORKDIR /opt/spark/work-dir
 
+ENV http_proxy ''
+ENV https_proxy ''
+
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
 
