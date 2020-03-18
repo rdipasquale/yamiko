@@ -25,7 +25,7 @@ object ParameterTuningGBM extends App {
       val ran=1 to 8
       val rdd=sc.parallelize(ran)
       rdd.map(f=>{
-        val result:Int=(("echo " + f) !)
+        val result:Int=(("python3 -v") !)
         println("resultado: " + result)
         result        
       }).collect()
