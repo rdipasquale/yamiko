@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gbmpvc
+  namespace: desa
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: gbmpv
+  resources:
+    requests:
+      storage: 1Gi
+

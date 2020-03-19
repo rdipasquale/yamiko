@@ -1,3 +1,31 @@
+#cd /home/devops/spark-2.4.5-bin-hadoop2.7
+#docker build -t yaf-gbm:12 .
+#docker tag yaf-gbm:12 devinfra1.osdev.cammesa.com:5000/yaf-gbm:12
+#docker push devinfra1.osdev.cammesa.com:5000/yaf-gbm:12
+
+#
+#bin/spark-submit --master k8s://https://192.168.230.184:6443 \ 
+#--deploy-mode cluster --name gbm-par-tuning --class ar.edu.uca.gbm.ParameterTuningGBM \ 
+#--conf spark.executor.instances=2 \
+#--conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.mount.path=/datos/kubernetes/gbm \ 
+#--conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.mount.readOnly=false \
+#--conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.options.path=/datos/kubernetes/gbm \
+#--conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.mount.path=/datos/kubernetes/gbm \
+#--conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.mount.readOnly=false \
+#--conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.options.path=/datos/kubernetes/gbm \
+#--conf spark.kubernetes.container.image.pullPolicy=Always \
+#--conf spark.kubernetes.driver.label.run=gbmpartuningpod \
+#--conf spark.kubernetes.driver.pod.name=gbmpartuningpod \
+#--conf spark.kubernetes.namespace=desa \
+#--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \ 
+#--conf spark.kubernetes.allocation.batch.size=8 \ 
+#--conf spark.driver.cores=1 \
+#--conf spark.executor.cores=1 \ 
+#--conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-gbm:12 \ 
+#local:///datos/kubernetes/gbm/yaf-gbm-par-tuning-1.0.0.jar 1 1
+
+#bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name gbm-par-tuning --class ar.edu.uca.gbm.ParameterTuningGBM --conf spark.executor.instances=2 --conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.mount.path=/datos/kubernetes/gbm --conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.mount.readOnly=false --conf spark.kubernetes.driver.volumes.hostPath.gbmpvc.options.path=/datos/kubernetes/gbm --conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.mount.path=/datos/kubernetes/gbm --conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.mount.readOnly=false --conf spark.kubernetes.executor.volumes.hostPath.gbmpvc.options.path=/datos/kubernetes/gbm --conf spark.kubernetes.container.image.pullPolicy=Always --conf spark.kubernetes.driver.label.run=gbmpartuningpod --conf spark.kubernetes.driver.pod.name=gbmpartuningpod --conf spark.kubernetes.namespace=desa --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark --conf spark.kubernetes.allocation.batch.size=8 --conf spark.driver.cores=1 --conf spark.executor.cores=1 --conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-gbm:12 local:///datos/kubernetes/gbm/yaf-gbm-par-tuning-1.0.0.jar 1 1
+
 #bin/spark-submit --master k8s://https://192.168.230.184:6443 --deploy-mode cluster --name gbm-par-tuning \
 #--class ar.edu.uca.gbm.ParameterTuningGBM --conf spark.executor.instances=2 \
 #--conf spark.kubernetes.driver.label.run=gbmpartuningpod \
@@ -22,11 +50,10 @@
 #--conf spark.executor.cores=1 \
 #--conf spark.kubernetes.container.image=devinfra1.osdev.cammesa.com:5000/yaf-gbm:latest \
 #local:///usr/local/src/yaf-gbm-par-tuning-1.0.0-shaded.jar 200
+FROM openjdk:8-jdk-slim
 
 MAINTAINER softwarefactory@cammesa.com.ar
 
-
-FROM openjdk:8-jdk-slim
 
 ARG spark_jars=jars
 ARG img_path=kubernetes/dockerfiles
@@ -64,13 +91,16 @@ COPY data /opt/spark/data
 
 ENV SPARK_HOME /opt/spark
 
-COPY yaf-gbm-par-tuning-1.0.0.jar /opt/spark/work-dir
-
 WORKDIR /opt/spark/work-dir
 
 RUN apt-get install -y python3-pip
+#RUN apt-get install -y python3
+#RUN apt-get install -y curl
+#RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+#RUN apt-get remove curl -y
 RUN apt-get autoremove -y
 RUN python3 --version
+#RUN python get-pip.py
 
 RUN pip3 install pandas
 RUN pip3 install matplotlib
@@ -80,5 +110,6 @@ RUN pip3 install lightgbm
 ENV http_proxy ''
 ENV https_proxy ''
 
-ENTRYPOINT [ "/opt/entrypoint.sh" ]
+COPY yaf-gbm-par-tuning-1.0.2.jar /opt/spark/work-dir
 
+ENTRYPOINT [ "/opt/entrypoint.sh" ]

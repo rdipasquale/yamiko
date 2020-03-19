@@ -24,13 +24,17 @@ object ParameterTuningGBM extends App {
       
       val ran=1 to 8
       val rdd=sc.parallelize(ran)
-      rdd.map(f=>{
-        val result:Int=(("python3 -v") !)
-        println("resultado: " + result)
-        result        
+      val salida=rdd.map(f=>{
+        val stdout = new StringBuilder
+        val stderr = new StringBuilder
+        ("python3 /datos/kubernetes/gbm/trainingLightGBMParam.py /datos/kubernetes/gbm/ e"+f.toString()+" MANAEO gbdt 32767 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5") ! ProcessLogger(stdout append _, stderr append _)
+        //val result:Int=(("python3 trainingLightGBM_SIIIO_CV_p_Ricardo.py /datos/kubernetes/gbm/e"+f.toString()+" MANAEO gbdt 32767 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 > salida"+f.toString()+".log" ) !)        
+        stdout.append(stderr).toString()        
       }).collect()
       
-			sc.stop()
+      salida.foreach(println(_))
+			
+      sc.stop()
       println("Termina en " + System.currentTimeMillis())      
 
     }

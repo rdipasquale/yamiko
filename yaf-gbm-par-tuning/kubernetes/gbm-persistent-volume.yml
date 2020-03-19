@@ -1,0 +1,15 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  namespace: desa
+  name: gbmpv
+  labels:
+    type: local
+spec:
+  storageClassName: gbmpv
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/datos/kubernetes/gbm"
