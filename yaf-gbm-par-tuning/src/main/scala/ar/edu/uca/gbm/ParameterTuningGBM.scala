@@ -34,10 +34,10 @@ object ParameterTuningGBM extends App {
       val SEED=1000
 	    val INDIVIDUALS=20      
 	    val MAX_GENERATIONS=20      
-	    val MAX_FITNESS=999900d
+	    val MAX_FITNESS=99999900d
 
       println("Empieza en " + System.currentTimeMillis())      
-      val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
+      val conf=new SparkConf().setMaster("local[4]").setAppName("gbm-par-tuning")
       val sc:SparkContext=new SparkContext(conf)
 //      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
 //      val sc:SparkContext=spark.sparkContext
