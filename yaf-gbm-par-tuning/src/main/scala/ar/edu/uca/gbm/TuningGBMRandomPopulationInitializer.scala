@@ -17,17 +17,11 @@ class TuningGBMRandomPopulationInitializer(modelo:ParametrizacionGBM) extends Po
       val pop:ArrayBuffer[Individual[Array[Int]]]=new ArrayBuffer[Individual[Array[Int]]]();
       for( i <- 1 to p.size().intValue()){
         val numeros:Array[Int]=new Array[Int](p.getGenome.size());
+				var cou:Int=0
         modelo.parametrosOrdenados.foreach(par=>{
-				  var cou:Int=0
-          val min:Int=par match {
-            case _: ParametroGBMCuantDouble => ((par.asInstanceOf[ParametroGBMCuantDouble]).getMin*100).intValue()
-            case _: ParametroGBMCuantInt=> ((par.asInstanceOf[ParametroGBMCuantInt]).getMin)
-            case _: ParametroGBMCualitativo=> ((par.asInstanceOf[ParametroGBMCualitativo]).getMin)}
-          val max:Int=par match {
-            case _: ParametroGBMCuantDouble => ((par.asInstanceOf[ParametroGBMCuantDouble]).getMax*100).intValue()
-            case _: ParametroGBMCuantInt=> ((par.asInstanceOf[ParametroGBMCuantInt]).getMax)
-            case _: ParametroGBMCualitativo=> ((par.asInstanceOf[ParametroGBMCualitativo]).getMax)}          
-          numeros(cou)=r.nextInt(max-min+1)
+          val min:Int=par.getMinInt
+          val max:Int=par.getMaxInt          
+          numeros(cou)=min+r.nextInt(max-min+1)
           cou=cou+1				  
 				})
 				pop+=IndividualArrIntFactory.create(p.getGenome.getStructure.head._1,numeros)				
