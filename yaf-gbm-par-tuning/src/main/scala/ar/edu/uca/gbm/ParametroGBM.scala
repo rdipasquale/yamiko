@@ -8,20 +8,21 @@ abstract class ParametroGBM[T](id:String,_value:T,rangeFrom:T,rangeTo:T) extends
   def getMax=rangeTo
   def getMinInt=0
   def getMaxInt=0
+  def getId=id
   def setValue(_value:T)={value=_value}  
   override def toString:String="id="+id+";value="+value
 }
 
 @SerialVersionUID(1L)
 class ParametroGBMCuantInt(id:String,_value:Int,rangeFrom:Int,rangeTo:Int) extends ParametroGBM[Int](id,_value,rangeFrom,rangeTo){
-    override def toString:String="%03.2f".format(value)
+    override def toString:String=value.toString()
     override def getMinInt=rangeFrom
     override def getMaxInt=rangeTo    
 }
 
 @SerialVersionUID(1L)
 class ParametroGBMCuantDouble(id:String,_value:Double,rangeFrom:Double,rangeTo:Double) extends ParametroGBM[Double](id,_value,rangeFrom,rangeTo){
-    override def toString:String=value.toString()
+    override def toString:String="%03.2f".format(value).replace(",",".")
     override def getMinInt=(rangeFrom*100).intValue()
     override def getMaxInt=(rangeTo*100).intValue()   
 }
@@ -89,7 +90,7 @@ class ParametrizacionGBM(pathbase:String, experimento:String, iparque:String,see
   //                                         # 0 means disable bagging; k means perform bagging at every k iteration
   //                                         # Note: to enable bagging, bagging_fraction should be set to value smaller than 1.0 as well
   //                                         # Aliases: subsample_freq  
-  val bagginFreq=new ParametroGBMCuantDouble("p_bagging_freq",0d,0d,1d)
+  val bagginFreq=new ParametroGBMCuantInt("p_bagging_freq",0,0,100)
   
   //# p_num_iteration = 5000                  # Numero de iteraciones en el entrenamiento: (Default = 100)
   //#                                         # Aliases:  num_iteration, n_iter, num_tree, num_trees,num_round, num_rounds, num_boost_round,
@@ -103,6 +104,18 @@ class ParametrizacionGBM(pathbase:String, experimento:String, iparque:String,see
   val nFolds=new ParametroGBMCuantInt("nfolds",5,5,10)
   
   val parametrosOrdenados=List(numLeaves,minDataInLeaf,learningRate,lambdaL1,lambdaL2,featureFraction,bagginFraction,bagginFreq,numIterations,nFolds)
+  
+  override def toString:String={
+    val sb=new StringBuffer()
+    parametrosOrdenados.foreach(f=>sb.append(f.toString()+" "))
+    sb.toString()
+  }
+  
+  def toStringRepresentation:String={
+    val sb=new StringBuffer()
+    parametrosOrdenados.foreach(f=>sb.append(f.getId +"="+ f.toString()+"\n"))
+    sb.toString()
+  }
   
 }
 

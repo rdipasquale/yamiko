@@ -30,9 +30,7 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 		val phenotype=new BasicPhenotype[Array[Int]]( chromosome , alleles);
 		
     val proceso="r"+ind.getId().toString()
-    val sb=new StringBuffer()
-    alleles.get(g).get.parametrosOrdenados.foreach(f=>sb.append(f.toString()+" "))
-    val command="python3 " + pathbase + "/trainingLightGBMParam.py " + pathbase + "/ "+proceso+" " + iparque + " gbdt " + seed + sb.toString() //" 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 "
+    val command="python3 " + pathbase + "/trainingLightGBMParam.py " + pathbase + "/ "+proceso+" " + iparque + " gbdt " + seed + " " + alleles.get(g).get.toString() //" 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 "
     val result:Int=(command !)            
     val filename = pathbase + "/" + proceso + "_" + iparque + "_errores.csv"
     var mae:Double=Double.MaxValue
@@ -53,7 +51,7 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 	  salida.lambdaL2.setValue(allele(4).toDouble/100)
 	  salida.featureFraction.setValue(allele(5).toDouble/100)
 	  salida.bagginFraction.setValue(allele(6).toDouble/100)
-	  salida.bagginFreq.setValue(allele(7).toDouble/100)
+	  salida.bagginFreq.setValue(allele(7))
 	  salida.numIterations.setValue(allele(8))
 	  salida.nFolds.setValue(allele(9))
 	  salida

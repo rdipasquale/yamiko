@@ -4,3 +4,4 @@
 /.project
 /.cache-main
 /dependency-reduced-pom.xml
+/.cache-tests

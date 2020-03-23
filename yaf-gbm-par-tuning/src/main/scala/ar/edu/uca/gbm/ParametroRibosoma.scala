@@ -14,7 +14,7 @@ class ParametroRibosoma(pathbase:String, iparque:String,seed:Int) extends Riboso
 	  salida.lambdaL2.setValue(allele(4).toDouble/100)
 	  salida.featureFraction.setValue(allele(5).toDouble/100)
 	  salida.bagginFraction.setValue(allele(6).toDouble/100)
-	  salida.bagginFreq.setValue(allele(7).toDouble/100)
+	  salida.bagginFreq.setValue(allele(7))
 	  salida.numIterations.setValue(allele(8))
 	  salida.nFolds.setValue(allele(9))
 	  salida
