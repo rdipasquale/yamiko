@@ -13,7 +13,7 @@ import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
  *
  */
 @SerialVersionUID(1L)
-class TuningGBMTwoPointCrossover extends Crossover[Array[Int]] {
+class TuningGBMOnePointCrossover extends Crossover[Array[Int]] {
   
     override def execute(individuals:List[Individual[Array[Int]]]):List[Individual[Array[Int]]] = {
 
@@ -30,18 +30,14 @@ class TuningGBMTwoPointCrossover extends Crossover[Array[Int]] {
 		  val r = Random
 		  val realSize=i1.getGenotype().getChromosomes()(0).getFullSize()
       
-		  val n=r.nextInt(realSize)
-		  var n2=r.nextInt(realSize)
-		  while (math.abs(n2-n)<2) n2=r.nextInt(realSize)
-		  
-		  val point=math.min(n, n2)
-      val point2=math.max(n, n2)
+		  var n=r.nextInt(realSize)
+		  while (n==0 || n==realSize-1) n=r.nextInt(realSize)
 		
       val desc1=new Array[Int](realSize)
 		  val desc2=new Array[Int](realSize)
 		
 		  for (i <- 0 to realSize-1)
-			  if (i<point || i>=point2)
+			  if (i<n)
 			  {
 			    desc1(i)=c1(i)
 			    desc2(i)=c2(i)

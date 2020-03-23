@@ -54,7 +54,7 @@ object ParameterTuningGBM extends App {
 	    val genome=new BasicGenome[Array[Int]](chromosomeName, List(gene), translators.toMap)
       
 	    val fit= new TuningGBMFitnessEvaluator()
-			val cross=new TuningGBMTwoPointCrossover()	    
+			val cross=new TuningGBMOnePointCrossover()	    
 			val acceptEvaluator:AcceptEvaluator[Array[Int]] =new DescendantModifiedAcceptLigthEvaluator()	    
 	    
 			val pop=new DistributedPopulation[Array[Int]](genome,INDIVIDUALS);
