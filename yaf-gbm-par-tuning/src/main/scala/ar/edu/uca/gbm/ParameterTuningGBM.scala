@@ -14,6 +14,12 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicGenome
 import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
 import ar.edu.ungs.yamiko.ga.operators.impl.DescendantModifiedAcceptLigthEvaluator
 import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
+import ar.edu.ungs.yamiko.workflow.Parameter
+import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
+import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
+import org.apache.log4j.Logger
+import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 
 /**
  * Optimiza los parametros del modelo basado en arboles de decision GBM
@@ -21,11 +27,14 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 object ParameterTuningGBM extends App {
    
   override def main(args : Array[String]) {
+      val log=Logger.getLogger("file")
       val DATA_PATH="/datos/kubernetes/gbm"
       val CANT_PARAMETROS=10
       val PARQUE="MANAEO"
       val SEED=1000
 	    val INDIVIDUALS=20      
+	    val MAX_GENERATIONS=20      
+	    val MAX_FITNESS=999900d
 
       println("Empieza en " + System.currentTimeMillis())      
       val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
@@ -36,7 +45,8 @@ object ParameterTuningGBM extends App {
  			val gene:Gene=new BasicGene("Gen unico", 0, CANT_PARAMETROS)
 			val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()      
       val chromosomeName="X"
-	    val popI =new TuningGBMRandomPopulationInitializer(new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED));
+	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
+      val popI =new TuningGBMRandomPopulationInitializer(parametrizacionTemplate);
       
 	    val rma=new TuningGBMMorphogenesisAgent(DATA_PATH, PARQUE,SEED);
 	    val translators=new HashMap[Gene, Ribosome[Array[Int]]]();
@@ -49,30 +59,37 @@ object ParameterTuningGBM extends App {
 	    
 			val pop=new DistributedPopulation[Array[Int]](genome,INDIVIDUALS);
 	    
-	    
-      val ran=1 to 2
-      val rdd=sc.parallelize(ran)
-//      val salida=rdd.map(f=>{
+	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
+					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
+					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelector(), 
+					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null)
 
-        // Si quiero obtener la salida
-//        val stdout = new StringBuilder
-//        val stderr = new StringBuilder
-//        ("python3 " + DATA_PATH + "/trainingLightGBMParam.py " + DATA_PATH + "/ e"+f.toString()+" MANAEO gbdt 1000 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5") ! ProcessLogger(stdout append _, stderr append _)
-//        stdout.append(stderr).toString()
-        // ---------
-      
-//        val proceso="r"+f.toString()
-//        val result:Int=(("python3 " + DATA_PATH + "/trainingLightGBMParam.py " + DATA_PATH + "/ "+proceso+" " + PARQUE + " gbdt 1000 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 > " + DATA_PATH +"salida"+f.toString()+".log" ) !)
-//                
-//        val filename = DATA_PATH + "/" + proceso + "_" + PARQUE + "_errores.csv"
-//        var mae:Double=Double.MaxValue
-//        if (result==0) for (line <- Source.fromFile(filename).getLines) if (line.startsWith("MAE")) mae=line.substring(5).toDouble                        
-//        mae
-//      }).collect()
-//      
-//      salida.foreach(z=>println("Resultado " + z))
-//			
-      sc.stop()
+	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    
+
+	    val t1=System.currentTimeMillis()
+	
+			log.warn("Iniciando ga.run() -> par.getMaxGenerations()=" + par.getMaxGenerations() + " par.getPopulationSize()=" + par.getPopulationSize() + " Crossover class=" + cross.getClass().getName());
+			    
+	    val winner= ga.run(sc)
+			
+	    val t2=System.currentTimeMillis();
+	    log.warn("Fin ga.run()");
+
+			log.warn("Winner -> Fitness=" + winner.getFitness() + " - " + IntArrayHelper.toStringIntArray(winner.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
+			log.warn("Tiempo -> " + (t2-t1)/1000 + " seg");
+			log.warn("Promedio -> " + ((t2-t1)/(par.getMaxGenerations().toDouble))+ " ms/generacion");
+
+	    var prom=0d;
+	    var cont=0;
+	    
+	    val finalPop=ga.finalPopulation.collect().toList
+	    
+			finalPop.foreach { i => {prom+=i.getFitness(); cont+=1;} }
+			
+			prom=prom/cont;
+			log.warn("Winner -> Fitness Promedio población final =" +prom);
+	    
+	    sc.stop()
       println("Termina en " + System.currentTimeMillis())      
 
     }

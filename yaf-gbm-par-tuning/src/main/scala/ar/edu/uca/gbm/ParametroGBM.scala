@@ -6,6 +6,8 @@ abstract class ParametroGBM[T](id:String,_value:T,rangeFrom:T,rangeTo:T) extends
   def getValue=value
   def getMin=rangeFrom
   def getMax=rangeTo
+  def getMinInt=0
+  def getMaxInt=0
   def setValue(_value:T)={value=_value}  
   override def toString:String="id="+id+";value="+value
 }
@@ -13,16 +15,21 @@ abstract class ParametroGBM[T](id:String,_value:T,rangeFrom:T,rangeTo:T) extends
 @SerialVersionUID(1L)
 class ParametroGBMCuantInt(id:String,_value:Int,rangeFrom:Int,rangeTo:Int) extends ParametroGBM[Int](id,_value,rangeFrom,rangeTo){
     override def toString:String="%03.2f".format(value)
+    override def getMinInt=rangeFrom
+    override def getMaxInt=rangeTo    
 }
 
 @SerialVersionUID(1L)
 class ParametroGBMCuantDouble(id:String,_value:Double,rangeFrom:Double,rangeTo:Double) extends ParametroGBM[Double](id,_value,rangeFrom,rangeTo){
-  override def toString:String=value.toString()  
+    override def toString:String=value.toString()
+    override def getMinInt=(rangeFrom*100).intValue()
+    override def getMaxInt=(rangeTo*100).intValue()   
 }
 
 @SerialVersionUID(1L)
-class ParametroGBMCualitativo(id:String,_value:Int,posibles:Array[String]) extends ParametroGBM[Int](id,_value,0,posibles.length){
-  override def toString:String=posibles(value)
+class ParametroGBMCualitativo(id:String,_value:Int,posibles:Array[String]) extends ParametroGBM[Int](id,_value,0,posibles.length-1){
+    override def toString:String=posibles(value)
+    override def getMaxInt=posibles.length-1      
 }
 
 @SerialVersionUID(1L)
