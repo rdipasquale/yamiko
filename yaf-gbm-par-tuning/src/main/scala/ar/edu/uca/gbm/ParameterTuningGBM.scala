@@ -17,7 +17,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
-import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
+//import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
 import org.apache.log4j.Logger
 import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 
@@ -58,6 +58,7 @@ object ParameterTuningGBM extends App {
 			val acceptEvaluator:AcceptEvaluator[Array[Int]] =new DescendantModifiedAcceptLigthEvaluator()	    
 	    
 			val pop=new DistributedPopulation[Array[Int]](genome,INDIVIDUALS);
+	    popI.execute(pop)
 	    
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
