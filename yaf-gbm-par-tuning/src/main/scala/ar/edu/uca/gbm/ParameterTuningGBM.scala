@@ -20,6 +20,8 @@ import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
 //import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
 import org.apache.log4j.Logger
 import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
+import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
+import ar.edu.ungs.yamiko.ga.operators.impl.TournamentSelector
 
 /**
  * Optimiza los parametros del modelo basado en arboles de decision GBM
@@ -32,12 +34,12 @@ object ParameterTuningGBM extends App {
       val CANT_PARAMETROS=10
       val PARQUE="MANAEO"
       val SEED=1000
-	    val INDIVIDUALS=20      
-	    val MAX_GENERATIONS=20      
+	    val INDIVIDUALS=120      
+	    val MAX_GENERATIONS=200      
 	    val MAX_FITNESS=99999900d
 
       println("Empieza en " + System.currentTimeMillis())      
-      val conf=new SparkConf().setMaster("local[4]").setAppName("gbm-par-tuning")
+      val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
       val sc:SparkContext=new SparkContext(conf)
 //      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
 //      val sc:SparkContext=spark.sparkContext
@@ -60,9 +62,18 @@ object ParameterTuningGBM extends App {
 			val pop=new DistributedPopulation[Array[Int]](genome,INDIVIDUALS);
 	    popI.execute(pop)
 	    
+	    // Default
+	    pop.replaceIndividual(pop.getAll()(0), IndividualArrIntFactory.create(chromosomeName, Array[Int](31,20,10,0,0,100,100,0,100,5)))
+	    // El que usa Cristian
+	    pop.replaceIndividual(pop.getAll()(1), IndividualArrIntFactory.create(chromosomeName, Array[Int](61,20,2,0,0,80,100,1,5000,7)))
+	    // Uno que encontre
+	    pop.replaceIndividual(pop.getAll()(2), IndividualArrIntFactory.create(chromosomeName, Array[Int](3,89,34,53,73,97,86,0,5984,9)))
+	    // El mejor que encontre
+	    pop.replaceIndividual(pop.getAll()(3), IndividualArrIntFactory.create(chromosomeName, Array[Int](27,33,44,81,73,97,86,0,5984,9)))
+	    
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
-					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new ProbabilisticRouletteSelector(), 
+					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(8), 
 					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null)
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    

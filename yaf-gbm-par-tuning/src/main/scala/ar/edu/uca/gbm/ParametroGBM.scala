@@ -49,7 +49,7 @@ class ParametrizacionGBM(pathbase:String, experimento:String, iparque:String,see
   //#                                         # Constraints: 1 < num_leaves <= 131072
   //val numLeaves=new ParametroGBMCuantInt("p_num_leaves",31,2,131072)
   // PRuebo 500.... sino, el espacio de busqueda es enorme...
-  val numLeaves=new ParametroGBMCuantInt("p_num_leaves",31,2,500)
+  val numLeaves=new ParametroGBMCuantInt("p_num_leaves",31,2,120)
 
   //p_min_data_in_leaf =  int(sys.argv[7])   # Minimal number of data in one leaf. Can be used to deal with over-fitting (Default = 20)
   //                                         # Aliases: min_data_per_leaf, min_data, min_child_samples
