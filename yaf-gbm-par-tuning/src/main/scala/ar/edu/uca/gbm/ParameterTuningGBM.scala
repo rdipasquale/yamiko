@@ -17,12 +17,11 @@ import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.ga.operators.impl.ProbabilisticRouletteSelector
-//import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
 import org.apache.log4j.Logger
 import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 import ar.edu.ungs.yamiko.ga.toolkit.IndividualArrIntFactory
 import ar.edu.ungs.yamiko.ga.operators.impl.TournamentSelector
-
 /**
  * Optimiza los parametros del modelo basado en arboles de decision GBM
  */
@@ -34,15 +33,15 @@ object ParameterTuningGBM extends App {
       val CANT_PARAMETROS=10
       val PARQUE="MANAEO"
       val SEED=1000
-	    val INDIVIDUALS=120      
+	    val INDIVIDUALS=60      
 	    val MAX_GENERATIONS=200      
 	    val MAX_FITNESS=99999900d
 
       println("Empieza en " + System.currentTimeMillis())      
-      val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
-      val sc:SparkContext=new SparkContext(conf)
-//      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
-//      val sc:SparkContext=spark.sparkContext
+//      val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
+//      val sc:SparkContext=new SparkContext(conf)
+      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
+      val sc:SparkContext=spark.sparkContext
       
  			val gene:Gene=new BasicGene("Gen unico", 0, CANT_PARAMETROS)
 			val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()      

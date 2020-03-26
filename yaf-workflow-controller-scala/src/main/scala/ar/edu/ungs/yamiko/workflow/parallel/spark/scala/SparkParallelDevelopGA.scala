@@ -33,7 +33,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   def getBestIndHolder()=bestIndHolder
   
   @throws(classOf[YamikoException])
-  def run(sc:SparkContext ):Individual[T] =
+def run(sc:SparkContext ):Individual[T] =
 		{
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
@@ -47,14 +47,15 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 			
 			while (generationNumber<parameter.getMaxGenerations() && parameter.getOptimalFitness()>bestFitness)
 			{			  
+			  generationNumber+=1
 			  Logger.getLogger("file").warn("Generation " + generationNumber + " -> principio del bucle");
 			  _finalPop=sc.parallelize(parameter.getPopulationInstance().getAll())
         val t1=System.currentTimeMillis()
-	      _finalPop.map(i=>{
+	      val popTrabajo=_finalPop.map(i=>{
 	          if (i.getFitness()==0d) bcMA.value.develop(bcG.value,i)       
 		        i}
-	       )
-	      val popTrabajo=_finalPop.collect()
+	       ).collect()
+
 	      popTrabajo.par.foreach(i=>i.setFitness(parameter.getFitnessEvaluator().execute(i)))          	
 	      val descendants=new ListBuffer[Individual[T]]
     		
@@ -62,11 +63,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((popTrabajo.size).intValue(),parameter.getPopulationInstance())).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 
-				for (t <- tuplasSer)
-				{
-            val parentsJ=List(t._1,t._2)
-  				  descendants++=parameter.getCrossover().execute(parentsJ);
-				}
+				for (t <- tuplasSer) descendants++=parameter.getCrossover().execute(List(t._1,t._2))
 				
 				descendants.par.foreach(d=>if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d))
 				
@@ -85,7 +82,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 				}
 				parameter.getPopulationInstance().replacePopulation(realDescentans)
 				
-			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness)
+			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms")
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
