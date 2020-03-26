@@ -81,8 +81,8 @@ def run(sc:SparkContext ):Individual[T] =
 					bestInd=bestOfGeneration;					
 				}
 				parameter.getPopulationInstance().replacePopulation(realDescentans)
-				
-			  println("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms")
+
+				Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms");
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
