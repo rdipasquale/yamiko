@@ -10,7 +10,7 @@ import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.domain.Genome
 
-@SerialVersionUID(1999L)
+@SerialVersionUID(1L)
 class Parameter[T](mutationProbability:Double,
                     crossoverProbability:Double,
                     populationSize:Int,
@@ -28,7 +28,8 @@ class Parameter[T](mutationProbability:Double,
                     maxNodes:Int,
                     migrationRatio:Double ,
                     maxTimeIsolatedMs:Int,
-                    dataParameter:DataParameter[T]
+                    dataParameter:DataParameter[T],
+                    threshold:Double=Double.MaxValue
                     ) extends Serializable{
   
   def getMutationProbability():Double=mutationProbability
@@ -49,4 +50,6 @@ class Parameter[T](mutationProbability:Double,
   def getMigrationRatio():Double=migrationRatio
   def getMaxTimeIsolatedMs():Int=maxTimeIsolatedMs
   def getDataParameter()=dataParameter
+  def getThreshold():Double=threshold
+  
 }

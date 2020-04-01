@@ -12,6 +12,7 @@ import ar.edu.ungs.yamiko.ga.domain.impl.BasicPhenotype
 import scala.collection.mutable.ListBuffer
 import sys.process._
 import scala.io.Source
+import java.io._
 
 class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) extends MorphogenesisAgent[Array[Int]]{
   
@@ -26,7 +27,8 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 		val allele=chromosome.getFullRawRepresentation()
 		var alleles=Map[Gene, ParametrizacionGBM]()
 		val g = genome.getStructure().head._2(0)
-		alleles+=( g -> translate(allele))
+		val par=translate(allele)
+		alleles+=( g -> par)
 		val phenotype=new BasicPhenotype[Array[Int]]( chromosome , alleles);
 		
     val proceso="r"+ind.getId().toString()
@@ -38,6 +40,15 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
     ind.setIntAttachment(List((mae*1000000).toInt))		
 		
 		ind.setPhenotype(phenotype);
+    
+    // TRack salida            
+    val pw = new PrintWriter(new File(pathbase + "/ "+proceso+"_salidaMA.log"))
+    pw.write(command)
+    pw.write("\n")    
+    pw.write("MAE="+mae+"\n")
+    pw.write(par.toStringRepresentation)
+    pw.close
+    
 	}
 
   def translate(allele:Array[Int]):ParametrizacionGBM ={

@@ -98,7 +98,7 @@ class ParametrizacionGBM(pathbase:String, experimento:String, iparque:String,see
   //#                                         # Aliases:  num_iteration, n_iter, num_tree, num_trees,num_round, num_rounds, num_boost_round,
   //#                                         #           n_estimators 
   //#                                         # Constraints: >= 0   
-  val numIterations=new ParametroGBMCuantInt("p_num_iteration",100,50,10000)
+  val numIterations=new ParametroGBMCuantInt("p_num_iteration",100,100,1000)
 
   //nfolds             = int(sys.argv[15])   # Numero de "folds" para Cross Validation. 
   //                                         # Numero grande tiende a LOOUT (mayor BIAS), valor bajo aumenta varianza- 

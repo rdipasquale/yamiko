@@ -34,14 +34,15 @@ object ParameterTuningGBM extends App {
       val PARQUE="MANAEO"
       val SEED=1000
 	    val INDIVIDUALS=60      
-	    val MAX_GENERATIONS=200      
+	    val MAX_GENERATIONS=100      
 	    val MAX_FITNESS=99999900d
+	    val THRESHOLD_INT=80000000d
 
       println("Empieza en " + System.currentTimeMillis())      
-//      val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
-//      val sc:SparkContext=new SparkContext(conf)
-      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
-      val sc:SparkContext=spark.sparkContext
+      val conf=new SparkConf().setMaster("local[4]").setAppName("gbm-par-tuning")
+      val sc:SparkContext=new SparkContext(conf)
+//      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
+//      val sc:SparkContext=spark.sparkContext
       
  			val gene:Gene=new BasicGene("Gen unico", 0, CANT_PARAMETROS)
 			val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()      
@@ -69,11 +70,13 @@ object ParameterTuningGBM extends App {
 	    pop.replaceIndividual(pop.getAll()(2), IndividualArrIntFactory.create(chromosomeName, Array[Int](3,89,34,53,73,97,86,0,5984,9)))
 	    // El mejor que encontre
 	    pop.replaceIndividual(pop.getAll()(3), IndividualArrIntFactory.create(chromosomeName, Array[Int](27,33,44,81,73,97,86,0,5984,9)))
+
+	    // 20/03/27 21:19:22 WARN file: Winner -> Fitness=8.0018487E7 - {3 ; 89 ; 34 ; 53 ; 73 ; 97 ; 86 ; 0 ; 5984 ; 9 }
 	    
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
 					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(8), 
-					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null)
+					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT)
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    
 
@@ -95,11 +98,22 @@ object ParameterTuningGBM extends App {
 	    
 	    val finalPop=ga.finalPopulation.collect().toList
 	    
-			finalPop.foreach { i => {prom+=i.getFitness(); cont+=1;} }
+			finalPop.foreach { i => {
+			  prom+=i.getFitness()
+			  cont+=1
+			  log.warn("Winner -> Poblacion final: Fitness=" + i.getFitness() + " - " + IntArrayHelper.toStringIntArray(i.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
+			} }
 			
 			prom=prom/cont;
 			log.warn("Winner -> Fitness Promedio población final =" +prom);
-	    
+
+			ga.interest.foreach { i => {
+			  prom+=i.getFitness()
+			  cont+=1
+			  log.warn("Winner -> Poblacion final: Fitness=" + i.getFitness() + " - " + IntArrayHelper.toStringIntArray(i.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
+			} }
+			
+			
 	    sc.stop()
       println("Termina en " + System.currentTimeMillis())      
 

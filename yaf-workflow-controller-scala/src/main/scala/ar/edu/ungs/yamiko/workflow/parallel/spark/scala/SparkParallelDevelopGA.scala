@@ -22,6 +22,8 @@ import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
 import ar.edu.ungs.yamiko.workflow.RestDataParameter
 import ar.edu.ungs.yamiko.toolkit.RestClient
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.HashSet
 
 class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   
@@ -31,14 +33,17 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   private var bestIndHolder=new BestIndHolder[T]()
   private val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   def getBestIndHolder()=bestIndHolder
+  val interest=new HashSet[Individual[T]]()
   
   @throws(classOf[YamikoException])
-def run(sc:SparkContext ):Individual[T] =
+  def run(sc:SparkContext ):Individual[T] =
 		{
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
-		  var bestInd:Individual[T]=null;
+		  
+		  var bestInd:Individual[T]=null
+		  val cache=new HashMap[T,Double]()
     
 			val bcMA:Broadcast[MorphogenesisAgent[T]]=sc.broadcast(parameter.getMorphogenesisAgent()); 
 			val bcG:Broadcast[Genome[T]]=sc.broadcast(parameter.getGenome());
@@ -56,7 +61,8 @@ def run(sc:SparkContext ):Individual[T] =
 		        i}
 	       ).collect()
 
-	      popTrabajo.par.foreach(i=>i.setFitness(parameter.getFitnessEvaluator().execute(i)))          	
+	      popTrabajo.par.foreach(i=>i.setFitness(parameter.getFitnessEvaluator().execute(i)))         
+	      popTrabajo.foreach(i=>cache.put(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(), i.getFitness()))
 	      val descendants=new ListBuffer[Individual[T]]
     		
     	  parameter.getPopulationInstance().replacePopulation(popTrabajo.toList)
@@ -66,11 +72,19 @@ def run(sc:SparkContext ):Individual[T] =
 				for (t <- tuplasSer) descendants++=parameter.getCrossover().execute(List(t._1,t._2))
 				
 				descendants.par.foreach(d=>if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d))
-				
+
+	      descendants.foreach(i=>{
+	        val d=cache.get(i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+	        if (!d.isEmpty)
+	          i.setFitness(d.get)
+	      })
+								
 				val descendantsF=sc.parallelize(descendants).map(i=>{
 	          if (i.getFitness()==0d) bcMA.value.develop(bcG.value,i)       
 		        i}).collect().toList
-				
+
+	      descendantsF.foreach(i=>cache.put(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(), i.getFitness()))
+		        
 	      val realDescentans=(descendantsF ++ popTrabajo).sortBy(_.getFitness).reverse.take(popTrabajo.size)
 
 	      val bestOfGeneration=realDescentans.take(1)(0)     
@@ -82,7 +96,14 @@ def run(sc:SparkContext ):Individual[T] =
 				}
 				parameter.getPopulationInstance().replacePopulation(realDescentans)
 
-				Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms");
+				parameter.getPopulationInstance().getAll().filter(i=>i.getFitness()>parameter.getThreshold()).foreach(f=>
+				  {  
+				    Logger.getLogger("file").warn("Generación " + generationNumber + " - Individuo de interés => "+f.getFitness() + " - " + f.getGenotype().getChromosomes()(0).getFullRawRepresentation() )
+				    interest.add(f)
+			    }    
+				)
+				
+				Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms")
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
