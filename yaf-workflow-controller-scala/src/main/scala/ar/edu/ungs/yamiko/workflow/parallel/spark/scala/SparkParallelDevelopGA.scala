@@ -24,6 +24,7 @@ import ar.edu.ungs.yamiko.workflow.RestDataParameter
 import ar.edu.ungs.yamiko.toolkit.RestClient
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
+import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
 
 class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   
@@ -34,6 +35,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   private val notScientificFormatter:DecimalFormat = new DecimalFormat("#");
   def getBestIndHolder()=bestIndHolder
   val interest=new HashSet[Individual[T]]()
+  val convergenteAnalysis=new ConvergenceAnalysis[T]()    
   
   @throws(classOf[YamikoException])
   def run(sc:SparkContext ):Individual[T] =
@@ -106,6 +108,10 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 				Logger.getLogger("file").warn("Generación " + generationNumber + " - Tamaño del cache = " + parameter.getCacheManager().size())
 			}
 
+			val impr=convergenteAnalysis.analysisCSV(parameter.getPopulationInstance().getAll())
+			Logger.getLogger("profiler").info(impr)
+			
+			
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");
 			_finalPop=sc.parallelize(parameter.getPopulationInstance().getAll())
       return bestInd;
