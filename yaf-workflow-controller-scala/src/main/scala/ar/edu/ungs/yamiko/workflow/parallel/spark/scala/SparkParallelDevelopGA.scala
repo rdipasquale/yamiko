@@ -43,7 +43,6 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 		  var bestFitness:Double=0;
 		  
 		  var bestInd:Individual[T]=null
-		  val cache=new HashMap[T,Double]()
     
 			val bcMA:Broadcast[MorphogenesisAgent[T]]=sc.broadcast(parameter.getMorphogenesisAgent()); 
 			val bcG:Broadcast[Genome[T]]=sc.broadcast(parameter.getGenome());
@@ -62,7 +61,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 	       ).collect()
 
 	      popTrabajo.par.foreach(i=>i.setFitness(parameter.getFitnessEvaluator().execute(i)))         
-	      popTrabajo.foreach(i=>cache.put(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(), i.getFitness()))
+	      popTrabajo.foreach(i=>parameter.getCacheManager().put(i, i.getFitness()))
 	      val descendants=new ListBuffer[Individual[T]]
     		
     	  parameter.getPopulationInstance().replacePopulation(popTrabajo.toList)
@@ -74,7 +73,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 				descendants.par.foreach(d=>if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d))
 
 	      descendants.foreach(i=>{
-	        val d=cache.get(i.getGenotype().getChromosomes()(0).getFullRawRepresentation())
+	        val d=parameter.getCacheManager().get(i)
 	        if (!d.isEmpty)
 	          i.setFitness(d.get)
 	      })
@@ -83,7 +82,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 	          if (i.getFitness()==0d) bcMA.value.develop(bcG.value,i)       
 		        i}).collect().toList
 
-	      descendantsF.foreach(i=>cache.put(i.getGenotype().getChromosomes()(0).getFullRawRepresentation(), i.getFitness()))
+	      descendantsF.foreach(i=>parameter.getCacheManager().put(i, i.getFitness()))
 		        
 	      val realDescentans=(descendantsF ++ popTrabajo).sortBy(_.getFitness).reverse.take(popTrabajo.size)
 
@@ -99,11 +98,12 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 				parameter.getPopulationInstance().getAll().filter(i=>i.getFitness()>parameter.getThreshold()).foreach(f=>
 				  {  
 				    Logger.getLogger("file").warn("Generación " + generationNumber + " - Individuo de interés => "+f.getFitness() + " - " + f.getGenotype().getChromosomes()(0).getFullRawRepresentation() )
-				    interest.add(f)
+				    if (interest.filter(pp=>math.abs(pp.getFitness()-f.getFitness())<0.000001).size==0) interest.add(f)
 			    }    
 				)
 				
 				Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms")
+				Logger.getLogger("file").warn("Generación " + generationNumber + " - Tamaño del cache = " + parameter.getCacheManager().size())
 			}
 
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");

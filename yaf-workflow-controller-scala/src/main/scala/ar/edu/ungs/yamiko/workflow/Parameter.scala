@@ -9,6 +9,7 @@ import ar.edu.ungs.yamiko.ga.operators.Selector
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
 import ar.edu.ungs.yamiko.ga.domain.Genome
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.CacheManager
 
 @SerialVersionUID(1L)
 class Parameter[T](mutationProbability:Double,
@@ -29,7 +30,8 @@ class Parameter[T](mutationProbability:Double,
                     migrationRatio:Double ,
                     maxTimeIsolatedMs:Int,
                     dataParameter:DataParameter[T],
-                    threshold:Double=Double.MaxValue
+                    threshold:Double=Double.MaxValue,
+                    cacheManager:CacheManager[T]=null
                     ) extends Serializable{
   
   def getMutationProbability():Double=mutationProbability
@@ -51,5 +53,6 @@ class Parameter[T](mutationProbability:Double,
   def getMaxTimeIsolatedMs():Int=maxTimeIsolatedMs
   def getDataParameter()=dataParameter
   def getThreshold():Double=threshold
+  def getCacheManager()=cacheManager
   
 }
