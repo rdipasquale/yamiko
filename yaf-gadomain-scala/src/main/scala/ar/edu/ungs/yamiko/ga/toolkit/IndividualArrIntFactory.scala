@@ -15,4 +15,6 @@ object IndividualArrIntFactory {
       lastId+=1
 		  new BasicIndividual[Array[Int]](new BasicGenotype[Array[Int]](List[Chromosome[Array[Int]]](new BasicChromosome[Array[Int]](name,numeros,numeros.size))),lastId)
   }
+  
+ 
 }

@@ -106,10 +106,14 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 				
 				Logger.getLogger("file").warn("Generación " + generationNumber + " - Mejor Elemento total " + bestInd.getFitness + " tiempo por generación=" + (System.currentTimeMillis()-t1) + "ms")
 				Logger.getLogger("file").warn("Generación " + generationNumber + " - Tamaño del cache = " + parameter.getCacheManager().size())
+
+  			val impr=convergenteAnalysis.analysisCSV(parameter.getPopulationInstance().getAll())
+  			Logger.getLogger("profiler").info(impr)
+        parameter.getPopulationInstance().getAll().foreach(i=>Logger.getLogger("poblaciones").info(generationNumber + "; "+i.getId()+ ";" + i.toStringRepresentation))
+  			
+			
 			}
 
-			val impr=convergenteAnalysis.analysisCSV(parameter.getPopulationInstance().getAll())
-			Logger.getLogger("profiler").info(impr)
 			
 			
 			Logger.getLogger("file").info("... Cumplidas " + generationNumber + " Generaciones.");

@@ -38,8 +38,8 @@ object ParameterTuningGBM extends App {
       val CANT_PARAMETROS=10
       val PARQUE="MANAEO"
       val SEED=1000
-	    val INDIVIDUALS=160    
-	    val MAX_GENERATIONS=200     
+	    val INDIVIDUALS=80    
+	    val MAX_GENERATIONS=100     
 	    val MAX_FITNESS=99999900d
 	    val THRESHOLD_INT=80000000d
 
@@ -81,7 +81,7 @@ object ParameterTuningGBM extends App {
 
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
-					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(8), 
+					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(INDIVIDUALS/10), 
 					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager())
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    

@@ -8,6 +8,7 @@ import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.Phenotype
 import ar.edu.ungs.yamiko.ga.domain.Chromosome
 import ar.edu.ungs.yamiko.ga.domain.Phenotype
+import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 
 
 
@@ -27,7 +28,9 @@ class BasicIndividual[T](genotype:Genotype[T],id:Int) extends Individual[T]{
 	override def getIntAttachment():List[Int]=intAttachment
 	override def setIntAttachment(a:List[Int])=intAttachment=a
 
-	override def toString = "BasicIndividual [id=" + id + ", fitness=" + fitness + "]";
+	override def toString = "BasicIndividual [id=" + id + ", fitness=" + fitness + "]"
+	override def toStringRepresentation = if  (this.getGenotype().getChromosomes()(0).getFullRawRepresentation().isInstanceOf[Array[Int]]) IntArrayHelper.toStringIntArray(this.getGenotype().getChromosomes()(0).getFullRawRepresentation().asInstanceOf[Array[Int]])  else this.getGenotype().getChromosomes()(0).getFullRawRepresentation().toString()  
+
 		
 	
   def canEqual(a: Any) = a.isInstanceOf[BasicIndividual[T]]

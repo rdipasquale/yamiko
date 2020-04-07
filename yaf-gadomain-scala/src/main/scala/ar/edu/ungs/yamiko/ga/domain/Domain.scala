@@ -184,6 +184,7 @@ trait Individual[T]  extends Serializable{
 	def getGenotype():Genotype[T]
 	def getIntAttachment():List[Int]
 	def setIntAttachment(a:List[Int])
+	def toStringRepresentation:String 
 }
 
 
