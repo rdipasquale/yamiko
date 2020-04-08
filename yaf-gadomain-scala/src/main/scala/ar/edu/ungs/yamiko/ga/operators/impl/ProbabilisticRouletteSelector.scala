@@ -10,11 +10,15 @@ import scala.util.Random
  */
 @SerialVersionUID(129L)
 class ProbabilisticRouletteSelector[T] extends Selector[T] {
-
- val DEFAULT_FACTOR=10000d
- def execute(p:Population[T]):Individual[T]=null
  
- def executeN(n:Int,p:Population[T]):List[Individual[T]] =
+ private var k=10000
+ 
+ override def getIntParameter=k
+ override def setIntParameter(par:Int)={k=par}
+ val DEFAULT_FACTOR=k.toDouble
+ override def execute(p:Population[T]):Individual[T]=null
+ 
+ override def executeN(n:Int,p:Population[T]):List[Individual[T]] =
  {
    val iNil:Individual[T]=null
    

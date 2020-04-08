@@ -35,14 +35,15 @@ object ParameterTuningGBM extends App {
   override def main(args : Array[String]) {
       val log=Logger.getLogger("file")
       val DATA_PATH="/datos/kubernetes/gbm"
-      val CANT_PARAMETROS=10
       val PARQUE="MANAEO"
       val SEED=1000
 	    val INDIVIDUALS=80    
 	    val MAX_GENERATIONS=100     
 	    val MAX_FITNESS=99999900d
 	    val THRESHOLD_INT=80000000d
-
+	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
+      val CANT_PARAMETROS=parametrizacionTemplate.parametrosOrdenados.size
+      
       println("Empieza en " + System.currentTimeMillis())      
       val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
       val sc:SparkContext=new SparkContext(conf)
@@ -52,7 +53,7 @@ object ParameterTuningGBM extends App {
  			val gene:Gene=new BasicGene("Gen unico", 0, CANT_PARAMETROS)
 			val ribosome:Ribosome[Array[Int]]=new ByPassRibosome()      
       val chromosomeName="X"
-	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
+
       val popI =new TuningGBMRandomPopulationInitializer(parametrizacionTemplate);
       
 	    val rma=new TuningGBMMorphogenesisAgent(DATA_PATH, PARQUE,SEED);
@@ -81,7 +82,7 @@ object ParameterTuningGBM extends App {
 
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
-					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(INDIVIDUALS/10), 
+					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(INDIVIDUALS/20), 
 					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager())
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    

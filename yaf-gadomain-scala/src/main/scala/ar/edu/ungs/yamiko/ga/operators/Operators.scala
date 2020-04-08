@@ -167,6 +167,7 @@ trait Selector[T] extends Serializable {
 	 * @return
 	 */
 	def executeN(n:Int, p:Population[T]):List[Individual[T]]
-	
+	def getIntParameter():Int
+	def setIntParameter(par:Int)
 	
 }

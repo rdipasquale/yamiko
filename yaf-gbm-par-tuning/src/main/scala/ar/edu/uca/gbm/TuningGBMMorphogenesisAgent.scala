@@ -32,7 +32,8 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 		val phenotype=new BasicPhenotype[Array[Int]]( chromosome , alleles);
 		
     val proceso="r"+ind.getId().toString()
-    val command="python3 " + pathbase + "/trainingLightGBMParam.py " + pathbase + "/ "+proceso+" " + iparque + " gbdt " + seed + " " + alleles.get(g).get.toString() //" 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 "
+    //val command="python3 " + pathbase + "/trainingLightGBMParam.py " + pathbase + "/ "+proceso+" " + iparque + " gbdt " + seed + " " + alleles.get(g).get.toString() //" 31 20 0.1 0.0 0.0 1.0 1.0 0 100 5 "
+    val command="python3 " + pathbase + "/trainingLightGBMParam.py " + pathbase + "/ "+proceso+" " + iparque + " gbdt " + seed + " " + alleles.get(g).get.parametrosOrdenados.slice(0,alleles.get(g).get.parametrosOrdenados.size-1).map(f=>f.toString()).mkString(" ") +" " + alleles.get(g).get.numIterations +" "+alleles.get(g).get.parametrosOrdenados.slice(alleles.get(g).get.parametrosOrdenados.size-1,alleles.get(g).get.parametrosOrdenados.size).map(f=>f.toString()).mkString(" ")
     val result:Int=(command !)            
     val filename = pathbase + "/" + proceso + "_" + iparque + "_errores.csv"
     var mae:Double=Double.MaxValue
@@ -42,7 +43,7 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 		ind.setPhenotype(phenotype);
     
     // TRack salida            
-    val pw = new PrintWriter(new File(pathbase + "/ "+proceso+"_salidaMA.log"))
+    val pw = new PrintWriter(new File(pathbase + "/"+proceso+"_salidaMA.log"))
     pw.write(command)
     pw.write("\n")    
     pw.write("MAE="+mae+"\n")
@@ -63,8 +64,9 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 	  salida.featureFraction.setValue(allele(5).toDouble/100)
 	  salida.bagginFraction.setValue(allele(6).toDouble/100)
 	  salida.bagginFreq.setValue(allele(7))
-	  salida.numIterations.setValue(allele(8))
-	  salida.nFolds.setValue(allele(9))
+	  salida.nFolds.setValue(allele(8))
+//	  salida.numIterations.setValue(allele(8))
+//	  salida.nFolds.setValue(allele(9))
 	  salida
 
     //pathbase           = sys.argv[1]         # Path donde estan todos los archivos

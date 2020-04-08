@@ -109,7 +109,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 
   			val impr=convergenteAnalysis.analysisCSV(parameter.getPopulationInstance().getAll())
   			Logger.getLogger("profiler").info(impr)
-        parameter.getPopulationInstance().getAll().foreach(i=>Logger.getLogger("poblaciones").info(generationNumber + "; "+i.getId()+ ";" + i.toStringRepresentation))
+        parameter.getPopulationInstance().getAll().foreach(i=>Logger.getLogger("poblaciones").info(generationNumber + ", "+i.getId()+ "," + i.toStringRepresentation+","+i.getFitness().longValue()))
   			
 			
 			}

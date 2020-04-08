@@ -98,14 +98,15 @@ class ParametrizacionGBM(pathbase:String, experimento:String, iparque:String,see
   //#                                         # Aliases:  num_iteration, n_iter, num_tree, num_trees,num_round, num_rounds, num_boost_round,
   //#                                         #           n_estimators 
   //#                                         # Constraints: >= 0   
-  val numIterations=new ParametroGBMCuantInt("p_num_iteration",100,100,1000)
+  val numIterations=new ParametroGBMCuantInt("p_num_iteration",1000,100,1000)
 
   //nfolds             = int(sys.argv[15])   # Numero de "folds" para Cross Validation. 
   //                                         # Numero grande tiende a LOOUT (mayor BIAS), valor bajo aumenta varianza- 
   //                                         # Valores tradicionales: entre 5 y 10 esta ok  
   val nFolds=new ParametroGBMCuantInt("nfolds",5,5,10)
   
-  val parametrosOrdenados=List(numLeaves,minDataInLeaf,learningRate,lambdaL1,lambdaL2,featureFraction,bagginFraction,bagginFreq,numIterations,nFolds)
+  //val parametrosOrdenados=List(numLeaves,minDataInLeaf,learningRate,lambdaL1,lambdaL2,featureFraction,bagginFraction,bagginFreq,numIterations,nFolds)
+  val parametrosOrdenados=List(numLeaves,minDataInLeaf,learningRate,lambdaL1,lambdaL2,featureFraction,bagginFraction,bagginFreq,nFolds)
   
   override def toString:String={
     val sb=new StringBuffer()

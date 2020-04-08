@@ -12,12 +12,15 @@ import scala.collection.mutable.ListBuffer
  * Se acumulan los campeones hasta llegar a la cantidad deseada de individuos.
  */
 @SerialVersionUID(1L)
-class TournamentSelector[T](k:Int) extends Selector[T] {
-
- private val r=Random
+class TournamentSelector[T](_k:Int) extends Selector[T] {
+ private var k=_k
  
- def execute(p:Population[T]):Individual[T]=null
- def executeN(n:Int,p:Population[T]):List[Individual[T]] =
+ override def getIntParameter=k
+ override def setIntParameter(par:Int)={k=par}
+ override def execute(p:Population[T]):Individual[T]=null
+ private val r=Random
+
+ override def executeN(n:Int,p:Population[T]):List[Individual[T]] =
  {
    val salida=ListBuffer[Individual[T]]()
    while (salida.size<n)
