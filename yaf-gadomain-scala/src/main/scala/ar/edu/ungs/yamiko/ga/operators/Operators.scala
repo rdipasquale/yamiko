@@ -3,6 +3,8 @@ package ar.edu.ungs.yamiko.ga.operators
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.domain.Population
 import ar.edu.ungs.yamiko.ga.domain.Genome
+import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
+import scala.collection.mutable.Map
 
 /**
  * Operador de Aceptación de Individuos a la Población.
@@ -152,7 +154,7 @@ trait PopulationInitializer[T] extends Serializable {
  * <br>Fecha Primera Version:  08-Oct-2013 11:41:32 p.m.
  * @author ricardo
  */
-@SerialVersionUID(12013L)
+@SerialVersionUID(1L)
 trait Selector[T] extends Serializable {
 
 	/**
@@ -171,3 +173,33 @@ trait Selector[T] extends Serializable {
 	def setIntParameter(par:Int)
 	
 }
+
+/**
+ * Evaluador stateful de estrategia evolutiva.
+ * Es stateful porque mantiene estado de cada generacion para tomar decisiones en el proceso evolutivo.
+ */
+@SerialVersionUID(1L)
+trait EvolutiveStrategy[T] extends Serializable {
+
+	/**
+	 * Agrega una generacion al Selecciona un individuo de una población.
+	 * @return
+	*/
+  def addGeneration(generation:Int,p:Population[T],ca:ConvergenceAnalysis[T])
+  
+  /**
+   * Decide si aplicar cambios a la probabilidad de mutacion.
+   */
+	def changeMutationProbability(generation:Int,mutProb:Double):Double
+
+  /**
+   * Decide si aplicar cambios a la probabilidad de mutacion.
+   */
+	def changeSelectorParameters(generation:Int,selector:Selector[T])
+	def getMinFitnesMap():Map[Int,Double]
+  def getMaxFitnesMap():Map[Int,Double]
+  def getAvgFitnesMap():Map[Int,Double]
+  def getRepeatedMap():Map[Int,Double]
+	
+}
+
