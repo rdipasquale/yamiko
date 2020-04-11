@@ -26,6 +26,9 @@ import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.ArrayIntCacheManager
 import ar.edu.ungs.yamiko.ga.domain.Individual
 import ar.edu.ungs.yamiko.ga.tools.IndArrayIntAdapter
 import ar.edu.ungs.yamiko.ga.tools.DeserializerIndArrayInt
+import ar.edu.ungs.yamiko.workflow.parallel.spark.scala.SparkParallelDevelopGA
+import ar.edu.ungs.yamiko.ga.operators.impl.EvolStrategyTournamentAndMutation
+import ar.edu.ungs.yamiko.ga.operators.impl.Descendant1ChildAtLeastEvaluator
 
 /**
  * Optimiza los parametros del modelo basado en arboles de decision GBM
@@ -37,10 +40,10 @@ object ParameterTuningGBM extends App {
       val DATA_PATH="/datos/kubernetes/gbm"
       val PARQUE="MANAEO"
       val SEED=1000
-	    val INDIVIDUALS=80    
+	    val INDIVIDUALS=80   
 	    val MAX_GENERATIONS=100     
 	    val MAX_FITNESS=99999900d
-	    val THRESHOLD_INT=80000000d
+	    val THRESHOLD_INT=80100000d
 	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
       val CANT_PARAMETROS=parametrizacionTemplate.parametrosOrdenados.size
       
@@ -63,7 +66,7 @@ object ParameterTuningGBM extends App {
       
 	    val fit= new TuningGBMFitnessEvaluator()
 			val cross=new TuningGBMOnePointCrossover()	    
-			val acceptEvaluator:AcceptEvaluator[Array[Int]] =new DescendantModifiedAcceptLigthEvaluator()	    
+			val acceptEvaluator:AcceptEvaluator[Array[Int]] =new Descendant1ChildAtLeastEvaluator()	    
 	    
 			val pop=new DistributedPopulation[Array[Int]](genome,INDIVIDUALS);
 	    popI.execute(pop)
@@ -83,7 +86,7 @@ object ParameterTuningGBM extends App {
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
 					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(INDIVIDUALS/20), 
-					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager())
+					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager(),new EvolStrategyTournamentAndMutation[Array[Int]]())
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    
 
@@ -119,6 +122,7 @@ object ParameterTuningGBM extends App {
 			  cont+=1
 			  log.warn("Winner -> Individuos de interes: Fitness=" + i.getFitness() + " - " + IntArrayHelper.toStringIntArray(i.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
 			} }
+			
 			
 			
 	    sc.stop()

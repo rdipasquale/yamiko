@@ -10,21 +10,14 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import ar.edu.ungs.yamiko.ga.domain.Genome
 import ar.edu.ungs.yamiko.ga.domain.Individual
-import ar.edu.ungs.yamiko.ga.domain.impl.DistributedPopulation
 import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
-import ar.edu.ungs.yamiko.ga.operators.AcceptEvaluator
-import ar.edu.ungs.yamiko.ga.operators.Crossover
-import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
 import ar.edu.ungs.yamiko.ga.operators.MorphogenesisAgent
-import ar.edu.ungs.yamiko.ga.operators.Mutator
-import ar.edu.ungs.yamiko.ga.operators.PopulationInitializer
 import ar.edu.ungs.yamiko.workflow.BestIndHolder
 import ar.edu.ungs.yamiko.workflow.Parameter
-import ar.edu.ungs.yamiko.workflow.RestDataParameter
-import ar.edu.ungs.yamiko.toolkit.RestClient
-import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
+import ar.edu.ungs.yamiko.ga.exceptions.YamikoException
 
 class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   
@@ -43,6 +36,7 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
       ParameterValidator.validateParameters(parameter);
     	var generationNumber=0;
 		  var bestFitness:Double=0;
+		  var mutProb=parameter.getMutationProbability()
 		  
 		  var bestInd:Individual[T]=null
     
@@ -70,9 +64,9 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 	      val candidates:List[Individual[T]]=(parameter.getSelector().executeN((popTrabajo.size).intValue(),parameter.getPopulationInstance())).asInstanceOf[List[Individual[T]]];
 				val tuplasSer=candidates.sliding(1, 2).flatten.toList zip candidates.drop(1).sliding(1, 2).flatten.toList
 
-				for (t <- tuplasSer) descendants++=parameter.getCrossover().execute(List(t._1,t._2))
+				for (t <- tuplasSer) descendants++=parameter.getAcceptEvaluator().execute(parameter.getCrossover().execute(List(t._1,t._2)), List(t._1,t._2)) 
 				
-				descendants.par.foreach(d=>if (r.nextDouble()<=parameter.getMutationProbability()) parameter.getMutator().execute(d))
+				descendants.par.foreach(d=>if (r.nextDouble()<=mutProb) parameter.getMutator().execute(d))
 
 	      descendants.foreach(i=>{
 	        val d=parameter.getCacheManager().get(i)
@@ -86,7 +80,8 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 
 	      descendantsF.foreach(i=>parameter.getCacheManager().put(i, i.getFitness()))
 		        
-	      val realDescentans=(descendantsF ++ popTrabajo).sortBy(_.getFitness).reverse.take(popTrabajo.size)
+	      //val realDescentans=(descendantsF ++ popTrabajo).sortBy(_.getFitness).reverse.take(popTrabajo.size)
+	      val realDescentans=(descendantsF).sortBy(_.getFitness).reverse.take(popTrabajo.size)
 
 	      val bestOfGeneration=realDescentans.take(1)(0)     
 	      bestIndHolder.holdBestInd(bestOfGeneration)
@@ -110,7 +105,18 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
   			val impr=convergenteAnalysis.analysisCSV(parameter.getPopulationInstance().getAll())
   			Logger.getLogger("profiler").info(impr)
         parameter.getPopulationInstance().getAll().foreach(i=>Logger.getLogger("poblaciones").info(generationNumber + ", "+i.getId()+ "," + i.toStringRepresentation+","+i.getFitness().longValue()))
-  			
+ 
+        if (parameter.getEvolutiveStrategy()!=null)
+        {
+          parameter.getEvolutiveStrategy().addGeneration(generationNumber, parameter.getPopulationInstance(), convergenteAnalysis)
+          val newMutProb=parameter.getEvolutiveStrategy().changeMutationProbability(generationNumber, mutProb)
+          if (newMutProb!=mutProb)
+          {
+            Logger.getLogger("file").warn("Generación " + generationNumber + " - Se ajusta la probabilidad de mutacion a " + newMutProb)
+            mutProb=newMutProb
+          }
+          parameter.getEvolutiveStrategy().changeSelectorParameters(generationNumber, parameter.getSelector())
+        }
 			
 			}
 
