@@ -41,13 +41,14 @@ object ParameterTuningGBM extends App {
       val PARQUE="MANAEO"
       val SEED=1000
 	    val INDIVIDUALS=80   
-	    val MAX_GENERATIONS=100     
+	    val MAX_GENERATIONS=200     
 	    val MAX_FITNESS=99999900d
 	    val THRESHOLD_INT=80100000d
 	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
       val CANT_PARAMETROS=parametrizacionTemplate.parametrosOrdenados.size
       
       println("Empieza en " + System.currentTimeMillis())      
+      val evolStrat=new EvolStrategyTournamentAndMutation[Array[Int]]()
       val conf=new SparkConf().setMaster("local[1]").setAppName("gbm-par-tuning")
       val sc:SparkContext=new SparkContext(conf)
 //      val spark = SparkSession.builder.appName("gbm-par-tuning").getOrCreate() 
@@ -83,10 +84,11 @@ object ParameterTuningGBM extends App {
 //	    // El mejor que encontre
 //	    pop.replaceIndividual(pop.getAll()(3), IndividualArrIntFactory.create(chromosomeName, Array[Int](27,33,44,81,73,97,86,0,999,9)))
 
+	    
 	    val par:Parameter[Array[Int]]=	new Parameter[Array[Int]](0.05d, 1d, INDIVIDUALS, acceptEvaluator, 
 					fit, cross, new TuningGBMMutator(parametrizacionTemplate), 
 					popI.asInstanceOf[PopulationInitializer[Array[Int]]], new TournamentSelector(INDIVIDUALS/20), 
-					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager(),new EvolStrategyTournamentAndMutation[Array[Int]]())
+					pop, MAX_GENERATIONS, MAX_FITNESS,rma,genome,0,0d,0,null,THRESHOLD_INT,new ArrayIntCacheManager(),evolStrat)
 
 	    val ga=new SparkParallelDevelopGA[Array[Int]](par)	    
 
@@ -123,8 +125,13 @@ object ParameterTuningGBM extends App {
 			  log.warn("Winner -> Individuos de interes: Fitness=" + i.getFitness() + " - " + IntArrayHelper.toStringIntArray(i.getGenotype().getChromosomes()(0).getFullRawRepresentation()));
 			} }
 			
-			
-			
+			evolStrat.getMaxFitnesMap().keys.foreach(f=>Logger.getLogger("stats").info(f
+			    +","+evolStrat.getMaxFitnesMap().get(f).get.toString().replace(",", ".")
+			    +","+evolStrat.getMinFitnesMap().get(f).get.toString().replace(",", ".")
+			    +","+evolStrat.getAvgFitnesMap().get(f).get.toString().replace(",", ".")
+			    +","+evolStrat.getRepeatedMap().get(f).get.toString().replace(",", ".")
+			    )
+			)
 	    sc.stop()
       println("Termina en " + System.currentTimeMillis())      
 
