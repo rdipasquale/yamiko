@@ -40,10 +40,10 @@ object ParameterTuningGBM extends App {
       val DATA_PATH="/datos/kubernetes/gbm"
       val PARQUE="MANAEO"
       val SEED=1000
-	    val INDIVIDUALS=80   
+	    val INDIVIDUALS=100   
 	    val MAX_GENERATIONS=200     
 	    val MAX_FITNESS=99999900d
-	    val THRESHOLD_INT=80100000d
+	    val THRESHOLD_INT=80200000d
 	    val parametrizacionTemplate=new ParametrizacionGBM(DATA_PATH, "",PARQUE,SEED)
       val CANT_PARAMETROS=parametrizacionTemplate.parametrosOrdenados.size
       

@@ -39,21 +39,23 @@ class TuningGBMMutator(template:ParametrizacionGBM) extends Mutator[Array[Int]] 
 		  
 		if (incrementar)
 		{
-		  val gap=max-array(pos)
+		  var gap=max-array(pos)
 		  if(gap<0)
 		  {
 		    println("Individuo " + ind.getId() + " - " + ind.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 		    println("pos " + pos + "max " + max + "array(pos) " + array(pos))
+		    gap=1
 		  }
 		  reemplazo(pos)=reemplazo(pos)+r.nextInt(gap)+1
 		}
 		else
 		{
-		  val gap=array(pos)-min
+		  var gap=array(pos)-min
 		  if(gap<0)
 		  {
 		    println("Individuo " + ind.getId() + " - " + ind.getGenotype().getChromosomes()(0).getFullRawRepresentation())
 		    println("pos " + pos + "max " + max + "array(pos) " + array(pos))
+		    gap=1
 		  }
 		  reemplazo(pos)=reemplazo(pos)-r.nextInt(gap)-1		  
 		}
