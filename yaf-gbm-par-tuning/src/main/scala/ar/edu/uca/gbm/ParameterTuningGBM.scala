@@ -38,7 +38,8 @@ object ParameterTuningGBM extends App {
   override def main(args : Array[String]) {
       val log=Logger.getLogger("file")
       val DATA_PATH="/datos/kubernetes/gbm"
-      val PARQUE="MANAEO"
+      //val PARQUE="MANAEO"
+      val PARQUE="ACHIEO"
       val SEED=1000
 	    val INDIVIDUALS=100   
 	    val MAX_GENERATIONS=200     

@@ -90,8 +90,28 @@ class SparkParallelDevelopGA[T] (parameter: Parameter[T]) extends Serializable{
 					bestFitness=bestOfGeneration.getFitness();
 					bestInd=bestOfGeneration;					
 				}
-				parameter.getPopulationInstance().replacePopulation(realDescentans)
-
+				
+				if (realDescentans.contains(bestInd))
+				  parameter.getPopulationInstance().replacePopulation(realDescentans)
+				else
+				{
+				  val rDA=(realDescentans).sortBy(_.getFitness).drop(1)++List(bestInd)
+				  parameter.getPopulationInstance().replacePopulation(rDA)
+				}				
+				
+				// Prueba
+				if (parameter.getPopulationInstance().getAll().count(ii=>ii.getFitness()==0d)>0)
+				{
+				  Logger.getLogger("file").warn("Generación " + generationNumber + " - Individuos con fitness 0!!!" )
+				  parameter.getPopulationInstance().replacePopulation(
+				      sc.parallelize(parameter.getPopulationInstance().getAll()).map(i=>{
+	              if (i.getFitness()==0d) bcMA.value.develop(bcG.value,i)       
+		              i}).collect().toList
+		           )
+		      
+          if (parameter.getPopulationInstance().getAll().count(ii=>ii.getFitness()==0d)>0) Logger.getLogger("file").warn("Generación " + generationNumber + " - Sigue habiendo Individuos con fitness 0!!!" )		           
+				}
+				
 				parameter.getPopulationInstance().getAll().filter(i=>i.getFitness()>parameter.getThreshold()).foreach(f=>
 				  {  
 				    Logger.getLogger("file").warn("Generación " + generationNumber + " - Individuo de interés => "+f.getFitness() + " - " + f.getGenotype().getChromosomes()(0).getFullRawRepresentation() )

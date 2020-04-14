@@ -43,12 +43,12 @@ class TuningGBMMorphogenesisAgent(pathbase:String, iparque:String,seed:Int) exte
 		ind.setPhenotype(phenotype);
     
     // TRack salida            
-    val pw = new PrintWriter(new File(pathbase + "/"+proceso+"_salidaMA.log"))
-    pw.write(command)
-    pw.write("\n")    
-    pw.write("MAE="+mae+"\n")
-    pw.write(par.toStringRepresentation)
-    pw.close
+//    val pw = new PrintWriter(new File(pathbase + "/"+proceso+"_salidaMA.log"))
+//    pw.write(command)
+//    pw.write("\n")    
+//    pw.write("MAE="+mae+"\n")
+//    pw.write(par.toStringRepresentation)
+//    pw.close
     
 	}
 
