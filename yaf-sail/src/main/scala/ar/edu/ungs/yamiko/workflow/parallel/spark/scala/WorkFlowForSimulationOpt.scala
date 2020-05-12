@@ -33,6 +33,7 @@ import ar.edu.ungs.sail.exceptions.NotCompatibleIndividualException
 import ar.edu.ungs.yamiko.ga.tools.ConvergenceAnalysis
 import org.apache.log4j.Logger
 import ar.edu.ungs.sail.Cache
+import java.io.FileWriter
 
 /**
  * En esta clase se modela un workflow orientado a evaluar escenarios simulados. Es decir, donde el fitness del proceso del GA se evalua de manera
@@ -75,7 +76,9 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
   val convergenteAnalysis=new ConvergenceAnalysis[List[(Int,Int)]]()    
   def bestInds()=holder
   def finalPopulation()=_finalpop
-  
+  val CLASS_BUENO=0
+  val CLASS_REGULAR=1
+  val CLASS_MALO=2
   
  	var generation=0
 
@@ -228,6 +231,20 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
 	                   case ((sumL, countL), (sumR, countR)) =>  (sumL + sumR, countL + countR)
 	                }).mapValues({case (sum , count) => sum / count.toDouble }).sortBy(_._1).collect()
     
+	  // Genero salida para el entrenamiento para ML
+	  val fw = new FileWriter("/tmp/training.txt", true)
+    try {     
+      promedios.foreach(f=>
+        { 
+          var cont=1
+          var str=(if(10000d-f._2<250) CLASS_BUENO else if(10000d-f._2>300) CLASS_MALO else CLASS_REGULAR) + " " //1:" + notScientificFormatter.format(10000d-f._2)+ " "
+          po.getAll().filter(p=>p.getId()==f._1)(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().foreach(p=>{str=str+cont.toString()+":"+(p._1*dimension+p._2)+" ";cont+=1;})
+          fw.write( str +"\n") 
+        })
+    }
+    finally fw.close() 
+    	                
+	                
     // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking (inverso)	                	                
     // En el ranking del peor al mejor (comenzando en 0), hay |e| (escenarios) y |pob| individuos. Por tanto si sumamos los rankings inversos agrupando por individuos
 	  // vamos a repartir un total de |e||pob| puntos. El max que puede obtener cada individuo es (|pob|-1)|e|, por lo que si queremos que un individuo que haya

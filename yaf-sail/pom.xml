@@ -6,13 +6,7 @@
   <name>${project.artifactId}</name>
   <description>yaf-sail</description>
   <inceptionYear>2017</inceptionYear>
-  <licenses>
-    <license>
-      <name>My License</name>
-      <url>http://....</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -21,6 +15,7 @@
     <scala.version>2.11.11</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
     <hadoop.version>2.7.1</hadoop.version>    
+    <spark.version>2.4.5</spark.version>        
   </properties>
 
   <dependencies>
@@ -91,6 +86,12 @@
         <scope>test</scope>
 	</dependency>
 	
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-mllib_${scala.compat.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>provided</scope>
+    </dependency>	        
 
   </dependencies>
 

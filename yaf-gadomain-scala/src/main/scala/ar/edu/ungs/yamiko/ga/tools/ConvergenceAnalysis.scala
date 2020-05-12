@@ -8,7 +8,10 @@ import ar.edu.ungs.yamiko.ga.toolkit.IntArrayHelper
 class ConvergenceAnalysis[T] extends Serializable{
 
   def getHistogram(l:List[Individual[T]])={
-    val salida=if  (l.isInstanceOf[List[Individual[Array[Int]]]]) l.groupBy(g=>IntArrayHelper.toStringIntArray(g.getGenotype().getChromosomes()(0).getFullRawRepresentation().asInstanceOf[Array[Int]])).mapValues(_.size) else l.groupBy(_.getGenotype().getChromosomes()(0).getFullRawRepresentation()).mapValues(_.size)
+//    if (l(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().isInstanceOf[Array[Int]])
+//      System.out.println("sss")
+
+    val salida=if  (l(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().isInstanceOf[Array[Int]]) l.groupBy(g=>IntArrayHelper.toStringIntArray(g.getGenotype().getChromosomes()(0).getFullRawRepresentation().asInstanceOf[Array[Int]])).mapValues(_.size) else l.groupBy(_.getGenotype().getChromosomes()(0).getFullRawRepresentation()).mapValues(_.size)
     salida.filter(p=>p._2>1)
   }
   
