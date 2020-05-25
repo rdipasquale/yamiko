@@ -14,11 +14,17 @@
     <encoding>UTF-8</encoding>
     <scala.version>2.11.11</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
-    <hadoop.version>2.7.1</hadoop.version>    
+    <hadoop.version>2.7.2</hadoop.version>    
     <spark.version>2.4.5</spark.version>        
   </properties>
 
   <dependencies>
+  
+	<dependency>
+	    <groupId>Azure</groupId>
+	    <artifactId>mmlspark</artifactId>
+	    <version>0.17</version>
+	</dependency>  
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
@@ -168,6 +174,15 @@
     </plugins>
 
   </build>
+  
+  <repositories>
+    <repository>
+      <id>xxx</id>
+      <name>xxx</name>
+      <url>https://dl.bintray.com/spark-packages/maven/</url>
+      <!-- https://mmlspark.azureedge.net/maven/ -->
+    </repository>
+  </repositories>
   
   <reporting>
     <plugins>

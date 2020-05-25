@@ -233,17 +233,25 @@ class WorkFlowForSimulationOpt(   pi:PopulationInitializer[List[(Int,Int)]],
     
 	  // Genero salida para el entrenamiento para ML
 	  val fw = new FileWriter("/tmp/training.txt", true)
+	  val fw2 = new FileWriter("/tmp/training2.txt", true)
     try {     
       promedios.foreach(f=>
         { 
+          var str=(if(10000d-f._2<355) CLASS_BUENO else if(10000d-f._2>420) CLASS_MALO else CLASS_REGULAR) + " " //1:" + notScientificFormatter.format(10000d-f._2)+ " "
+          var str2=(if(10000d-f._2<355) CLASS_BUENO else if(10000d-f._2>420) CLASS_MALO else CLASS_REGULAR) + " 0:" + notScientificFormatter.format(10000d-f._2)+ " "
           var cont=1
-          var str=(if(10000d-f._2<250) CLASS_BUENO else if(10000d-f._2>300) CLASS_MALO else CLASS_REGULAR) + " " //1:" + notScientificFormatter.format(10000d-f._2)+ " "
           po.getAll().filter(p=>p.getId()==f._1)(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().foreach(p=>{str=str+cont.toString()+":"+(p._1*dimension+p._2)+" ";cont+=1;})
-          fw.write( str +"\n") 
+          cont=1
+          po.getAll().filter(p=>p.getId()==f._1)(0).getGenotype().getChromosomes()(0).getFullRawRepresentation().foreach(p=>{str2=str2+cont.toString()+":"+(p._1*dimension+p._2)+" ";cont+=1;})
+          fw.write( str +"\n")
+          fw2.write( str2 +"\n")          
         })
     }
-    finally fw.close() 
-    	                
+    finally {
+      fw.close()
+      fw2.close()
+    }
+
 	                
     // Los ordeno y les pongo una etiqueta con el orden en la coleccion ordenada, para luego tomar el ranking (inverso)	                	                
     // En el ranking del peor al mejor (comenzando en 0), hay |e| (escenarios) y |pob| individuos. Por tanto si sumamos los rankings inversos agrupando por individuos

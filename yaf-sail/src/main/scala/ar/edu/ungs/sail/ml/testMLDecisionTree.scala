@@ -11,11 +11,11 @@ import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf
 
-object testML {
+object testMLDecisionTree {
   def main(args: Array[String]): Unit = {
     
     
-  	val URI_SPARK="local[1]"
+  	val URI_SPARK="local[4]"
     val conf=new SparkConf().setMaster(URI_SPARK)
     val spark = SparkSession
       .builder
@@ -24,7 +24,8 @@ object testML {
       .getOrCreate()
     
     // Load the data stored in LIBSVM format as a DataFrame.
-  val data = spark.read.format("libsvm").load("/tmp/training.txt")
+  //val data = spark.read.format("libsvm").load("/media/ricardo/hd1/Ricardo/UNGS/DSO2020/1/features3.csv")
+  val data = spark.read.format("libsvm").load("/media/ricardo/hd1/Ricardo/UNGS/DSO2020/2/training.txt")
   
   // Index labels, adding metadata to the label column.
   // Fit on whole dataset to include all labels in index.
@@ -36,7 +37,7 @@ object testML {
   val featureIndexer = new VectorIndexer()
     .setInputCol("features")
     .setOutputCol("indexedFeatures")
-    .setMaxCategories(4) // features with > 4 distinct values are treated as continuous.
+    .setMaxCategories(3) // features with > 4 distinct values are treated as continuous.
     .fit(data)
   
   // Split the data into training and test sets (30% held out for testing).

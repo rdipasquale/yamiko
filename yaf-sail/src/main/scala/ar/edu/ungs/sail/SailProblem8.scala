@@ -29,17 +29,17 @@ object SailProblem8 extends App {
   
    override def main(args : Array[String]) {
 
-    	val URI_SPARK="local[1]"
-      val MAX_GENERATIONS=100
-      val POPULATION_SIZE=10
+    	val URI_SPARK="local[8]"
+      val MAX_GENERATIONS=200
+      val POPULATION_SIZE=80
       val DIMENSION=8
       val NODOS_POR_CELDA=4
       val METROS_POR_CELDA=50
       val NODOS_MINIMO_PATH=9
       val CAMINO_MAXIMO=10
 
-      //val escenarios96=DeserializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt")      
-      val escenarios96=new EscenariosViento(Map(1->DeserializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt").getEscenarioById(1)))
+      val escenarios96=DeserializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt")      
+      //val escenarios96=new EscenariosViento(Map(1->DeserializadorEscenarios.run("./esc8x8/200_escenario8x8ConRachasNoUniformes.txt").getEscenarioById(1)))
       
       val t0=Deserializador.run("estadoInicialEscenario8x8.winds").asInstanceOf[scala.collection.immutable.Map[Int, List[EstadoEscenarioViento]]]          	
       val e=t0.get(0).get
