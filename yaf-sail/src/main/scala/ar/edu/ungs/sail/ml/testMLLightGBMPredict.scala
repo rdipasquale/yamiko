@@ -123,7 +123,7 @@ val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
 //184.2605832595686 - 1 - 0%
 //210.58347303606212 - 1 - 0%
 //236.9063628125556 - 3 - 0%
-//Sobre 1713 casos heldout  	
+//Sobre 1718 casos holdout  	
 //  sub.show(1000,false)
 //  
   println(scoredData.count())
