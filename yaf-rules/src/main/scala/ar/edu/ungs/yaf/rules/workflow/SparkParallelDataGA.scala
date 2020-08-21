@@ -28,7 +28,7 @@ import org.apache.spark.SparkContext
  * Este flujo es prácticamente serial, salvo que procesa datos de una RDD antes de la evaluación del fitness.
  * Especialmente pensada para el caso en el que se procese un problema de reglas de asociación binario.
  */
-class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
+class SparkParallelDataGA[T] (parameter: Parameter[T]) extends Serializable{
   
   private var _finalPop:List[Individual[T]] = null
   def finalPopulation:List[Individual[T]] = _finalPop 
@@ -41,7 +41,7 @@ class SerialGA[T] (parameter: Parameter[T]) extends Serializable{
   private val cacheUni=Map[Int,Int]()
   private val cacheDuo=Map[Int,Map[Int,Int]]()
   private var spark:SparkContext=null 
-  def setFileName(fn:SparkContext)={spark=fn}
+  def setSparkContext(fn:SparkContext)={spark=fn}
   
   @throws(classOf[YamikoException])
   def run():Individual[T] =

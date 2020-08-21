@@ -15,7 +15,7 @@ import ar.edu.ungs.yamiko.ga.operators.FitnessEvaluator
  * @author ricardo
  *
  */
-class CensusFitnessEvaluatorJMeasure() extends FitnessEvaluator[BitSet]{
+class JMeasureFitnessEvaluatorNoBin() extends FitnessEvaluator[BitSet]{
 
 	val W1=0.6
 	val W2=0.4
